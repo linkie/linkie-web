@@ -1,6 +1,7 @@
 plugins {
     id "org.jetbrains.kotlin.jvm" version "1.6.21"
     id "org.jetbrains.kotlin.plugin.serialization" version "1.6.21"
+    id "com.github.johnrengelman.shadow" version "7.0.0"
 }
 
 group = "me.shedaniel"
@@ -20,8 +21,14 @@ repositories {
     maven { url "https://maven.quiltmc.org/repository/release" }
 }
 
+configurations {
+    shadow {
+        extendsFrom(implementation)
+    }
+}
+
 dependencies {
-    implementation("me.shedaniel:linkie-core:1.0.96")
+    implementation("me.shedaniel:linkie-core:1.0.101")
     implementation("io.ktor:ktor-server-cors:2.0.1")
     implementation("io.ktor:ktor-server-content-negotiation:2.0.1")
     implementation("io.ktor:ktor-server-status-pages:2.0.1")
@@ -33,6 +40,24 @@ dependencies {
     implementation 'io.ktor:ktor-client-java-jvm:2.0.2'
     implementation 'io.ktor:ktor-client-core-jvm:2.0.2'
 }
+
+jar {
+    classifier "raw"
+}
+
+shadowJar {
+    configurations = [project.configurations.shadow]
+    classifier null
+    version null
+    mergeServiceFiles()
+    manifest {
+        attributes(
+                "Main-Class": "me.shedaniel.linkie.web.LinkieWebServerKt"
+        )
+    }
+}
+
+build.finalizedBy shadowJar
 
 compileKotlin {
     kotlinOptions.jvmTarget = '1.8'

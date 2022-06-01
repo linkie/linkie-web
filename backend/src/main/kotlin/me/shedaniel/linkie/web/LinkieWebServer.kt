@@ -24,7 +24,6 @@ import me.shedaniel.linkie.getMappedDesc
 import me.shedaniel.linkie.getObfMergedDesc
 import me.shedaniel.linkie.obfMergedName
 import me.shedaniel.linkie.utils.MemberEntry
-import me.shedaniel.linkie.utils.ResultHolder
 import me.shedaniel.linkie.utils.toVersion
 import me.shedaniel.linkie.utils.tryToVersion
 import me.shedaniel.linkie.web.deps.Deps
