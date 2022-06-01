@@ -1,0 +1,39 @@
+plugins {
+    id "org.jetbrains.kotlin.jvm" version "1.6.21"
+    id "org.jetbrains.kotlin.plugin.serialization" version "1.6.21"
+}
+
+group = "me.shedaniel"
+version = "1.0-SNAPSHOT"
+
+repositories {
+    mavenCentral()
+    maven { url "https://maven.fabricmc.net" }
+    maven {
+        url "https://jitpack.io"
+        content {
+            includeGroupByRegex "com(.\\w+)+"
+        }
+    }
+    maven { url "https://maven.shedaniel.me/" }
+    maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
+    maven { url "https://maven.quiltmc.org/repository/release" }
+}
+
+dependencies {
+    implementation("me.shedaniel:linkie-core:1.0.96")
+    implementation("io.ktor:ktor-server-cors:2.0.1")
+    implementation("io.ktor:ktor-server-content-negotiation:2.0.1")
+    implementation("io.ktor:ktor-server-status-pages:2.0.1")
+    implementation("io.ktor:ktor-client-content-negotiation:2.0.1")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:2.0.1")
+    implementation("io.github.pdvrieze.xmlutil:serialization-jvm:0.84.2")
+    implementation 'io.ktor:ktor-server-core-jvm:2.0.2'
+    implementation 'io.ktor:ktor-server-netty-jvm:2.0.2'
+    implementation 'io.ktor:ktor-client-java-jvm:2.0.2'
+    implementation 'io.ktor:ktor-client-core-jvm:2.0.2'
+}
+
+compileKotlin {
+    kotlinOptions.jvmTarget = '1.8'
+}

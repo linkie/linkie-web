@@ -1,0 +1,200 @@
+<template>
+    <Block>
+        <SubHeader :addPadding="false">
+            {{ getDisplayName(entry) }}
+            <div class="badge badge-sm ml-2" :class="{
+                    'badge-primary': entry.type === 'class',
+                    'badge-secondary': entry.type === 'field',
+                    'badge-accent': entry.type === 'method',
+                }">{{ entry.type }}
+            </div>
+        </SubHeader>
+        <div class="text-sm breadcrumbs" v-if="breadcrumbs.length > 1">
+            <ul>
+                <li v-for="breadcrumb in breadcrumbs">{{ breadcrumb }}</li>
+            </ul>
+        </div>
+        <div class="divider mt-0 mb-0"></div>
+        <EntryDetails v-if="entry.type === 'field' && namespace.supportsFieldDescription" title="Type:" :content="fieldType" :code="false"/>
+        <EntryDetails v-if="entry.type !== 'class' && namespace.supportsMixin" title="Mixin Target:" :content="mixinTarget"/>
+        <EntryDetails v-if="entry.type !== 'class' && namespace.supportsAT" title="AT:" :content="atText"/>
+        <EntryDetails v-if="entry.type !== 'class' && namespace.supportsAW" title="AW:" :content="awText"/>
+    </Block>
+</template>
+
+<script lang="ts">
+import {defineComponent, PropType} from "vue"
+import {MappingEntry, Namespace} from "../../routes/Mappings.vue"
+import Block from "../Block.vue"
+import Header from "../dependencies/Header.vue"
+import SubHeader from "../dependencies/SubHeader.vue"
+import EntryDetails from "./EntryDetails.vue"
+
+function getOptimumName(entry: MappingEntry): string {
+    return entry.named || entry.intermediary || ""
+}
+
+function getOptimumOwnerName(entry: MappingEntry): string {
+    return entry.ownerNamed || entry.ownerIntermediary || ""
+}
+
+function getOptimumDesc(entry: MappingEntry): string {
+    return entry.descNamed || entry.descIntermediary || ""
+}
+
+function formatName(str: string | undefined) {
+    if (str) {
+        return str.replaceAll("$", ".").replaceAll("/", ".")
+    } else {
+        return str
+    }
+}
+
+function onlyClass(str: string | undefined) {
+    if (str) {
+        let indexOf = str.lastIndexOf("/")
+        str = indexOf == -1 ? str : str.substring(indexOf + 1)
+        return formatName(str)
+    } else {
+        return str
+    }
+}
+
+function getObf(entry: MappingEntry) {
+    if (entry.type == "class") {
+        return formatName(entry.obf)
+    } else {
+        return `${formatName(entry.ownerObf)}.${onlyClass(entry.obf)}`
+    }
+}
+
+function getIntermediaryName(entry: MappingEntry) {
+    if (entry.type == "class") {
+        return formatName(entry.intermediary)
+    } else {
+        return `${formatName(entry.ownerIntermediary)}.${onlyClass(entry.intermediary)}`
+    }
+}
+
+function getDisplayName(entry: MappingEntry, simplify: boolean = true) {
+    if (simplify) {
+        if (entry.type == "class") {
+            return onlyClass(getOptimumName(entry))
+        } else {
+            return `${onlyClass(getOptimumOwnerName(entry))}.${onlyClass(getOptimumName(entry))}`
+        }
+    } else {
+        if (entry.type == "class") {
+            return formatName(getOptimumName(entry))
+        } else {
+            return `${formatName(getOptimumOwnerName(entry))}.${onlyClass(getOptimumName(entry))}`
+        }
+    }
+}
+
+function getBreadcrumbs(entry: MappingEntry) {
+    let breadcrumbs = [] as string[]
+    if (entry.obf) {
+        breadcrumbs.push(getObf(entry)!)
+    }
+    let intermediary = getIntermediaryName(entry)!
+    let named = getDisplayName(entry, false)!
+    breadcrumbs.push(intermediary)
+    if (intermediary !== named && named) {
+        breadcrumbs.push(named)
+    }
+    return breadcrumbs
+}
+
+function beautifyFieldType(type: string) {
+    if (!type) return type
+    let bracketLast = type.lastIndexOf("[")
+    let clear = bracketLast == -1 ? type : type.substring(bracketLast + 1)
+    let arrays = length - clear.length
+
+    let str = ""
+    if (clear.length > 0) {
+        if (clear.startsWith("L")) {
+            str += clear.substring(1, clear.length - 1).replaceAll("/", ".").replaceAll("$", ".")
+        } else {
+            switch (clear.at(0)) {
+                case "Z":
+                    str += "boolean"
+                    break
+                case "C":
+                    str += "char"
+                    break
+                case "B":
+                    str += "byte"
+                    break
+                case "S":
+                    str += "short"
+                    break
+                case "I":
+                    str += "int"
+                    break
+                case "F":
+                    str += "float"
+                    break
+                case "J":
+                    str += "long"
+                    break
+                case "D":
+                    str += "double"
+                    break
+            }
+        }
+    }
+
+    for (let i = 0; i < arrays; i++) {
+        str += "[]"
+    }
+
+    return str
+}
+
+export default defineComponent({
+    name: "MappingsEntryBlock",
+    components: {EntryDetails, SubHeader, Header, Block},
+    data() {
+        return {
+            getDisplayName,
+        }
+    },
+    computed: {
+        breadcrumbs() {
+            return getBreadcrumbs(this.entry)
+        },
+        mixinTarget() {
+            return `L${getOptimumOwnerName(this.entry)};${getOptimumName(this.entry)}${this.entry.type === "field" ? ":" : ""}${getOptimumDesc(this.entry)}`
+        },
+        atText() {
+            if (this.entry.type === "method") {
+                return `public ${getOptimumOwnerName(this.entry).replaceAll("/", ".")} ${this.entry.intermediary}${getOptimumDesc(this.entry)} # ${getOptimumName(this.entry)}`
+            } else {
+                return `public ${getOptimumOwnerName(this.entry).replaceAll("/", ".")} ${this.entry.intermediary} # ${getOptimumName(this.entry)}`
+            }
+        },
+        awText() {
+            return `accessible ${this.entry.type} ${getOptimumOwnerName(this.entry)} ${getOptimumName(this.entry)} ${getOptimumDesc(this.entry)}`
+        },
+        fieldType() {
+            let desc = getOptimumDesc(this.entry)
+            return beautifyFieldType(desc)
+        },
+    },
+    props: {
+        namespace: {
+            type: Object as PropType<Namespace | undefined>,
+            required: true,
+        },
+        entry: {
+            type: Object as PropType<MappingEntry>,
+            required: true,
+        },
+    },
+})
+</script>
+
+<style scoped>
+</style>
