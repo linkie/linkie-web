@@ -1,9 +1,9 @@
 <template>
     <div class="px-5 pt-6">
         <div class="card bg-base-100 shadow-xl rounded-lg overflow-x-auto">
-            <div class="flex">
-                <div class="px-4 whitespace-nowrap">
-                    Loader
+            <div class="flex flex-col md:flex-row">
+                <div class="px-4 whitespace-nowrap h-12">
+                    <span class="align-middle">Loader</span>
                     <select class="select capitalize font-light rounded-none w-52"
                             @change="loader = (($event.target as any)?.value?.toLowerCase() ?? loader)" :value="loader ?? ''">
                         <option disabled selected>Select mod loader</option>
@@ -13,8 +13,8 @@
                     </select>
                 </div>
 
-                <div class="px-4 whitespace-nowrap">
-                    Version
+                <div class="px-4 whitespace-nowrap h-12">
+                    <span class="align-middle">Version</span>
                     <select class="select capitalize font-light rounded-none w-52"
                             @change="version = (($event.target as any)?.value ?? version)" :value="version ?? ''">
                         <option disabled selected>Select version</option>
@@ -24,7 +24,7 @@
                     </select>
                 </div>
 
-                <div class="px-4 grow">
+                <div class="px-4 grow h-12">
                     <div class="flex flex-col flex-nowrap justify-center h-full whitespace-nowrap">
                         <div>
                             <span class="pr-2">Enable snapshots</span>
@@ -73,5 +73,9 @@ export default defineComponent({
 <style scoped>
 .checkbox {
     vertical-align: -0.1rem;
+}
+
+.select-label {
+    display: flex !important;
 }
 </style>

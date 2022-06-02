@@ -1,6 +1,6 @@
 <template>
-    <div class="flex justify-center">
-        <div v-if="Object.keys(searchData.versions).length !== 0" class="max-w-4xl">
+    <div class="max-w-4xl mx-auto">
+        <div v-if="Object.keys(searchData.versions).length !== 0">
             <DependencyFilterBlock :searchData="searchData"/>
 
             <Block>

@@ -1,14 +1,16 @@
 <template>
-    <div class="flex justify-center" v-if="mappingsData.namespaces.length !== 0">
-        <div class="pl-5 pt-6 w-72 min-w-[18rem]">
-            <div class="p-5 card bg-base-100 shadow-xl rounded-lg">
-                <MappingsFilterBlock :data="mappingsData"/>
+    <div class="max-w-[calc(56rem+var(--sidebar-width))] mx-auto">
+        <div v-if="mappingsData.namespaces.length !== 0" class="grid-setup">
+            <div class="col-[1] px-5 pt-6 sm:pr-0 sm:w-[var(--sidebar-width)] sm:min-w-[var(--sidebar-width)]">
+                <div class="p-5 card bg-base-100 shadow-xl rounded-lg">
+                    <MappingsFilterBlock :data="mappingsData"/>
+                </div>
             </div>
-        </div>
-        <div class="w-[56rem]">
-            <MappingsSearchBlock/>
-            <MappingsEntryBlock v-for="entry in infoData.entries" :namespace="mappingsData.namespaces.find(value => value.id === infoData.namespace)"
-                                :entry="entry"/>
+            <div class="col-[2/span_2] min-w-0">
+                <MappingsSearchBlock/>
+                <MappingsEntryBlock v-for="entry in infoData.entries" :namespace="mappingsData.namespaces.find(value => value.id === infoData.namespace)"
+                                    :entry="entry"/>
+            </div>
         </div>
     </div>
 </template>
@@ -247,5 +249,14 @@ export default defineComponent({
 </script>
 
 <style scoped>
+div {
+    --sidebar-width: 18rem;
+}
 
+@media (min-width: 640px) {
+    .grid-setup {
+        grid-template-columns: auto 0 minmax(0, calc(100% - var(--sidebar-width)));
+        @apply grid grid-flow-col;
+    }
+}
 </style>
