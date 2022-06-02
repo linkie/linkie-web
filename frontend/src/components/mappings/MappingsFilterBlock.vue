@@ -46,6 +46,17 @@
                 <span class="pl-2">Fields</span>
             </div>
         </div>
+
+        <div class="divider mt-0 mb-0"></div>
+        <SubHeader :add-padding="false" class="pb-2">Translate To</SubHeader>
+        <select class="select select-sm capitalize font-light p-0"
+                @change="translateAs = ($event.target as any)?.value === 'Do not translate' ? undefined : ($event.target as any)?.value?.toLowerCase()" :value="translateAs ?? 'Do not translate'">
+            <option disabled selected>Select namespace</option>
+            <option>Do not translate</option>
+            <option v-for="ns in namespaces" :disabled="ns.id === namespace">
+                {{ ns.id }}
+            </option>
+        </select>
     </div>
 </template>
 
@@ -61,18 +72,23 @@ export default defineComponent({
     name: "MappingsFilterBlock",
     components: {SubHeader},
     computed: {
-        ...mapWritableState(useMappingsStore, ["namespace", "version", "allowSnapshots", "allowClasses", "allowFields", "allowMethods"]),
+        ...mapWritableState(useMappingsStore, ["namespace", "version", "allowSnapshots", "allowClasses", "allowFields", "allowMethods", "translateAs"]),
         namespaces(): Namespace[] {
             return this.data.namespaces
         },
         applicableVersions(): string[] {
-            let {namespace, allowSnapshots} = useMappingsStore()
+            let {namespace, allowSnapshots, translateAs} = useMappingsStore()
             if (!namespace) return []
             let namespaceObj = this.data.namespaces.find(value => value.id === namespace)
             if (!namespaceObj) return []
             let versions = namespaceObj.versions
             if (versions && !allowSnapshots) {
               versions = versions.filter(entry => entry.stable)
+            }
+            if (versions && translateAs) {
+                let translateAsObj = this.data.namespaces.find(value => value.id === translateAs)
+                let retain = translateAsObj?.versions?.map(entry => entry.version) ?? []
+                versions = versions.filter(value => retain.includes(value.version))
             }
             return versions.map(entry => entry.version)
         },

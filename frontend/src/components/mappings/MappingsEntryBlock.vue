@@ -2,6 +2,7 @@
     <Block>
         <SubHeader :addPadding="false">
             {{ getDisplayName(entry) }}
+            <span v-if="entry.translatedTo"> > {{ getDisplayName(entry.translatedTo) }}</span>
             <div class="badge badge-sm ml-2" :class="{
                     'badge-primary': entry.type === 'class',
                     'badge-secondary': entry.type === 'field',
@@ -15,10 +16,20 @@
             </ul>
         </div>
         <div class="divider mt-0 mb-0"></div>
-        <EntryDetails v-if="entry.type === 'field' && namespace.supportsFieldDescription" title="Type:" :content="fieldType" :code="false"/>
-        <EntryDetails v-if="entry.type !== 'class' && namespace.supportsMixin" title="Mixin Target:" :content="mixinTarget"/>
-        <EntryDetails v-if="entry.type !== 'class' && namespace.supportsAT" title="AT:" :content="atText"/>
-        <EntryDetails v-if="entry.type !== 'class' && namespace.supportsAW" title="AW:" :content="awText"/>
+        <EntryDetails v-if="entry.type === 'field' && namespace.supportsFieldDescription" title="Type:" :content="fieldType(entry)" :code="false"/>
+        <EntryDetails v-if="entry.type !== 'class' && namespace.supportsMixin" title="Mixin Target:" :content="mixinTarget(entry)"/>
+        <EntryDetails v-if="namespace.supportsAT" title="AT:" :content="atText(entry)"/>
+        <EntryDetails v-if="namespace.supportsAW" title="AW:" :content="awText(entry)"/>
+
+        <div v-if="entry.translatedTo">
+            <div class="divider mt-0 mb-0"></div>
+            <EntryDetails v-if="entry.type === 'field' && translatedToNamespace.supportsFieldDescription" title="Type:" :content="fieldType(entry.translatedTo)"
+                          :code="false"/>
+            <EntryDetails v-if="entry.type !== 'class' && translatedToNamespace.supportsMixin" title="Mixin Target:"
+                          :content="mixinTarget(entry.translatedTo)"/>
+            <EntryDetails v-if="translatedToNamespace.supportsAT" title="AT:" :content="atText(entry.translatedTo)"/>
+            <EntryDetails v-if="translatedToNamespace.supportsAW" title="AW:" :content="awText(entry.translatedTo)"/>
+        </div>
     </Block>
 </template>
 
@@ -94,14 +105,39 @@ function getDisplayName(entry: MappingEntry, simplify: boolean = true) {
 
 function getBreadcrumbs(entry: MappingEntry) {
     let breadcrumbs = [] as string[]
-    if (entry.obf) {
-        breadcrumbs.push(getObf(entry)!)
-    }
-    let intermediary = getIntermediaryName(entry)!
-    let named = getDisplayName(entry, false)!
-    breadcrumbs.push(intermediary)
-    if (intermediary !== named && named) {
-        breadcrumbs.push(named)
+    if (!entry.translatedTo) {
+        if (entry.obf) {
+            breadcrumbs.push(getObf(entry)!)
+        }
+        let intermediary = getIntermediaryName(entry)!
+        let named = getDisplayName(entry, false)!
+        breadcrumbs.push(intermediary)
+        if (intermediary !== named && named) {
+            breadcrumbs.push(named)
+        }
+    } else {
+        let translatedTo = entry.translatedTo
+        let intermediary = getIntermediaryName(entry)!
+        let named = getDisplayName(entry, false)!
+        if (intermediary !== named && named) {
+            breadcrumbs.push(named)
+        }
+        breadcrumbs.push(intermediary)
+        let obf = entry.obf ? getObf(entry)! : undefined
+        let tObf = translatedTo.obf ? getObf(translatedTo)! : undefined
+        if (tObf != obf) {
+            if (obf) breadcrumbs.push(obf)
+            if (tObf) breadcrumbs.push(tObf)
+        }
+
+        let Tintermediary = getIntermediaryName(translatedTo)!
+        let Tnamed = getDisplayName(translatedTo, false)!
+        if (Tintermediary !== intermediary) {
+            breadcrumbs.push(Tintermediary)
+        }
+        if (Tintermediary !== Tnamed && Tnamed) {
+            breadcrumbs.push(Tnamed)
+        }
     }
     return breadcrumbs
 }
@@ -165,26 +201,37 @@ export default defineComponent({
         breadcrumbs() {
             return getBreadcrumbs(this.entry)
         },
-        mixinTarget() {
-            return `L${getOptimumOwnerName(this.entry)};${getOptimumName(this.entry)}${this.entry.type === "field" ? ":" : ""}${getOptimumDesc(this.entry)}`
+    },
+    methods: {
+        mixinTarget(entry: MappingEntry) {
+            return `L${getOptimumOwnerName(entry)};${getOptimumName(entry)}${entry.type === "field" ? ":" : ""}${getOptimumDesc(entry)}`
         },
-        atText() {
-            if (this.entry.type === "method") {
-                return `public ${getOptimumOwnerName(this.entry).replaceAll("/", ".")} ${this.entry.intermediary}${getOptimumDesc(this.entry)} # ${getOptimumName(this.entry)}`
+        atText(entry: MappingEntry) {
+            if (entry.type === "class") {
+                return `public ${getOptimumName(entry).replaceAll("/", ".")}`
+            } else if (entry.type === "method") {
+                return `public ${getOptimumOwnerName(entry).replaceAll("/", ".")} ${entry.intermediary}${getOptimumDesc(entry)} # ${getOptimumName(entry)}`
             } else {
-                return `public ${getOptimumOwnerName(this.entry).replaceAll("/", ".")} ${this.entry.intermediary} # ${getOptimumName(this.entry)}`
+                return `public ${getOptimumOwnerName(entry).replaceAll("/", ".")} ${entry.intermediary} # ${getOptimumName(entry)}`
             }
         },
-        awText() {
-            return `accessible ${this.entry.type} ${getOptimumOwnerName(this.entry)} ${getOptimumName(this.entry)} ${getOptimumDesc(this.entry)}`
+        awText(entry: MappingEntry) {
+            if (entry.type === "class") {
+                return `accessible ${entry.type} ${getOptimumName(entry)}`
+            }
+            return `accessible ${entry.type} ${getOptimumOwnerName(entry)} ${getOptimumName(entry)} ${getOptimumDesc(entry)}`
         },
-        fieldType() {
-            let desc = getOptimumDesc(this.entry)
+        fieldType(entry: MappingEntry) {
+            let desc = getOptimumDesc(entry)
             return beautifyFieldType(desc)
         },
     },
     props: {
         namespace: {
+            type: Object as PropType<Namespace | undefined>,
+            required: true,
+        },
+        translatedToNamespace: {
             type: Object as PropType<Namespace | undefined>,
             required: true,
         },

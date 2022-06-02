@@ -1,7 +1,8 @@
 import axios, {AxiosResponse} from "axios"
 
 export const HTTP = axios.create({
-    baseURL: "https://linkieapi.shedaniel.me",
+    // baseURL: "https://linkieapi.shedaniel.me",
+    baseURL: "http://localhost:6969",
 })
 
 export function reqVersions<T = any>(): Promise<AxiosResponse<T>> {
@@ -17,7 +18,7 @@ export function reqNamespaces<T = any>(): Promise<AxiosResponse<T>> {
 }
 
 export function reqSearch<T = any>(namespace: string, version: string, query: string, allowClasses: boolean, allowFields: boolean, allowMethods: boolean,
-                                   abortController?: AbortController, limit: number = 50): Promise<AxiosResponse<T>> {
+                                   translate?: string, abortController?: AbortController, limit: number = 50): Promise<AxiosResponse<T>> {
     return HTTP.get(`/api/search`, {
         signal: abortController?.signal,
         params: {
@@ -28,6 +29,7 @@ export function reqSearch<T = any>(namespace: string, version: string, query: st
             allowClasses,
             allowFields,
             allowMethods,
+            translate,
         },
     })
 }

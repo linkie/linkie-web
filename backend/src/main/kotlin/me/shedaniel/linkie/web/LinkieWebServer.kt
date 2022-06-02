@@ -1,5 +1,6 @@
 package me.shedaniel.linkie.web
 
+import com.soywiz.korio.dynamic.KDynamic.Companion.get
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
@@ -14,16 +15,23 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import me.shedaniel.linkie.Class
 import me.shedaniel.linkie.Field
+import me.shedaniel.linkie.MappingsContainer
 import me.shedaniel.linkie.MappingsEntryType
+import me.shedaniel.linkie.Method
 import me.shedaniel.linkie.Namespaces
+import me.shedaniel.linkie.getClassByObfName
 import me.shedaniel.linkie.getMappedDesc
 import me.shedaniel.linkie.getObfMergedDesc
 import me.shedaniel.linkie.obfMergedName
+import me.shedaniel.linkie.optimumName
 import me.shedaniel.linkie.utils.MemberEntry
+import me.shedaniel.linkie.utils.QueryResult
+import me.shedaniel.linkie.utils.ResultHolder
 import me.shedaniel.linkie.utils.toVersion
 import me.shedaniel.linkie.utils.tryToVersion
 import me.shedaniel.linkie.web.deps.Deps
@@ -41,12 +49,13 @@ val xml = XML {
     autoPolymorphic = true
 }
 
+val json = Json {
+    prettyPrint = false
+    isLenient = true
+    explicitNulls = false
+}
+
 fun main() {
-    val json = Json {
-        prettyPrint = false
-        isLenient = true
-        explicitNulls = false
-    }
     depsCycle()
     startDepsCycle()
     startLinkie()
@@ -142,9 +151,19 @@ fun main() {
                 val allowClasses = call.parameters["allowClasses"]?.toBoolean() ?: true
                 val allowMethods = call.parameters["allowMethods"]?.toBoolean() ?: true
                 val allowFields = call.parameters["allowFields"]?.toBoolean() ?: true
+                val translateNsStr = call.parameters["translate"]?.lowercase()
                 require(limit in 1..1000) { "Limit must be between 1 and 1000" }
                 val namespace = Namespaces[namespaceStr]
-                val provider = version?.let { namespace.getProvider(it) } ?: namespace.getDefaultProvider()
+                val translateNamespace = translateNsStr?.let { Namespaces[it] }
+
+                val allVersions = namespace.getAllSortedVersions().toMutableList()
+                if (translateNamespace != null) {
+                    allVersions.retainAll(translateNamespace.getAllSortedVersions())
+                }
+
+                val defaultVersion = namespace.defaultVersion.takeIf { it in allVersions } ?: (translateNamespace?.defaultVersion?.takeIf { it in allVersions } ?: allVersions.first())
+
+                val provider = version?.let { namespace.getProvider(it) } ?: namespace.getProvider(defaultVersion)
                 val mappings = provider.get()
                 try {
                     val result = MappingsQueryUtils.query(mappings, query, *buildList {
@@ -152,49 +171,116 @@ fun main() {
                         if (allowMethods) add(MappingsEntryType.METHOD)
                         if (allowFields) add(MappingsEntryType.FIELD)
                     }.toTypedArray(), limit = limit)
-                    Thread.sleep(1000)
-                    call.respond(
-                        SearchResultEntries(
-                            entries = result.results.asSequence().take(limit).mapNotNull {
-                                when (val entry = it.value) {
-                                    is Class -> json.encodeToJsonElement(
-                                        SearchResultClassEntry.serializer(), SearchResultClassEntry(
-                                            obf = entry.obfMergedName,
-                                            intermediary = entry.intermediaryName,
-                                            named = entry.mappedName,
-                                            score = it.score,
-                                            memberType = "c",
-                                        )
-                                    )
-                                    is MemberEntry<*> -> json.encodeToJsonElement(
-                                        SearchResultMemberEntry.serializer(), SearchResultMemberEntry(
-                                            obf = entry.member.obfMergedName,
-                                            intermediary = entry.member.intermediaryName,
-                                            named = entry.member.mappedName,
-                                            ownerObf = entry.owner.obfMergedName,
-                                            ownerIntermediary = entry.owner.intermediaryName,
-                                            ownerNamed = entry.owner.mappedName,
-                                            descObf = entry.member.getObfMergedDesc(mappings),
-                                            descIntermediary = entry.member.intermediaryDesc,
-                                            descNamed = entry.member.getMappedDesc(mappings),
-                                            score = it.score,
-                                            memberType = if (entry.member is Field) "f" else "m"
-                                        )
-                                    )
-                                    else -> null
-                                }
-                            }.toList(),
-                            fuzzy = result.fuzzy,
+                    if (translateNamespace == null) {
+                        call.respond(
+                            SearchResultEntries(
+                                entries = result.results.asSequence().take(limit).mapNotNull {
+                                    toJsonFromEntry(mappings, it.value, it.score)
+                                }.toList(),
+                                fuzzy = result.fuzzy,
+                            )
                         )
-                    )
+                    } else {
+                        val target = translateNamespace.getProvider(provider.version!!).get()
+                        val elements = mutableListOf<JsonElement>()
+                        translate(mappings, target, result.results.asSequence().take(limit)) { from, to, score ->
+                            toJsonFromEntry(mappings, from, score)?.also { obj ->
+                                val translated = toJsonFromEntry(target, to, score)
+                                if (translated == null) elements.add(obj)
+                                else {
+                                    elements.add(buildJsonObject {
+                                        obj.forEach { key, value -> this.put(key, value) }
+                                        put("l", translated)
+                                    })
+                                }
+                            }
+                        }
+                        call.respond(
+                            SearchResultEntries(
+                                entries = elements,
+                                fuzzy = result.fuzzy,
+                            )
+                        )
+                    }
                 } catch (error: NullPointerException) {
                     call.respond(buildJsonObject {
-                        put("error", error.message)
+                        put("error", error.message ?: error.toString())
                     })
+                    error.printStackTrace()
                 }
             }
         }
     }.start(wait = true)
+}
+
+fun toJsonFromEntry(mappings: MappingsContainer, entry: Any?, score: Double): JsonObject? {
+    return when (entry) {
+        is Class -> json.encodeToJsonElement(
+            SearchResultClassEntry.serializer(), SearchResultClassEntry(
+                obf = entry.obfMergedName,
+                intermediary = entry.intermediaryName,
+                named = entry.mappedName,
+                score = score,
+                memberType = "c",
+            )
+        ) as JsonObject
+        is MemberEntry<*> -> json.encodeToJsonElement(
+            SearchResultMemberEntry.serializer(), SearchResultMemberEntry(
+                obf = entry.member.obfMergedName,
+                intermediary = entry.member.intermediaryName,
+                named = entry.member.mappedName,
+                ownerObf = entry.owner.obfMergedName,
+                ownerIntermediary = entry.owner.intermediaryName,
+                ownerNamed = entry.owner.mappedName,
+                descObf = entry.member.getObfMergedDesc(mappings),
+                descIntermediary = entry.member.intermediaryDesc,
+                descNamed = entry.member.getMappedDesc(mappings),
+                score = score,
+                memberType = if (entry.member is Field) "f" else "m"
+            )
+        ) as JsonObject
+        else -> null
+    }
+}
+
+private fun translate(
+    source: MappingsContainer,
+    target: MappingsContainer,
+    results: Sequence<ResultHolder<*>>,
+    callback: (Any, Any, Double) -> Unit,
+) {
+    results.forEach { (value, score) ->
+        when {
+            value is Class -> {
+                val obfName = value.obfMergedName ?: return@forEach
+                val targetClass = target.getClassByObfName(obfName) ?: return@forEach
+                callback(value, targetClass, score)
+            }
+            value is MemberEntry<*> && value.member is Field -> {
+                val parent = value.owner
+                val field = value.member as Field
+
+                val obfName = field.obfMergedName ?: return@forEach
+                val parentObfName = parent.obfMergedName ?: return@forEach
+                val targetParent = target.getClassByObfName(parentObfName) ?: return@forEach
+                val targetField = targetParent.fields.firstOrNull { it.obfMergedName == obfName } ?: return@forEach
+
+                callback(value, MemberEntry(targetParent, targetField), score)
+            }
+            value is MemberEntry<*> && value.member is Method -> {
+                val parent = value.owner
+                val method = value.member as Method
+
+                val obfName = method.obfMergedName ?: return@forEach
+                val obfDesc = method.getObfMergedDesc(source)
+                val parentObfName = parent.obfMergedName ?: return@forEach
+                val targetParent = target.getClassByObfName(parentObfName) ?: return@forEach
+                val targetMethod = targetParent.methods.firstOrNull { it.obfMergedName == obfName && it.getObfMergedDesc(target) == obfDesc } ?: return@forEach
+
+                callback(value, MemberEntry(targetParent, targetMethod), score)
+            }
+        }
+    }
 }
 
 @Serializable

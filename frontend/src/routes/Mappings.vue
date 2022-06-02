@@ -1,5 +1,5 @@
 <template>
-    <div class="max-w-[calc(56rem+var(--sidebar-width))] mx-auto">
+    <div class="max-w-[calc(62rem+var(--sidebar-width))] mx-auto">
         <div v-if="mappingsData.namespaces.length !== 0" class="grid-setup">
             <div class="col-[1] px-5 pt-6 sm:pr-0 sm:w-[var(--sidebar-width)] sm:min-w-[var(--sidebar-width)]">
                 <div class="p-5 card bg-base-100 shadow-xl rounded-lg">
@@ -9,6 +9,7 @@
             <div class="col-[2/span_2] min-w-0">
                 <MappingsSearchBlock/>
                 <MappingsEntryBlock v-for="entry in infoData.entries" :namespace="mappingsData.namespaces.find(value => value.id === infoData.namespace)"
+                                    :translated-to-namespace="infoData.translateAs ? mappingsData.namespaces.find(value => value.id === infoData.translateAs) : undefined"
                                     :entry="entry"/>
             </div>
         </div>
@@ -55,6 +56,7 @@ export interface MappingEntry {
     ownerIntermediary?: string,
     ownerNamed?: string,
     type: MappingType,
+    translatedTo?: MappingEntry,
 }
 
 interface InfoData {
@@ -63,6 +65,7 @@ interface InfoData {
     allowClasses?: boolean,
     allowFields?: boolean,
     allowMethods?: boolean,
+    translateAs?: string,
     query?: string,
     entries: MappingEntry[],
     fuzzy: boolean,
@@ -86,7 +89,7 @@ export default defineComponent({
         }
     },
     computed: {
-        ...mapState(useMappingsStore, ["namespace", "version", "allowSnapshots", "searchText", "allowClasses", "allowMethods", "allowFields"]),
+        ...mapState(useMappingsStore, ["namespace", "version", "allowSnapshots", "searchText", "allowClasses", "allowMethods", "allowFields", "translateAs"]),
     },
     watch: {
         namespace: {
@@ -135,6 +138,13 @@ export default defineComponent({
             },
             immediate: true,
         },
+        translateAs: {
+            handler() {
+                this.ensureMappingsData()
+                this.updateMappingsInfo()
+            },
+            immediate: true,
+        },
     },
     mounted() {
         this.updateMappingsData()
@@ -157,7 +167,7 @@ export default defineComponent({
             }
         },
         ensureMappingsData() {
-            let {namespace, version, allowSnapshots} = useMappingsStore()
+            let {namespace, version, allowSnapshots, translateAs} = useMappingsStore()
             if (!namespace) {
                 namespace = this.mappingsData.namespaces.at(0)?.id
                 useMappingsStore().namespace = namespace
@@ -168,6 +178,11 @@ export default defineComponent({
                 if (!allowSnapshots) {
                     applicable_versions = applicable_versions.filter(entry => entry.stable)
                 }
+                if (translateAs) {
+                    let translateAsObj = this.mappingsData.namespaces.find(value => value.id === translateAs)
+                    let retain = translateAsObj?.versions?.map(entry => entry.version) ?? []
+                    applicable_versions = applicable_versions.filter(value => retain.includes(value.version))
+                }
                 if (!version || !applicable_versions.find(entry => entry.version === version)) {
                     version = applicable_versions.find(_ => true)?.version
                     useMappingsStore().version = version
@@ -175,15 +190,16 @@ export default defineComponent({
             }
         },
         updateMappingsInfo() {
-            let {namespace, version, searchText, allowClasses, allowFields, allowMethods} = useMappingsStore()
+            let {namespace, version, searchText, allowClasses, allowFields, allowMethods, translateAs} = useMappingsStore()
             if (namespace && version && searchText && (allowClasses || allowMethods || allowFields)) {
                 if (this.infoData.namespace !== namespace || this.infoData.version !== version || this.infoData.query !== searchText
-                    || this.infoData.allowClasses !== allowClasses || this.infoData.allowFields !== allowFields || this.infoData.allowMethods !== allowMethods) {
+                    || this.infoData.allowClasses !== allowClasses || this.infoData.allowFields !== allowFields || this.infoData.allowMethods !== allowMethods
+                    || this.infoData.translateAs !== translateAs) {
                     if (this.searchController) {
                         this.searchController.abort()
                     }
                     this.searchController = new AbortController()
-                    reqSearch(namespace, version, searchText, allowClasses, allowFields, allowMethods, this.searchController).then(value => {
+                    reqSearch(namespace, version, searchText, allowClasses, allowFields, allowMethods, translateAs, this.searchController).then(value => {
                         if (value.data.error) {
                             if (value.data.error !== "No results found!") {
                                 addAlert({
@@ -196,7 +212,7 @@ export default defineComponent({
                             return
                         }
                         this.infoData.fuzzy = value.data.fuzzy
-                        this.infoData.entries = this.mapEntriesToMappingEntry(value.data.entries as any[])
+                        this.infoData.entries = (value.data.entries as any[]).map(this.mapEntryToMappingEntry)
                     }).catch(reason => {
                         if (!axios.isCancel(reason)) {
                             addAlert({
@@ -215,34 +231,37 @@ export default defineComponent({
             this.setInfoDataToCurrent()
         },
         setInfoDataToCurrent() {
-            let {namespace, version, searchText, allowClasses, allowFields, allowMethods} = useMappingsStore()
+            let {namespace, version, searchText, allowClasses, allowFields, allowMethods, translateAs} = useMappingsStore()
             this.infoData.namespace = namespace
             this.infoData.version = version
             this.infoData.query = searchText
             this.infoData.allowClasses = allowClasses
             this.infoData.allowMethods = allowMethods
             this.infoData.allowFields = allowFields
+            this.infoData.translateAs = translateAs
         },
-        mapEntriesToMappingEntry(entries: any[]) {
-            return entries.map(obj => {
-                let type: string
-                if (obj.t === "c") type = "class"
-                else if (obj.t === "f") type = "field"
-                else if (obj.t === "m") type = "method"
-                else type = obj.t
-                return {
-                    obf: obj.o,
-                    intermediary: obj.i,
-                    named: obj.n,
-                    descObf: obj.d,
-                    descIntermediary: obj.e,
-                    descNamed: obj.f,
-                    ownerObf: obj.a,
-                    ownerIntermediary: obj.b,
-                    ownerNamed: obj.c,
-                    type,
-                } as MappingEntry
-            })
+        mapEntryToMappingEntry(obj: any): MappingEntry {
+            let type: string
+            if (obj.t === "c") type = "class"
+            else if (obj.t === "f") type = "field"
+            else if (obj.t === "m") type = "method"
+            else type = obj.t
+            let translatedTo: undefined | MappingEntry
+            if (obj.l) translatedTo = this.mapEntryToMappingEntry(obj.l)
+            else translatedTo = undefined
+            return {
+                obf: obj.o,
+                intermediary: obj.i,
+                named: obj.n,
+                descObf: obj.d,
+                descIntermediary: obj.e,
+                descNamed: obj.f,
+                ownerObf: obj.a,
+                ownerIntermediary: obj.b,
+                ownerNamed: obj.c,
+                type,
+                translatedTo,
+            } as MappingEntry
         },
     },
 })

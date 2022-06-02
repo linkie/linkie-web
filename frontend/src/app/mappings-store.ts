@@ -8,15 +8,19 @@ interface State {
     allowFields: boolean,
     allowMethods: boolean,
     searchText: string,
+    translateAs?: string,
 }
 
 function newState(): State {
     return {
+        namespace: undefined,
+        version: undefined,
         allowSnapshots: false,
         allowClasses: true,
         allowFields: true,
         allowMethods: true,
         searchText: "",
+        translateAs: undefined,
     }
 }
 
