@@ -1,8 +1,8 @@
 import axios, {AxiosResponse} from "axios"
 
 export const HTTP = axios.create({
-    // baseURL: "https://linkieapi.shedaniel.me",
-    baseURL: "http://localhost:6969",
+    baseURL: "https://linkieapi.shedaniel.me",
+    // baseURL: "http://localhost:6969",
 })
 
 export function reqVersions<T = any>(): Promise<AxiosResponse<T>> {
