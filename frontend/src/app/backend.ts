@@ -1,7 +1,7 @@
 import axios, {AxiosResponse} from "axios"
 
 export const HTTP = axios.create({
-    baseURL: "http://localhost:6969",
+    baseURL: "https://linkieapi.shedaniel.me",
 })
 
 export function reqVersions<T = any>(): Promise<AxiosResponse<T>> {
@@ -9,7 +9,7 @@ export function reqVersions<T = any>(): Promise<AxiosResponse<T>> {
 }
 
 export function reqVersionsFor<T = any>(loader: string): Promise<AxiosResponse<T>> {
-    return HTTP.get(`/api/versions`)
+    return HTTP.get(`/api/versions/${loader}`)
 }
 
 export function reqNamespaces<T = any>(): Promise<AxiosResponse<T>> {

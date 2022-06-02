@@ -1,6 +1,6 @@
 <template>
     <div class="flex justify-center" v-if="mappingsData.namespaces.length !== 0">
-        <div class="pl-5 pt-6 w-72">
+        <div class="pl-5 pt-6 w-72 min-w-[18rem]">
             <div class="p-5 card bg-base-100 shadow-xl rounded-lg">
                 <MappingsFilterBlock :data="mappingsData"/>
             </div>

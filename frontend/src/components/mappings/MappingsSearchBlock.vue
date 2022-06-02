@@ -22,8 +22,6 @@
 import {defineComponent} from "vue"
 import {mapState} from "pinia"
 import {useMappingsStore} from "../../app/mappings-store"
-// @ts-ignore
-import {debounce} from "debounce"
 
 export default defineComponent({
     name: "MappingsSearchBlock",
@@ -37,9 +35,11 @@ export default defineComponent({
     },
     methods: {
         searchTimeOut(event: any) {
-            debounce((_: any) => {
+            clearTimeout(this.timer)
+
+            this.timer = setTimeout(() => {
                 useMappingsStore().searchText = (event.target as any)?.value
-            }, 1000).call(event, [])
+            }, 1000)
         },
     },
 })
