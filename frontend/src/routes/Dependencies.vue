@@ -98,6 +98,7 @@ export default defineComponent({
             formatMaven,
             formatDependency,
             tab,
+            reqVersionsPromise: undefined as Promise<any> | undefined,
         }
     },
     computed: {
@@ -136,8 +137,8 @@ export default defineComponent({
     },
     methods: {
         updateDependencyData() {
-            if (Object.keys(this.searchData.versions).length == 0) {
-                reqVersions().then(value => {
+            if (Object.keys(this.searchData.versions).length == 0 && !this.reqVersionsPromise) {
+                this.reqVersionsPromise = reqVersions().then(value => {
                     this.searchData.versions = value.data
                     this.ensureDependencyData()
                 }).catch(reason => {
@@ -145,6 +146,8 @@ export default defineComponent({
                         type: "error",
                         message: `Failed to fetch versions: ${reason.message}`,
                     })
+                }).finally(() => {
+                    this.reqVersionsPromise = undefined
                 })
             }
         },

@@ -100,4 +100,9 @@ export default defineComponent({
 body {
     @apply bg-base-200
 }
+
+.select {
+    outline: 0 !important;
+    border: 0 !important;
+}
 </style>

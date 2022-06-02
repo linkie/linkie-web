@@ -16,8 +16,10 @@ export function reqNamespaces<T = any>(): Promise<AxiosResponse<T>> {
     return HTTP.get(`/api/namespaces`)
 }
 
-export function reqSearch<T = any>(namespace: string, version: string, query: string, allowClasses: boolean, allowFields: boolean, allowMethods: boolean, limit: number = 50): Promise<AxiosResponse<T>> {
+export function reqSearch<T = any>(namespace: string, version: string, query: string, allowClasses: boolean, allowFields: boolean, allowMethods: boolean,
+                                   abortController?: AbortController, limit: number = 50): Promise<AxiosResponse<T>> {
     return HTTP.get(`/api/search`, {
+        signal: abortController?.signal,
         params: {
             namespace,
             query,

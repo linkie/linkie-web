@@ -23,6 +23,7 @@ import MappingsSearchBlock from "../components/mappings/MappingsSearchBlock.vue"
 import MappingsEntryBlock from "../components/mappings/MappingsEntryBlock.vue"
 import MappingsFilterBlock from "../components/mappings/MappingsFilterBlock.vue"
 import {VersionEntry} from "./Dependencies.vue"
+import axios from "axios"
 
 export interface Namespace {
     id: string,
@@ -78,6 +79,8 @@ export default defineComponent({
                 entries: [],
                 fuzzy: false,
             } as InfoData,
+            reqNamespacesPromise: undefined as Promise<any> | undefined,
+            searchController: undefined as AbortController | undefined,
         }
     },
     computed: {
@@ -137,8 +140,8 @@ export default defineComponent({
     },
     methods: {
         updateMappingsData() {
-            if (Object.keys(this.mappingsData.namespaces).length == 0) {
-                reqNamespaces().then(value => {
+            if (Object.keys(this.mappingsData.namespaces).length == 0 && !this.reqNamespacesPromise) {
+                this.reqNamespacesPromise = reqNamespaces().then(value => {
                     this.mappingsData.namespaces = value.data
                     this.ensureMappingsData()
                 }).catch(reason => {
@@ -146,6 +149,8 @@ export default defineComponent({
                         type: "error",
                         message: `Failed to fetch namespaces: ${reason.message}`,
                     })
+                }).finally(() => {
+                    this.reqNamespacesPromise = undefined
                 })
             }
         },
@@ -172,7 +177,11 @@ export default defineComponent({
             if (namespace && version && searchText && (allowClasses || allowMethods || allowFields)) {
                 if (this.infoData.namespace !== namespace || this.infoData.version !== version || this.infoData.query !== searchText
                     || this.infoData.allowClasses !== allowClasses || this.infoData.allowFields !== allowFields || this.infoData.allowMethods !== allowMethods) {
-                    reqSearch(namespace, version, searchText, allowClasses, allowFields, allowMethods).then(value => {
+                    if (this.searchController) {
+                        this.searchController.abort()
+                    }
+                    this.searchController = new AbortController()
+                    reqSearch(namespace, version, searchText, allowClasses, allowFields, allowMethods, this.searchController).then(value => {
                         if (value.data.error) {
                             if (value.data.error !== "No results found!") {
                                 addAlert({
@@ -185,44 +194,53 @@ export default defineComponent({
                             return
                         }
                         this.infoData.fuzzy = value.data.fuzzy
-                        this.infoData.entries = (value.data.entries as any[]).map(obj => {
-                            let type: string
-                            if (obj.t === "c") type = "class"
-                            else if (obj.t === "f") type = "field"
-                            else if (obj.t === "m") type = "method"
-                            else type = obj.t
-                            return {
-                                obf: obj.o,
-                                intermediary: obj.i,
-                                named: obj.n,
-                                descObf: obj.d,
-                                descIntermediary: obj.e,
-                                descNamed: obj.f,
-                                ownerObf: obj.a,
-                                ownerIntermediary: obj.b,
-                                ownerNamed: obj.c,
-                                type,
-                            } as MappingEntry
-                        })
+                        this.infoData.entries = this.mapEntriesToMappingEntry(value.data.entries as any[])
                     }).catch(reason => {
-                        addAlert({
-                            type: "error",
-                            message: `Failed to search: ${reason.message}`,
-                        })
-                        this.infoData.entries = []
-                        this.infoData.fuzzy = false
+                        if (!axios.isCancel(reason)) {
+                            addAlert({
+                                type: "error",
+                                message: `Failed to search: ${reason.message}`,
+                            })
+                            this.infoData.entries = []
+                            this.infoData.fuzzy = false
+                        }
                     })
                 }
             } else {
                 this.infoData.entries = []
                 this.infoData.fuzzy = false
             }
+            this.setInfoDataToCurrent()
+        },
+        setInfoDataToCurrent() {
+            let {namespace, version, searchText, allowClasses, allowFields, allowMethods} = useMappingsStore()
             this.infoData.namespace = namespace
             this.infoData.version = version
             this.infoData.query = searchText
             this.infoData.allowClasses = allowClasses
             this.infoData.allowMethods = allowMethods
             this.infoData.allowFields = allowFields
+        },
+        mapEntriesToMappingEntry(entries: any[]) {
+            return entries.map(obj => {
+                let type: string
+                if (obj.t === "c") type = "class"
+                else if (obj.t === "f") type = "field"
+                else if (obj.t === "m") type = "method"
+                else type = obj.t
+                return {
+                    obf: obj.o,
+                    intermediary: obj.i,
+                    named: obj.n,
+                    descObf: obj.d,
+                    descIntermediary: obj.e,
+                    descNamed: obj.f,
+                    ownerObf: obj.a,
+                    ownerIntermediary: obj.b,
+                    ownerNamed: obj.c,
+                    type,
+                } as MappingEntry
+            })
         },
     },
 })

@@ -39,7 +39,7 @@ export default defineComponent({
 
             this.timer = setTimeout(() => {
                 useMappingsStore().searchText = (event.target as any)?.value
-            }, 1000)
+            }, 300)
         },
     },
 })
@@ -48,5 +48,6 @@ export default defineComponent({
 <style scoped>
 .input {
     outline: 0 !important;
+    border: 0 !important;
 }
 </style>

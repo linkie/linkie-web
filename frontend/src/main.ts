@@ -30,7 +30,9 @@ HTTP.interceptors.response.use(response => {
     NProgress.done()
     return response
 }, error => {
-    console.log(error)
+    if (!axios.isCancel(error)) {
+        console.log(error)
+    }
     return Promise.reject(error)
 })
 
