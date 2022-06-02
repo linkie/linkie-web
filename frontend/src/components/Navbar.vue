@@ -12,7 +12,7 @@
                 <li>
                     <label class="cursor-pointer">
                         Dark Mode
-                        <input type="checkbox" class="toggle" :checked="darkMode" data-toggle-theme="dark,cupcake" data-act-class="ACTIVECLASS"/>
+                        <input type="checkbox" class="toggle" :checked="darkMode" @click="setDarkMode(($event.target as any)?.checked ?? darkMode)"/>
                     </label>
                 </li>
             </ul>
@@ -28,6 +28,12 @@ export default defineComponent({
     computed: {
         darkMode(): boolean {
             return localStorage.getItem("theme") === "dark"
+        },
+    },
+    methods: {
+        setDarkMode(darkMode: boolean) {
+            localStorage.setItem("theme", darkMode ? "dark" : "cupcake");
+            document.documentElement.setAttribute("data-theme", localStorage.getItem("theme")!);
         },
     },
 })

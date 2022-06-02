@@ -12,7 +12,6 @@
     "nprogress": "^0.2.0",
     "pinia": "^2.0.0-rc.10",
     "pinia-plugin-persistedstate": "^1.6.1",
-    "theme-change": "^2.0.2",
     "vue": "^3.2.25",
     "vue-axios": "^3.4.1"
   },

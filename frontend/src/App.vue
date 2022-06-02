@@ -7,8 +7,6 @@ import Mappings from "./routes/Mappings.vue"
 import OpenSourceLicenses from "./routes/OpenSourceLicenses.vue"
 import NotFound from "./routes/NotFound.vue"
 import {Alert, useAlertsStore} from "./app/alerts-store"
-// @ts-ignore
-import {themeChange} from "theme-change"
 import {mapActions, mapState} from "pinia"
 
 import Footer from "./components/Footer.vue"
@@ -41,7 +39,13 @@ export default defineComponent({
         ...mapActions(useAlertsStore, ["removeAlert"]),
     },
     mounted() {
-        themeChange(false)
+        let theme = localStorage.getItem("theme")
+        if (theme) {
+            document.documentElement.setAttribute("data-theme", theme)
+        } else {
+            localStorage.setItem("theme", "cupcake")
+            document.documentElement.setAttribute("data-theme", "cupcake")
+        }
     },
 })
 
