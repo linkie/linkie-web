@@ -151,7 +151,7 @@ fun main() {
                         if (allowClasses) add(MappingsEntryType.CLASS)
                         if (allowMethods) add(MappingsEntryType.METHOD)
                         if (allowFields) add(MappingsEntryType.FIELD)
-                    }.toTypedArray())
+                    }.toTypedArray(), limit = limit)
                     Thread.sleep(1000)
                     call.respond(
                         SearchResultEntries(

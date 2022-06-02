@@ -18,11 +18,12 @@ object MappingsQueryUtils {
         val fuzzy: Boolean,
     )
 
-    suspend fun query(mappings: MappingsContainer, searchTerm: String, vararg types: MappingsEntryType): Result {
+    suspend fun query(mappings: MappingsContainer, searchTerm: String, vararg types: MappingsEntryType, limit: Int): Result {
         require(types.isNotEmpty())
         val context = QueryContext(
             provider = { mappings },
             searchKey = searchTerm,
+            limit = limit.toLong(),
         )
         val result: MutableList<ResultHolder<*>> = mutableListOf()
         var classes: ClassResultList? = null
