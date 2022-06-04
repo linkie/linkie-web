@@ -44,7 +44,7 @@ import DependencyFilterBlock from "../components/dependencies/DependencyFilterBl
 import CodeBlock from "../components/dependencies/CodeBlock.vue"
 import SubHeader from "../components/dependencies/SubHeader.vue"
 import {DependencyType, formatDependency, formatMaven, tab} from "../app/dep-format"
-import {reqVersions, reqVersionsFor} from "../app/backend"
+import {reqVersions} from "../app/backend"
 import Block from "../components/Block.vue"
 import {defineComponent} from "vue"
 import {useDependencySearchStore} from "../app/dependency-store"
@@ -54,6 +54,7 @@ import {addAlert} from "../app/alerts"
 export interface VersionEntry {
     version: string,
     stable: boolean,
+    blocks: DependencyBlocks,
 }
 
 export interface DependencyEntry {
@@ -79,11 +80,6 @@ export interface DependencySearchData {
     versions: { [loader: string]: VersionEntry[]; }
 }
 
-export interface DependencyInfoData {
-    loader?: string,
-    versions: { [version: string]: DependencyBlocks; }
-}
-
 export default defineComponent({
     name: "Dependencies",
     components: {Block, CodeBlock, DependencyBlock, DependencyFilterBlock, SubHeader},
@@ -92,9 +88,6 @@ export default defineComponent({
             searchData: {
                 versions: {},
             } as DependencySearchData,
-            infoData: {
-                versions: {},
-            } as DependencyInfoData,
             formatMaven,
             formatDependency,
             tab,
@@ -103,7 +96,10 @@ export default defineComponent({
     },
     computed: {
         dependencyBlocks(): [string, DependencyBlock][] {
-            return Object.entries(this.infoData.versions[useDependencySearchStore().version ?? ""] ?? {})
+            let {loader, version} = useDependencySearchStore()
+            return Object.entries(this.searchData.versions[loader ?? ""]
+                ?.find(entry => entry.version === version)
+                ?.blocks ?? {})
         },
         ...mapState(useDependencySearchStore, ["loader", "version", "allowSnapshots"]),
     },
@@ -112,13 +108,11 @@ export default defineComponent({
             handler() {
                 this.updateDependencyData()
                 this.ensureDependencyData()
-                this.updateDependencyInfo()
             },
             immediate: true,
         },
         version: {
             handler() {
-                this.updateDependencyData()
                 this.ensureDependencyData()
             },
             immediate: true,
@@ -133,7 +127,6 @@ export default defineComponent({
     mounted() {
         this.updateDependencyData()
         this.ensureDependencyData()
-        this.updateDependencyInfo()
     },
     methods: {
         updateDependencyData() {
@@ -167,24 +160,6 @@ export default defineComponent({
                     useDependencySearchStore().version = version
                 }
             }
-        },
-        updateDependencyInfo() {
-            let {loader} = useDependencySearchStore()
-            if (loader) {
-                if (this.infoData.loader !== loader) {
-                    reqVersionsFor(loader).then(value => {
-                        this.infoData.versions = value.data
-                    }).catch(reason => {
-                        addAlert({
-                            type: "error",
-                            message: `Failed to fetch dependencies: ${reason.message}`,
-                        })
-                    })
-                }
-            } else {
-                this.infoData.versions = {}
-            }
-            this.infoData.loader = loader
         },
     },
 })

@@ -6,11 +6,7 @@ export const HTTP = axios.create({
 })
 
 export function reqVersions<T = any>(): Promise<AxiosResponse<T>> {
-    return HTTP.get(`/api/versions`)
-}
-
-export function reqVersionsFor<T = any>(loader: string): Promise<AxiosResponse<T>> {
-    return HTTP.get(`/api/versions/${loader}`)
+    return HTTP.get(`/api/versions/all`)
 }
 
 export function reqNamespaces<T = any>(): Promise<AxiosResponse<T>> {
