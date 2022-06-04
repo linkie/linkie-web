@@ -15,14 +15,14 @@
                 <li v-for="breadcrumb in breadcrumbs">{{ breadcrumb }}</li>
             </ul>
         </div>
-        <div class="divider mt-0 mb-0"></div>
+        <div class="divider mt-0 mb-0"/>
         <EntryDetails v-if="entry.type === 'field' && namespace.supportsFieldDescription" title="Type:" :content="fieldType(entry)" :code="false"/>
         <EntryDetails v-if="entry.type !== 'class' && namespace.supportsMixin" title="Mixin Target:" :content="mixinTarget(entry)"/>
         <EntryDetails v-if="namespace.supportsAT" title="AT:" :content="atText(entry)"/>
         <EntryDetails v-if="namespace.supportsAW" title="AW:" :content="awText(entry)"/>
 
         <div v-if="entry.translatedTo">
-            <div class="divider mt-0 mb-0"></div>
+            <div class="divider mt-0 mb-0"/>
             <EntryDetails v-if="entry.type === 'field' && translatedToNamespace.supportsFieldDescription" title="Type:" :content="fieldType(entry.translatedTo)"
                           :code="false"/>
             <EntryDetails v-if="entry.type !== 'class' && translatedToNamespace.supportsMixin" title="Mixin Target:"

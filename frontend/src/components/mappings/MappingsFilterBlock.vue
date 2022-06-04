@@ -9,7 +9,7 @@
             </option>
         </select>
         
-        <div class="divider mt-0 mb-0"></div>
+        <div class="divider mt-0 mb-0"/>
         <SubHeader :add-padding="false" class="pb-2">Version</SubHeader>
         <div class="flex flex-col flex-nowrap justify-center h-full whitespace-nowrap pb-2">
             <div>
@@ -27,7 +27,7 @@
             </option>
         </select>
 
-        <div class="divider mt-0 mb-0"></div>
+        <div class="divider mt-0 mb-0"/>
         <SubHeader :add-padding="false" class="pb-2">Search Type</SubHeader>
         <div class="flex flex-col flex-nowrap justify-center h-full whitespace-nowrap pb-2">
             <div>
@@ -47,7 +47,7 @@
             </div>
         </div>
 
-        <div class="divider mt-0 mb-0"></div>
+        <div class="divider mt-0 mb-0"/>
         <SubHeader :add-padding="false" class="pb-2">Translate To</SubHeader>
         <select class="select select-sm font-light p-0"
                 @change="translateAs = ($event.target as any)?.value === 'Do not translate' ? undefined : ($event.target as any)?.value?.toLowerCase()" :value="translateAs ?? 'Do not translate'">

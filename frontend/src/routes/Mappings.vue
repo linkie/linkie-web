@@ -1,7 +1,7 @@
 <template>
     <div class="max-w-[calc(62rem+var(--sidebar-width))] mx-auto">
         <div v-if="mappingsData.namespaces.length !== 0" class="grid-setup">
-            <div class="col-[1] px-5 pt-6 sm:pr-0 sm:w-[var(--sidebar-width)] sm:min-w-[var(--sidebar-width)]">
+            <div class="col-[1] px-5 pt-6 sm:pr-0 sm:w-[var(--sidebar-width)] sm:min-w-[var(--sidebar-width)] sm:absolute">
                 <div class="p-5 card bg-base-100 shadow-xl rounded-lg">
                     <MappingsFilterBlock :data="mappingsData"/>
                 </div>
