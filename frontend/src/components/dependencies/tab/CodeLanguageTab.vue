@@ -7,16 +7,13 @@
 
 <script lang="ts">
 import {defineComponent} from "vue"
-import {mapActions, mapWritableState} from "pinia"
+import {mapWritableState} from "pinia"
 import {usePreferenceStore} from "../../../app/preference-store"
 
 export default defineComponent({
     name: "CodeLanguageTab",
     computed: {
         ...mapWritableState(usePreferenceStore, ["codeLanguage"]),
-    },
-    methods: {
-        ...mapActions(usePreferenceStore, ["setCodeLanguage"]),
     },
     props: {
         language: {
