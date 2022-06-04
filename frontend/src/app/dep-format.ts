@@ -1,4 +1,5 @@
 import {usePreferenceStore} from "./preference-store"
+import {useDependencySearchStore} from "./dependency-store"
 
 export function formatMaven(url: string): string {
     let codeLanguage = usePreferenceStore().codeLanguage
@@ -11,38 +12,60 @@ export function formatMaven(url: string): string {
     }
 }
 
-export function formatDepLine(configuration: string, notation: string): string {
+function isFG(): boolean {
+    let {loader, forgeGradle} = useDependencySearchStore()
+    return loader === "forge" && forgeGradle
+}
+
+export function formatDepLine(configuration: string, notation: string, wrap?: string): string {
     let codeLanguage = usePreferenceStore().codeLanguage
+    if (!wrap) wrap = "\"%%\""
     if (codeLanguage === "groovy") {
-        return `${configuration} "${notation}"`
+        return `${configuration} ${wrap.replace("%%", notation)}`
     } else if (codeLanguage === "kotlin") {
-        return `${configuration}("${notation}")`
+        return `${configuration}(${wrap.replace("%%", notation)})`
     } else {
         return notation
     }
 }
 
-export function formatDep(configuration: string, notation: string, block: boolean): string {
-    if (!block) return formatDepLine(configuration, notation)
+export function formatDep(configuration: string, notation: string, block: boolean, wrap?: string): string {
+    if (!block) return formatDepLine(configuration, notation, wrap)
     return `dependencies {
-    ${formatDepLine(configuration, notation)}
+    ${formatDepLine(configuration, notation, wrap)}
 }`
 }
 
 export function formatApi(notation: string, block: boolean = true): string {
-    return formatDep("modApi", notation, block)
+    if (!isFG()) {
+        return formatDep("modApi", notation, block)
+    } else {
+        return formatDep("api", notation, block, `fg.deobf("%%")`)
+    }
 }
 
 export function formatImpl(notation: string, block: boolean = true): string {
-    return formatDep("modImplementation", notation, block)
+    if (!isFG()) {
+        return formatDep("modImplementation", notation, block)
+    } else {
+        return formatDep("implementation", notation, block, `fg.deobf("%%")`)
+    }
 }
 
 export function formatCompileOnly(notation: string, block: boolean = true): string {
-    return formatDep("modCompileOnly", notation, block)
+    if (!isFG()) {
+        return formatDep("modCompileOnly", notation, block)
+    } else {
+        return formatDep("compileOnly", notation, block, `fg.deobf("%%")`)
+    }
 }
 
 export function formatRuntimeOnly(notation: string, block: boolean = true): string {
-    return formatDep("modRuntimeOnly", notation, block)
+    if (!isFG()) {
+        return formatDep("modRuntimeOnly", notation, block)
+    } else {
+        return formatDep("runtimeOnly", notation, block, `fg.deobf("%%")`)
+    }
 }
 
 export const dependencyTypes = ["Api", "Implementation", "CompileOnly", "RuntimeOnly", "Mappings"] as const

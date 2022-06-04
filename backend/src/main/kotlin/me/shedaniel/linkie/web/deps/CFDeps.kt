@@ -9,7 +9,7 @@ class CFDeps(
     name: String,
     val modId: Int,
     val loaders: (ModFile, String) -> List<String>,
-    val notation: (String, String) -> String,
+    val notation: (loader: String, mc: String, version: String) -> String,
     val versionGrabber: (ModFile) -> String,
     val mavens: List<MavenData>,
 ) : Deps(name) {
@@ -21,7 +21,7 @@ class CFDeps(
                 gameVersion.gameVersionName to it
             }
         }.groupBy({ it.first }, { it.second }).forEach { (version, files) ->
-            val file = files.maxByOrNull { it.id } ?: return@forEach
+            val file = files.filter { it.releaseType != 3 }.maxByOrNull { it.id } ?: return@forEach
             val modVersion = versionGrabber(file)
             loaders(file, version).forEach { loader ->
                 val versionIdentifier = VersionIdentifier(
@@ -34,7 +34,7 @@ class CFDeps(
                     Dependency(
                         name = name,
                         type = DependencyType.Api,
-                        notation = notation(loader, modVersion),
+                        notation = notation(loader, version, modVersion),
                         version = modVersion
                     )
                 )

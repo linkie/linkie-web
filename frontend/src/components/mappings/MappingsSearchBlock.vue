@@ -12,7 +12,7 @@
                     </svg>
                 </div>
                 <input type="text" placeholder="Search..." class="input rounded-lg flex-1 px-0" :value="searchText"
-                       @keyup="searchTimeOut($event)" autofocus/>
+                       @keyup="searchTimeOut($event)" @keydown.space.prevent autofocus/>
             </div>
         </div>
     </div>
@@ -38,8 +38,8 @@ export default defineComponent({
             clearTimeout(this.timer)
 
             this.timer = setTimeout(() => {
-                useMappingsStore().searchText = (event.target as any)?.value
-            }, 300)
+                useMappingsStore().searchText = (event.target as any)?.value?.replaceAll(" ", "")
+            }, 100)
         },
     },
 })

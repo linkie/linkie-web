@@ -16,10 +16,5 @@ function newState(): State {
 export const usePreferenceStore = defineStore({
     id: "preference",
     state: newState,
-    actions: {
-        setCodeLanguage(codeLanguage: CodeLanguage) {
-            this.codeLanguage = codeLanguage
-        },
-    },
     persist: true,
 })

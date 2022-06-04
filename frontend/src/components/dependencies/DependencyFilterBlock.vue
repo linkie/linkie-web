@@ -4,7 +4,7 @@
             <div class="flex flex-col md:flex-row">
                 <div class="px-4 whitespace-nowrap h-12">
                     <span class="align-middle">Loader</span>
-                    <select class="select capitalize font-light rounded-none w-52"
+                    <select class="select font-light rounded-none w-48"
                             @change="loader = (($event.target as any)?.value?.toLowerCase() ?? loader)" :value="loader ?? ''">
                         <option disabled selected>Select mod loader</option>
                         <option v-for="loader in loaders">
@@ -13,9 +13,21 @@
                     </select>
                 </div>
 
+                <div class="px-4 whitespace-nowrap h-12" v-if="loader === 'forge'">
+                    <span class="align-middle">Build System</span>
+                    <select class="select font-light rounded-none w-48"
+                            @change="forgeGradle = (($event.target as any)?.value === 'ForgeGradle')" :value="forgeGradle ? 'ForgeGradle' : 'Architectury Loom'">
+                        <option disabled selected>Select build system</option>
+                        <option>Architectury Loom</option>
+                        <option>ForgeGradle</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="flex flex-col md:flex-row">
                 <div class="px-4 whitespace-nowrap h-12">
                     <span class="align-middle">Version</span>
-                    <select class="select capitalize font-light rounded-none w-52"
+                    <select class="select font-light rounded-none w-48"
                             @change="version = (($event.target as any)?.value ?? version)" :value="version ?? ''">
                         <option disabled selected>Select version</option>
                         <option v-for="v in applicableVersions">
@@ -47,7 +59,7 @@ import {mapWritableState} from "pinia"
 export default defineComponent({
     name: "DependencyFilterBlock",
     computed: {
-        ...mapWritableState(useDependencySearchStore, ["loader", "version", "allowSnapshots"]),
+        ...mapWritableState(useDependencySearchStore, ["loader", "version", "allowSnapshots", "forgeGradle"]),
         loaders(): string[] {
             return Object.keys(this.searchData.versions)
         },

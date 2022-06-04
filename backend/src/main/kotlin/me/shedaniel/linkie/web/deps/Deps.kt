@@ -37,7 +37,7 @@ val allDeps = listOf(
     CFDeps(
         "Architectury API", 419699,
         loaders = { _, _ -> listOf("fabric", "forge") },
-        notation = { loader, version -> "dev.architectury:architectury-${if (loader == "quilt") "fabric" else loader}:$version" },
+        notation = { loader, _, version -> "dev.architectury:architectury-${if (loader == "quilt") "fabric" else loader}:$version" },
         versionGrabber = { file -> file.displayName.substringAfterLast("v") },
         mavens = listOf(
             Deps.MavenData(
@@ -49,25 +49,81 @@ val allDeps = listOf(
             ),
         )
     ),
+    CombinedDeps(
+        "shedaniel",
+        CFDeps(
+            "Roughly Enough Items", 310111,
+            loaders = { _, version ->
+                when {
+                    version.tryToVersion() == null || version.toVersion().snapshot != null -> listOf("fabric")
+                    version.toVersion() >= "1.16.5".toVersion() -> listOf("fabric", "forge")
+                    version.toVersion() > "1.13.2".toVersion() -> listOf("fabric")
+                    else -> listOf()
+                }
+            },
+            notation = { loader, _, version -> "me.shedaniel:RoughlyEnoughItems-$loader:$version" },
+            versionGrabber = { file -> file.displayName.substringAfterLast("v").replace(" Build ", "+build.") },
+            mavens = listOf(
+                Deps.MavenData(
+                    url = "https://maven.shedaniel.me/",
+                ),
+            )
+        ),
+        CFDeps(
+            "Cloth Config", 348521,
+            loaders = { _, version ->
+                when {
+                    version.tryToVersion() == null || version.toVersion().snapshot != null -> listOf("fabric")
+                    version.toVersion() >= "1.16.5".toVersion() -> listOf("fabric", "forge")
+                    else -> listOf("fabric")
+                }
+            },
+            notation = { loader, _, version ->
+                if ((version.tryToVersion()?.major ?: 0) >= 4 || loader == "forge") {
+                    "me.shedaniel.cloth:cloth-config-$loader:$version"
+                } else {
+                    "me.shedaniel.cloth:config-2:$version"
+                }
+            },
+            versionGrabber = { file -> file.displayName.substringAfterLast("v").replace(" Build ", "+build.") },
+            mavens = listOf(
+                Deps.MavenData(
+                    url = "https://maven.shedaniel.me/",
+                ),
+            )
+        ),
+    ),
     CFDeps(
-        "Roughly Enough Items", 310111,
-        loaders = { _, version ->
-            when {
-                version.tryToVersion() == null || version.toVersion().snapshot != null -> listOf("fabric")
-                version.toVersion() >= "1.16.5".toVersion() -> listOf("fabric", "forge")
-                version.toVersion() > "1.13.2".toVersion() -> listOf("fabric")
-                else -> listOf()
+        "Mod Menu", 308702,
+        loaders = { _, _ -> listOf("fabric") },
+        notation = { _, _, version ->
+            if (version.contains("+build.")) {
+                "io.github.prospector:modmenu:$version"
+            } else if (version.contains("-")) {
+                "io.github.prospector.modmenu:ModMenu:$version"
+            } else {
+                "com.terraformersmc:modmenu:$version"
             }
         },
-        notation = { loader, version -> "me.shedaniel:RoughlyEnoughItems-$loader:$version" },
-        versionGrabber = { file -> file.displayName.substringAfterLast("v").replace(" Build ", "+build.") },
+        versionGrabber = { file -> file.fileName.substringAfterLast("-").replace(".jar", "") },
         mavens = listOf(
             Deps.MavenData(
-                url = "https://maven.shedaniel.me/",
+                url = "https://maven.terraformersmc.com/releases/",
+            ),
+        )
+    ),
+    CFDeps(
+        "Just Enough Items", 238222,
+        loaders = { _, _ -> listOf("forge") },
+        notation = { _, mc, version -> "mezz.jei:jei-$mc:$version" },
+        versionGrabber = { file -> file.displayName.substringAfterLast("-").replace(".jar", "") },
+        mavens = listOf(
+            Deps.MavenData(
+                url = "https://dvs1.progwml6.com/files/maven/",
             ),
             Deps.MavenData(
-                subtitle = "Alternative Maven Repository",
-                url = "https://maven.architectury.dev/",
+                subtitle = "Fallback Maven Repository",
+                url = "https://modmaven.dev",
             ),
         )
     ),

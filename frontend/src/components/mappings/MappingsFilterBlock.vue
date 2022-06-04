@@ -1,7 +1,7 @@
 <template>
     <div class="flex flex-col">
         <SubHeader :add-padding="false" class="pb-2">Namespace</SubHeader>
-        <select class="select select-sm capitalize font-light p-0"
+        <select class="select select-sm font-light p-0"
                 @change="namespace = ($event.target as any)?.value?.toLowerCase() ?? namespace" :value="namespace ?? ''">
             <option disabled selected>Select namespace</option>
             <option v-for="namespace in namespaces">
@@ -19,7 +19,7 @@
             </div>
         </div>
         
-        <select class="select select-sm capitalize font-light p-0"
+        <select class="select select-sm font-light p-0"
                 @change="version = ($event.target as any)?.value ?? version" :value="version ?? ''">
             <option disabled selected>Select version</option>
             <option v-for="v in applicableVersions">
@@ -49,7 +49,7 @@
 
         <div class="divider mt-0 mb-0"></div>
         <SubHeader :add-padding="false" class="pb-2">Translate To</SubHeader>
-        <select class="select select-sm capitalize font-light p-0"
+        <select class="select select-sm font-light p-0"
                 @change="translateAs = ($event.target as any)?.value === 'Do not translate' ? undefined : ($event.target as any)?.value?.toLowerCase()" :value="translateAs ?? 'Do not translate'">
             <option disabled selected>Select namespace</option>
             <option>Do not translate</option>
