@@ -9,8 +9,6 @@ import NProgress from "nprogress"
 import {HTTP} from "./app/backend"
 import {createPinia} from "pinia"
 import persistedState from "pinia-plugin-persistedstate"
-// @ts-ignore
-import {registerSW} from "virtual:pwa-register"
 
 NProgress.configure({
     showSpinner: false,
@@ -45,10 +43,3 @@ app.use(VueAxios, axios)
 app.provide("axios", app.config.globalProperties.axios)
 
 app.mount("#app")
-
-const updateSW = registerSW({
-    onNeedRefresh() {
-    },
-    onOfflineReady() {
-    },
-})
