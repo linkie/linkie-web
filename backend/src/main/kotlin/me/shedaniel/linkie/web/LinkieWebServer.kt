@@ -31,8 +31,12 @@ import me.shedaniel.linkie.Method
 import me.shedaniel.linkie.Namespaces
 import me.shedaniel.linkie.getClassByObfName
 import me.shedaniel.linkie.getMappedDesc
+import me.shedaniel.linkie.getObfClientDesc
 import me.shedaniel.linkie.getObfMergedDesc
+import me.shedaniel.linkie.getObfServerDesc
+import me.shedaniel.linkie.obfClientName
 import me.shedaniel.linkie.obfMergedName
+import me.shedaniel.linkie.obfServerName
 import me.shedaniel.linkie.utils.MemberEntry
 import me.shedaniel.linkie.utils.ResultHolder
 import me.shedaniel.linkie.utils.toVersion
@@ -129,8 +133,8 @@ fun main() {
                 val allowFields = call.parameters["allowFields"]?.toBoolean() ?: true
                 val translateNsStr = call.parameters["translate"]?.lowercase()
                 require(limit in 1..1000) { "Limit must be between 1 and 1000" }
-                val namespace = Namespaces[namespaceStr]
-                val translateNamespace = translateNsStr?.let { Namespaces[it] }
+                val namespace = Namespaces.namespaces[namespaceStr] ?: throw IllegalArgumentException("No namespace found for $namespaceStr")
+                val translateNamespace = translateNsStr?.let { Namespaces.namespaces[it] ?: throw IllegalArgumentException("No namespace found for $it") }
 
                 val allVersions = namespace.getAllSortedVersions().toMutableList()
                 if (translateNamespace != null) {
@@ -253,6 +257,8 @@ fun toJsonFromEntry(mappings: MappingsContainer, entry: Any?, score: Double): Js
                 obf = entry.obfMergedName,
                 intermediary = entry.intermediaryName,
                 named = entry.mappedName,
+                obfClient = entry.obfClientName,
+                obfServer = entry.obfServerName,
                 score = score,
                 memberType = "c",
             )
@@ -268,6 +274,12 @@ fun toJsonFromEntry(mappings: MappingsContainer, entry: Any?, score: Double): Js
                 descObf = entry.member.getObfMergedDesc(mappings),
                 descIntermediary = entry.member.intermediaryDesc,
                 descNamed = entry.member.getMappedDesc(mappings),
+                ownerObfClient = entry.owner.obfClientName,
+                obfClient = entry.member.obfClientName,
+                descObfClient = entry.member.getObfClientDesc(mappings),
+                ownerObfServer = entry.owner.obfServerName,
+                obfServer = entry.member.obfServerName,
+                descObfServer = entry.member.getObfServerDesc(mappings),
                 score = score,
                 memberType = if (entry.member is Field) "f" else "m"
             )
@@ -349,6 +361,10 @@ data class SearchResultClassEntry(
     val intermediary: String,
     @SerialName("n")
     val named: String?,
+    @SerialName("h")
+    val obfClient: String?,
+    @SerialName("l")
+    val obfServer: String?,
     @SerialName("z")
     val score: Double,
     @SerialName("t")
@@ -375,6 +391,18 @@ data class SearchResultMemberEntry(
     val descIntermediary: String,
     @SerialName("f")
     val descNamed: String?,
+    @SerialName("g")
+    val ownerObfClient: String?,
+    @SerialName("h")
+    val obfClient: String?,
+    @SerialName("j")
+    val descObfClient: String?,
+    @SerialName("k")
+    val ownerObfServer: String?,
+    @SerialName("l")
+    val obfServer: String?,
+    @SerialName("m")
+    val descObfServer: String?,
     @SerialName("z")
     val score: Double,
     @SerialName("t")

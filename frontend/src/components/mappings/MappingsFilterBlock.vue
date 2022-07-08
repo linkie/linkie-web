@@ -2,13 +2,13 @@
     <div class="flex flex-col">
         <SubHeader :add-padding="false" class="pb-2">Namespace</SubHeader>
         <select class="select select-sm font-light p-0"
-                @change="namespace = ($event.target as any)?.value?.toLowerCase() ?? namespace" :value="namespace ?? ''">
+                @change="namespace = delocalizeNamespace(($event.target as any)?.value).id" :value="localizeNamespace(namespace) ?? localizeNamespace(firstNamespace) ?? ''">
             <option disabled selected>Select namespace</option>
-            <option v-for="namespace in namespaces">
-                {{ namespace.id }}
+            <option v-for="namespace in namespacesSorted">
+                {{ localizeNamespace(namespace) }}
             </option>
         </select>
-        
+
         <div class="divider mt-0 mb-0"/>
         <SubHeader :add-padding="false" class="pb-2">Version</SubHeader>
         <div class="flex flex-col flex-nowrap justify-center h-full whitespace-nowrap pb-2">
@@ -18,7 +18,7 @@
                        @input="allowSnapshots = ($event.target as any)?.checked ?? allowSnapshots"/>
             </div>
         </div>
-        
+
         <select class="select select-sm font-light p-0"
                 @change="version = ($event.target as any)?.value ?? version" :value="version ?? ''">
             <option disabled selected>Select version</option>
@@ -50,11 +50,12 @@
         <div class="divider mt-0 mb-0"/>
         <SubHeader :add-padding="false" class="pb-2">Translate To</SubHeader>
         <select class="select select-sm font-light p-0"
-                @change="translateAs = ($event.target as any)?.value === 'Do not translate' ? undefined : ($event.target as any)?.value?.toLowerCase()" :value="translateAs ?? 'Do not translate'">
+                @change="translateAs = ($event.target as any)?.value === 'Do not translate' ? undefined : delocalizeNamespace(($event.target as any)?.value).id"
+                :value="localizeNamespace(translateAs) ?? 'Do not translate'">
             <option disabled selected>Select namespace</option>
             <option>Do not translate</option>
             <option v-for="ns in namespaces" :disabled="ns.id === namespace">
-                {{ ns.id }}
+                {{ localizeNamespace(ns) }}
             </option>
         </select>
     </div>
@@ -65,16 +66,40 @@ import {defineComponent, PropType} from "vue"
 import {mapWritableState} from "pinia"
 import {useMappingsStore} from "../../app/mappings-store"
 import {MappingsData, Namespace} from "../../routes/Mappings.vue"
-import {useDependencySearchStore} from "../../app/dependency-store"
 import SubHeader from "../dependencies/SubHeader.vue"
+import {namespaceLocalizations} from "../../app/backend"
 
 export default defineComponent({
     name: "MappingsFilterBlock",
     components: {SubHeader},
+    methods: {
+        localizeNamespace(namespace?: Namespace | string): string | undefined {
+            if (typeof namespace === "string") {
+                return namespaceLocalizations[namespace.toLowerCase()] || namespace.toLowerCase()
+            } else if (namespace) {
+                let id = namespace.id
+                return namespaceLocalizations[id.toLowerCase()] || id.toLowerCase()
+            } else {
+                return undefined
+            }
+        },
+        delocalizeNamespace(string: string) : Namespace {
+            let id = Object.entries(namespaceLocalizations)
+                .find(([id, name]) => name === string)
+                ?.[0] ?? this.namespace?.id
+            return this.namespaces.find(ns => ns.id === id) ?? (this.namespace ?? this.namespaces[0])
+        }
+    },
     computed: {
         ...mapWritableState(useMappingsStore, ["namespace", "version", "allowSnapshots", "allowClasses", "allowFields", "allowMethods", "translateAs"]),
         namespaces(): Namespace[] {
             return this.data.namespaces
+        },
+        namespacesSorted(): Namespace[] {
+            return this.namespaces.sort((a, b) => (this.localizeNamespace(a) ?? "").localeCompare(this.localizeNamespace(b) ?? ""))
+        },
+        firstNamespace(): Namespace | undefined {
+            return this.namespaces.at(0)
         },
         applicableVersions(): string[] {
             let {namespace, allowSnapshots, translateAs} = useMappingsStore()
@@ -83,7 +108,7 @@ export default defineComponent({
             if (!namespaceObj) return []
             let versions = namespaceObj.versions
             if (versions && !allowSnapshots) {
-              versions = versions.filter(entry => entry.stable)
+                versions = versions.filter(entry => entry.stable)
             }
             if (versions && translateAs) {
                 let translateAsObj = this.data.namespaces.find(value => value.id === translateAs)

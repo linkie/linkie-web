@@ -2,7 +2,7 @@
     <Block>
         <SubHeader :addPadding="false">
             {{ getDisplayName(entry) }}
-            <span v-if="entry.translatedTo"> > {{ getDisplayName(entry.translatedTo) }}</span>
+            <span v-if="hasTranslation"> > {{ getDisplayName(entry.translatedTo) }}</span>
             <div class="badge badge-sm ml-2" :class="{
                     'badge-primary': entry.type === 'class',
                     'badge-secondary': entry.type === 'field',
@@ -21,7 +21,7 @@
         <EntryDetails v-if="namespace.supportsAT" title="AT:" :content="atText(entry)"/>
         <EntryDetails v-if="namespace.supportsAW" title="AW:" :content="awText(entry)"/>
 
-        <div v-if="entry.translatedTo">
+        <div v-if="hasTranslation">
             <div class="divider mt-0 mb-0"/>
             <EntryDetails v-if="entry.type === 'field' && translatedToNamespace.supportsFieldDescription" title="Type:" :content="fieldType(entry.translatedTo)"
                           :code="false"/>
@@ -79,6 +79,22 @@ function getObf(entry: MappingEntry) {
     }
 }
 
+function getObfClient(entry: MappingEntry) {
+    if (entry.type == "class") {
+        return formatName(entry.obfClient)
+    } else {
+        return `${formatName(entry.ownerObfClient)}.${onlyClass(entry.obfClient)}`
+    }
+}
+
+function getObfServer(entry: MappingEntry) {
+    if (entry.type == "class") {
+        return formatName(entry.obfServer)
+    } else {
+        return `${formatName(entry.ownerObfServer)}.${onlyClass(entry.obfServer)}`
+    }
+}
+
 function getIntermediaryName(entry: MappingEntry) {
     if (entry.type == "class") {
         return formatName(entry.intermediary)
@@ -103,11 +119,18 @@ function getDisplayName(entry: MappingEntry, simplify: boolean = true) {
     }
 }
 
-function getBreadcrumbs(entry: MappingEntry) {
+function getBreadcrumbs(hasTranslation: boolean, entry: MappingEntry) {
     let breadcrumbs = [] as string[]
-    if (!entry.translatedTo) {
+    if (!hasTranslation) {
         if (entry.obf) {
             breadcrumbs.push(getObf(entry)!)
+        } else {
+            let list = [] as string[]
+            if (entry.obfClient) list.push(getObfClient(entry)! + " (client)")
+            if (entry.obfServer) list.push(getObfServer(entry)! + " (server)")
+            if (list.length > 0) {
+                breadcrumbs.push(list.join(" / "))
+            }
         }
         let intermediary = getIntermediaryName(entry)!
         let named = getDisplayName(entry, false)!
@@ -199,7 +222,10 @@ export default defineComponent({
     },
     computed: {
         breadcrumbs() {
-            return getBreadcrumbs(this.entry)
+            return getBreadcrumbs(this.hasTranslation, this.entry)
+        },
+        hasTranslation() {
+            return this.entry.translatedTo && this.translatedToNamespace
         },
     },
     methods: {
@@ -228,12 +254,10 @@ export default defineComponent({
     },
     props: {
         namespace: {
-            type: Object as PropType<Namespace | undefined>,
-            required: true,
+            type: Object as PropType<Namespace>,
         },
         translatedToNamespace: {
-            type: Object as PropType<Namespace | undefined>,
-            required: true,
+            type: Object as PropType<Namespace>,
         },
         entry: {
             type: Object as PropType<MappingEntry>,
