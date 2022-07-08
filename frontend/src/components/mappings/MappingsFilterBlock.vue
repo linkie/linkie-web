@@ -86,7 +86,7 @@ export default defineComponent({
         delocalizeNamespace(string: string) : Namespace {
             let id = Object.entries(namespaceLocalizations)
                 .find(([id, name]) => name === string)
-                ?.[0] ?? this.namespace?.id
+                ?.[0] ?? this.namespace
             return this.namespaces.find(ns => ns.id === id) ?? (this.namespace ?? this.namespaces[0])
         }
     },

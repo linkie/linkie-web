@@ -139,7 +139,7 @@ function getBreadcrumbs(hasTranslation: boolean, entry: MappingEntry) {
             breadcrumbs.push(named)
         }
     } else {
-        let translatedTo = entry.translatedTo
+        let translatedTo = entry.translatedTo!
         let intermediary = getIntermediaryName(entry)!
         let named = getDisplayName(entry, false)!
         if (intermediary !== named && named) {
@@ -224,8 +224,8 @@ export default defineComponent({
         breadcrumbs() {
             return getBreadcrumbs(this.hasTranslation, this.entry)
         },
-        hasTranslation() {
-            return this.entry.translatedTo && this.translatedToNamespace
+        hasTranslation(): boolean {
+            return this.entry.translatedTo !== undefined && this.translatedToNamespace !== undefined
         },
     },
     methods: {
