@@ -175,7 +175,7 @@ export default defineComponent({
         ensureMappingsData() {
             let {namespace, version, allowSnapshots, translateAs} = useMappingsStore()
             if (!namespace) {
-                namespace = this.mappingsData.namespaces.at(0)?.id
+                namespace = this.mappingsData.namespaces[0]?.id
                 useMappingsStore().namespace = namespace
             }
             let namespaceObj = this.mappingsData.namespaces.find(value => value.id === namespace)

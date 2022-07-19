@@ -176,7 +176,7 @@ function beautifyFieldType(type: string) {
         if (clear.startsWith("L")) {
             str += clear.substring(1, clear.length - 1).replaceAll("/", ".").replaceAll("$", ".")
         } else {
-            switch (clear.at(0)) {
+            switch (clear[0]) {
                 case "Z":
                     str += "boolean"
                     break

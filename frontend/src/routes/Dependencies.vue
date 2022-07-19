@@ -155,7 +155,7 @@ export default defineComponent({
         ensureDependencyData() {
             let {loader, version, allowSnapshots} = useDependencySearchStore()
             if (!loader) {
-                loader = Object.keys(this.searchData.versions).at(0)
+                loader = Object.keys(this.searchData.versions)[0]
                 useDependencySearchStore().loader = loader
             }
             let applicable_versions = this.searchData.versions[loader!!]

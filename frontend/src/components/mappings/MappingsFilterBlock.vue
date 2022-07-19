@@ -99,7 +99,7 @@ export default defineComponent({
             return this.namespaces.sort((a, b) => (this.localizeNamespace(a) ?? "").localeCompare(this.localizeNamespace(b) ?? ""))
         },
         firstNamespace(): Namespace | undefined {
-            return this.namespaces.at(0)
+            return this.namespaces[0]
         },
         applicableVersions(): string[] {
             let {namespace, allowSnapshots, translateAs} = useMappingsStore()
