@@ -1,5 +1,5 @@
 <template>
-    <p class="mt-1" v-if="title != null">{{ title }}</p>
+    <p class="mt-1" v-if="title != undefined">{{ title }}</p>
     <div class="rounded-lg bg-base-300 p-3 text-sm mt-2 mb-1">
         <div class="flex">
             <div class="flex-1">

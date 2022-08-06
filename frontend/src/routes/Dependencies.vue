@@ -38,7 +38,7 @@
                                 {{ dependency.name }}
                                 <span class="hover:underline cursor-pointer" @click="copyAs(dependency.version)">{{ dependency.version }}</span>
                             </p>
-                            <CodeBlock :title="null">dependencies {<br>
+                            <CodeBlock :title="undefined">dependencies {<br>
                                 <span>{{ "    " }}</span>
                                 <span class="hover:underline cursor-pointer" @click="copyAs(formatDependency(dependency.type, dependency.notation, false))">
                                 {{ formatDependency(dependency.type, dependency.notation, false) }}

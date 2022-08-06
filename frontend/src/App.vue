@@ -95,9 +95,9 @@ export default defineComponent({
 
             <div class="absolute right-10 z-10">
                 <TransitionGroup name="list" tag="div">
-                    <div v-for="notification in Object.keys(notifications)" @click="removeNotification(notification)"
+                    <div v-for="notification in Object.keys(notifications)" @click="removeNotification(notification as unknown as number)"
                          class="toast mt-4 bg-base-100 p-5 shadow-2xl rounded-xl">
-                        {{ notifications[notification].message }}
+                        {{ notifications[notification as unknown as number].message }}
                     </div>
                 </TransitionGroup>
             </div>
