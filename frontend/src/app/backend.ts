@@ -34,14 +34,23 @@ export function reqOss<T = any>(): Promise<AxiosResponse<T>> {
     return HTTP.get(`/api/oss`)
 }
 
+export let namespaceGroups: { [key: string]: string | string[] } = {
+    "yarn": "Fabric",
+    "mojang": "Fabric",
+    "mojang_srg": "Forge",
+    "mojang_hashed": "Quilt",
+    "mcp": "Forge",
+    "quilt-mappings": "Quilt",
+}
+
 export let namespaceLocalizations: { [namespace: string]: string } = {
     "yarn": "Yarn",
-    "mojang": "Official Mojang (Fabric Intermediary)",
-    "mojang_srg": "Official Mojang (Forge SRG)",
-    "mojang_hashed": "Official Mojang (Quilt Hashed)",
+    "mojang": "Mojang (Intermediary)",
+    "mojang_srg": "Mojang (SRG)",
+    "mojang_hashed": "Mojang (Hashed)",
     "mcp": "MCP",
     "quilt-mappings": "Quilt Mappings",
-    "legacy-yarn": "Legacy Yarn (Unofficial)",
+    "legacy-yarn": "Legacy Yarn",
     "yarrn": "Yarrn",
     "plasma": "Plasma",
 } 

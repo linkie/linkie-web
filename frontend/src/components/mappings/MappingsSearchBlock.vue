@@ -11,7 +11,7 @@
                         <line x1="21" y1="21" x2="15" y2="15"></line>
                     </svg>
                 </div>
-                <input type="text" placeholder="Search..." class="input rounded-lg flex-1 px-0" :value="searchText"
+                <input type="text" placeholder="Search..." class="input rounded-lg flex-1 px-0 text-lg" :value="searchText"
                        @keyup="searchTimeOut($event)" @keydown.space.prevent autofocus/>
             </div>
         </div>

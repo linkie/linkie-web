@@ -1,7 +1,7 @@
 <template>
     <Block>
         <Header>{{ title }}</Header>
-        <slot></slot>
+        <slot/>
     </Block>
 </template>
 

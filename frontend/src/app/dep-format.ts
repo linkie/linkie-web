@@ -31,8 +31,12 @@ export function formatDepLine(configuration: string, notation: string, wrap?: st
 
 export function formatDep(configuration: string, notation: string, block: boolean, wrap?: string): string {
     if (!block) return formatDepLine(configuration, notation, wrap)
+    return formatBlock(formatDepLine(configuration, notation, wrap))
+}
+
+export function formatBlock(inner: string): string {
     return `dependencies {
-    ${formatDepLine(configuration, notation, wrap)}
+    ${inner}
 }`
 }
 

@@ -1,8 +1,10 @@
 <template>
     <Block>
         <SubHeader :addPadding="false">
-            {{ getDisplayName(entry) }}
-            <span v-if="hasTranslation"> > {{ getDisplayName(entry.translatedTo) }}</span>
+            <span class="hover:underline cursor-pointer" @click="copyAs(getDisplayName(entry))">{{ getDisplayName(entry) }}</span>
+            <span v-if="hasTranslation" class="hover:underline cursor-pointer" @click="copyAs(getDisplayName(entry.translatedTo))"> > {{
+                    getDisplayName(entry.translatedTo)
+                }}</span>
             <div class="badge badge-sm ml-2" :class="{
                     'badge-primary': entry.type === 'class',
                     'badge-secondary': entry.type === 'field',
@@ -12,23 +14,37 @@
         </SubHeader>
         <div class="text-sm breadcrumbs" v-if="breadcrumbs.length > 1">
             <ul>
-                <li v-for="breadcrumb in breadcrumbs">{{ breadcrumb }}</li>
+                <li v-for="breadcrumb in breadcrumbs" class="hover:underline cursor-pointer" @click="copyAs(breadcrumb)">{{ breadcrumb }}</li>
             </ul>
         </div>
         <div class="divider mt-0 mb-0"/>
-        <EntryDetails v-if="entry.type === 'field' && namespace.supportsFieldDescription" title="Type:" :content="fieldType(entry)" :code="false"/>
-        <EntryDetails v-if="entry.type !== 'class' && namespace.supportsMixin" title="Mixin Target:" :content="mixinTarget(entry)"/>
-        <EntryDetails v-if="namespace.supportsAT" title="AT:" :content="atText(entry)"/>
-        <EntryDetails v-if="namespace.supportsAW" title="AW:" :content="awText(entry)"/>
+        <EntryDetails v-if="entry.type === 'field' && namespace.supportsFieldDescription" title="Type:" :code="false">
+            <span class="hover:underline cursor-pointer" @click="copyAs(fieldType(entry))">{{ fieldType(entry) }}</span>
+        </EntryDetails>
+        <EntryDetails v-if="entry.type !== 'class' && namespace.supportsMixin" title="Mixin Target:">
+            <span class="hover:underline cursor-pointer" @click="copyAs(mixinTarget(entry))">{{ mixinTarget(entry) }}</span>
+        </EntryDetails>
+        <EntryDetails v-if="namespace.supportsAT" title="AT:">
+            <span class="hover:underline cursor-pointer" @click="copyAs(atText(entry))">{{ atText(entry) }}</span>
+        </EntryDetails>
+        <EntryDetails v-if="namespace.supportsAW" title="AW:">
+            <span class="hover:underline cursor-pointer" @click="copyAs(awText(entry))">{{ awText(entry) }}</span>
+        </EntryDetails>
 
         <div v-if="hasTranslation">
             <div class="divider mt-0 mb-0"/>
-            <EntryDetails v-if="entry.type === 'field' && translatedToNamespace.supportsFieldDescription" title="Type:" :content="fieldType(entry.translatedTo)"
-                          :code="false"/>
-            <EntryDetails v-if="entry.type !== 'class' && translatedToNamespace.supportsMixin" title="Mixin Target:"
-                          :content="mixinTarget(entry.translatedTo)"/>
-            <EntryDetails v-if="translatedToNamespace.supportsAT" title="AT:" :content="atText(entry.translatedTo)"/>
-            <EntryDetails v-if="translatedToNamespace.supportsAW" title="AW:" :content="awText(entry.translatedTo)"/>
+            <EntryDetails v-if="entry.type === 'field' && translatedToNamespace.supportsFieldDescription" title="Type:" :code="false">
+                <span class="hover:underline cursor-pointer" @click="copyAs(fieldType(entry.translatedTo))">{{ fieldType(entry.translatedTo) }}</span>
+            </EntryDetails>
+            <EntryDetails v-if="entry.type !== 'class' && translatedToNamespace.supportsMixin" title="Mixin Target:">
+                <span class="hover:underline cursor-pointer" @click="copyAs(mixinTarget(entry.translatedTo))">{{ mixinTarget(entry.translatedTo) }}</span>
+            </EntryDetails>
+            <EntryDetails v-if="translatedToNamespace.supportsAT" title="AT:">
+                <span class="hover:underline cursor-pointer" @click="copyAs(atText(entry.translatedTo))">{{ atText(entry.translatedTo) }}</span>
+            </EntryDetails>
+            <EntryDetails v-if="translatedToNamespace.supportsAW" title="AW:">
+                <span class="hover:underline cursor-pointer" @click="copyAs(awText(entry.translatedTo))">{{ awText(entry.translatedTo) }}</span>
+            </EntryDetails>
         </div>
     </Block>
 </template>
@@ -40,6 +56,7 @@ import Block from "../Block.vue"
 import Header from "../dependencies/Header.vue"
 import SubHeader from "../dependencies/SubHeader.vue"
 import EntryDetails from "./EntryDetails.vue"
+import {copyAs} from "../../app/copy";
 
 function getOptimumName(entry: MappingEntry): string {
     return entry.named || entry.intermediary || ""
@@ -218,6 +235,7 @@ export default defineComponent({
     data() {
         return {
             getDisplayName,
+            copyAs,
         }
     },
     computed: {

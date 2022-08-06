@@ -8,6 +8,7 @@ module.exports = {
     },
     plugins: [
         require("daisyui"),
+        require("tailwind-gradient-mask-image"),
     ],
     daisyui: {
         themes: [

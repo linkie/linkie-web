@@ -2,8 +2,10 @@
     <div class="max-w-[calc(62rem+var(--sidebar-width))] mx-auto">
         <div v-if="mappingsData.namespaces.length !== 0" class="grid-setup">
             <div class="col-[1] px-5 pt-6 sm:pr-0 sm:w-[var(--sidebar-width)] sm:min-w-[var(--sidebar-width)] sm:absolute">
-                <div class="p-5 card bg-base-100 shadow-xl rounded-lg">
-                    <MappingsFilterBlock :data="mappingsData"/>
+                <div class="p-5 card bg-base-100 shadow-xl rounded-lg sm:max-h-[calc(100vh-12rem)]">
+                    <div class="sm:gradient-mask-b-90 sm:overflow-y-auto no-scrollbar sm:pb-12">
+                        <MappingsFilterBlock :data="mappingsData"/>
+                    </div>
                 </div>
             </div>
             <div class="col-[2/span_2] min-w-0">
@@ -199,8 +201,8 @@ export default defineComponent({
             let {namespace, version, searchText, allowClasses, allowFields, allowMethods, translateAs} = useMappingsStore()
             if (namespace && version && searchText && (allowClasses || allowMethods || allowFields)) {
                 if (this.infoData.namespace !== namespace || this.infoData.version !== version || this.infoData.query !== searchText
-                    || this.infoData.allowClasses !== allowClasses || this.infoData.allowFields !== allowFields || this.infoData.allowMethods !== allowMethods
-                    || this.infoData.translateAs !== translateAs) {
+                        || this.infoData.allowClasses !== allowClasses || this.infoData.allowFields !== allowFields || this.infoData.allowMethods !== allowMethods
+                        || this.infoData.translateAs !== translateAs) {
                     if (this.searchController) {
                         this.searchController.abort()
                     }
@@ -289,5 +291,16 @@ div {
         grid-template-columns: auto 0 minmax(0, calc(100% - var(--sidebar-width)));
         @apply grid grid-flow-col;
     }
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.no-scrollbar {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
 }
 </style>

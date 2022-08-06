@@ -1,5 +1,5 @@
 <template>
-    <div class="text-base-content font-extrabold text-xl" :class="addPadding ? 'py-2' : ''">
+    <div class="font-extrabold text-xl" :class="addPadding ? 'py-2' : ''">
         <slot/>
     </div>
 </template>

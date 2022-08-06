@@ -25,14 +25,27 @@
                                 <SubHeader v-if="block.mavens.indexOf(maven) === 0 && !maven.subtitle">Maven Repository</SubHeader>
 
                                 <CodeBlock :title="maven.subtitle ?? ''">
-                                    {{ formatMaven(maven.url) }}
+                                    <span class="hover:underline cursor-pointer"
+                                          @click="copyAs(formatMaven(maven.url))">
+                                        {{ formatMaven(maven.url) }}
+                                    </span>
                                 </CodeBlock>
                             </div>
                         </div>
 
-                        <CodeBlock v-for="dependency in block.dependencies" :title="dependency.name">
-                            {{ formatDependency(dependency.type, dependency.notation) }}
-                        </CodeBlock>
+                        <div v-for="dependency in block.dependencies">
+                            <p class="mt-1">
+                                {{ dependency.name }}
+                                <span class="hover:underline cursor-pointer" @click="copyAs(dependency.version)">{{ dependency.version }}</span>
+                            </p>
+                            <CodeBlock :title="null">dependencies {<br>
+                                <span>{{ "    " }}</span>
+                                <span class="hover:underline cursor-pointer" @click="copyAs(formatDependency(dependency.type, dependency.notation, false))">
+                                {{ formatDependency(dependency.type, dependency.notation, false) }}
+                            </span>
+                                <br>}
+                            </CodeBlock>
+                        </div>
                     </DependencyBlock>
                 </div>
             </div>
@@ -51,13 +64,14 @@ import DependencyBlock from "../components/dependencies/DependencyBlock.vue"
 import DependencyFilterBlock from "../components/dependencies/DependencyFilterBlock.vue"
 import CodeBlock from "../components/dependencies/CodeBlock.vue"
 import SubHeader from "../components/dependencies/SubHeader.vue"
-import {DependencyType, formatDependency, formatMaven, tab} from "../app/dep-format"
+import {DependencyType, formatBlock, formatDependency, formatMaven, tab} from "../app/dep-format"
 import {reqVersions} from "../app/backend"
 import Block from "../components/Block.vue"
 import {defineComponent} from "vue"
 import {useDependencySearchStore} from "../app/dependency-store"
 import {mapState} from "pinia"
 import {addAlert} from "../app/alerts"
+import {copyAs} from "../app/copy";
 
 export interface VersionEntry {
     version: string,
@@ -98,16 +112,18 @@ export default defineComponent({
             } as DependencySearchData,
             formatMaven,
             formatDependency,
+            formatBlock,
             tab,
             reqVersionsPromise: undefined as Promise<any> | undefined,
+            copyAs,
         }
     },
     computed: {
         dependencyBlocks(): [string, DependencyBlock][] {
             let {loader, version} = useDependencySearchStore()
             return Object.entries(this.searchData.versions[loader ?? ""]
-                ?.find(entry => entry.version === version)
-                ?.blocks ?? {})
+                    ?.find(entry => entry.version === version)
+                    ?.blocks ?? {})
         },
         ...mapState(useDependencySearchStore, ["loader", "version", "allowSnapshots"]),
     },

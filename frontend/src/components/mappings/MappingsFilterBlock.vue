@@ -1,16 +1,41 @@
 <template>
     <div class="flex flex-col">
-        <SubHeader :add-padding="false" class="pb-2">Namespace</SubHeader>
-        <select class="select select-sm font-light p-0"
-                @change="namespace = delocalizeNamespace(($event.target as any)?.value).id" :value="localizeNamespace(namespace) ?? localizeNamespace(firstNamespace) ?? ''">
-            <option disabled selected>Select namespace</option>
-            <option v-for="namespace in namespacesSorted">
-                {{ localizeNamespace(namespace) }}
-            </option>
-        </select>
+        <SubHeader :add-padding="false" class="pb-1">Namespace</SubHeader>
+
+        <div v-for="[group, nses] in Object.entries(namespacesGrouped)" class="pb-1">
+            <Transition
+                    enter-active-class="duration-200 ease-out"
+                    enter-from-class="transform opacity-0 translate-x-full"
+                    enter-to-class="opacity-100 translate-x-0">
+                <div v-if="group !== 'Others' || expandNamespaces">
+                    <p class="text-sm font-bold">{{ group }}</p>
+                    <div v-for="ns in nses" :class="[
+                    namespace === ns.id ? 'opacity-100 font-bold' : 'opacity-60 hover:font-normal',
+                    'cursor-pointer px-2 py-1 capitalize rounded transition-all hover:opacity-100 hover:bg-neutral hover:text-white']"
+                         @click="namespace = ns.id">
+                        {{ localizeNamespace(ns) ?? '' }}
+                    </div>
+                </div>
+            </Transition>
+        </div>
+
+        <div class="px-2 py-1 justify-center cursor-pointer flex opacity-60 hover:opacity-100 transition-all rounded hover:bg-neutral hover:text-white"
+             @click="expandNamespaces=!expandNamespaces">
+            <svg xmlns="http://www.w3.org/2000/svg" :class="[expandNamespaces ? 'rotate-180' : '']" width="24" height="24" viewBox="0 0 24 24"
+                 stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+            <span v-if="!expandNamespaces">
+                Show More...
+            </span>
+            <span v-else>
+                Show Less...
+            </span>
+        </div>
 
         <div class="divider mt-0 mb-0"/>
-        <SubHeader :add-padding="false" class="pb-2">Version</SubHeader>
+        <SubHeader :add-padding="false" class="pb-1">Version</SubHeader>
         <div class="flex flex-col flex-nowrap justify-center h-full whitespace-nowrap pb-2">
             <div>
                 <span class="pr-2">Enable snapshots</span>
@@ -19,16 +44,20 @@
             </div>
         </div>
 
-        <select class="select select-sm font-light p-0"
-                @change="version = ($event.target as any)?.value ?? version" :value="version ?? ''">
-            <option disabled selected>Select version</option>
-            <option v-for="v in applicableVersions">
-                {{ v }}
-            </option>
-        </select>
+        <div class="bg-base-300 rounded-lg">
+            <div class="p-3 h-40 overflow-x-clip gradient-mask-b-80 overflow-y-scroll">
+                <p v-for="v in applicableVersions"
+                   :class="[version === v.version && v.hasTranslation ? 'opacity-100 font-bold' : 'opacity-60 hover:font-normal',
+                    v.hasTranslation ? 'transition-all hover:opacity-100 hover:bg-neutral hover:text-white rounded-md cursor-pointer' : 'cursor-not-allowed line-through',
+                    'px-2 py-1']"
+                   @click="version = v.hasTranslation ? v.version : version">
+                    {{ v.hasTranslation ? v.version : v.version + ' (no translation)' }}
+                </p>
+            </div>
+        </div>
 
         <div class="divider mt-0 mb-0"/>
-        <SubHeader :add-padding="false" class="pb-2">Search Type</SubHeader>
+        <SubHeader :add-padding="false" class="pb-1">Search Type</SubHeader>
         <div class="flex flex-col flex-nowrap justify-center h-full whitespace-nowrap pb-2">
             <div>
                 <input type="checkbox" class="checkbox checkbox-primary h-4" :checked="allowClasses" aria-label="Allow Classes"
@@ -48,16 +77,28 @@
         </div>
 
         <div class="divider mt-0 mb-0"/>
-        <SubHeader :add-padding="false" class="pb-2">Translate To</SubHeader>
-        <select class="select select-sm font-light p-0"
-                @change="translateAs = ($event.target as any)?.value === 'Do not translate' ? undefined : delocalizeNamespace(($event.target as any)?.value).id"
-                :value="localizeNamespace(translateAs) ?? 'Do not translate'">
-            <option disabled selected>Select namespace</option>
-            <option>Do not translate</option>
-            <option v-for="ns in namespaces" :disabled="ns.id === namespace">
-                {{ localizeNamespace(ns) }}
-            </option>
-        </select>
+        <div class="my-2">
+            <div :class="[
+                translateAs === undefined ? 'font-bold' : '',
+                'bg-base-300 cursor-pointer px-2 py-1 transition-all hover:bg-stone-300 rounded-t-lg text-lg']" 
+                 @click="translateAs = undefined">
+                Do Not Translate
+            </div>
+            <div class="px-2 py-1 transition-all rounded-b-lg bg-base-200">
+                <div :class="['text-lg mb-1', translateAs === undefined ? '' : 'font-bold']">Translate To</div>
+                <div v-for="[group, nses] in Object.entries(namespacesGrouped)" class="pb-1">
+                        <p class="text-sm font-bold">{{ group }}</p>
+                        <div v-for="ns in nses">
+                            <div v-if="ns?.id !== namespace" :class="[
+                        translateAs === ns.id ? 'opacity-100 font-bold' : 'opacity-60 hover:font-normal',
+                        'cursor-pointer px-2 py-1 capitalize rounded transition-all hover:opacity-100 hover:bg-neutral hover:text-white']"
+                                 @click="translateAs = ns.id">
+                                {{ localizeNamespace(ns) ?? '' }}
+                            </div>
+                        </div>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -67,11 +108,21 @@ import {mapWritableState} from "pinia"
 import {useMappingsStore} from "../../app/mappings-store"
 import {MappingsData, Namespace} from "../../routes/Mappings.vue"
 import SubHeader from "../dependencies/SubHeader.vue"
-import {namespaceLocalizations} from "../../app/backend"
+import {namespaceGroups, namespaceLocalizations} from "../../app/backend"
+
+interface VersionPossible {
+    version: string
+    hasTranslation: boolean
+}
 
 export default defineComponent({
     name: "MappingsFilterBlock",
     components: {SubHeader},
+    data() {
+        return {
+            expandNamespaces: false,
+        }
+    },
     methods: {
         localizeNamespace(namespace?: Namespace | string): string | undefined {
             if (typeof namespace === "string") {
@@ -83,10 +134,10 @@ export default defineComponent({
                 return undefined
             }
         },
-        delocalizeNamespace(string: string) : Namespace {
+        delocalizeNamespace(string: string): Namespace {
             let id = Object.entries(namespaceLocalizations)
-                .find(([id, name]) => name === string)
-                ?.[0] ?? this.namespace
+                    .find(([id, name]) => name === string)
+                    ?.[0] ?? this.namespace
             return this.namespaces.find(ns => ns.id === id) ?? (this.namespace ?? this.namespaces[0])
         }
     },
@@ -95,13 +146,30 @@ export default defineComponent({
         namespaces(): Namespace[] {
             return this.data.namespaces
         },
-        namespacesSorted(): Namespace[] {
-            return this.namespaces.sort((a, b) => (this.localizeNamespace(a) ?? "").localeCompare(this.localizeNamespace(b) ?? ""))
+        namespacesGrouped(): { [group: string]: Namespace[] } {
+            let groups = {} as { [group: string]: Namespace[] }
+            for (let ns in this.namespaces) {
+                let groupsApplicable = namespaceGroups[this.namespaces[ns].id] ?? "Others"
+                if (typeof groupsApplicable === "string") {
+                    groupsApplicable = [groupsApplicable]
+                }
+                for (let group of groupsApplicable) {
+                    if (!groups[group]) {
+                        groups[group] = []
+                    }
+                    groups[group].push(this.namespaces[ns])
+                }
+            }
+            for (let groupsKey in groups) {
+                //sort
+                groups[groupsKey].sort((a, b) => (this.localizeNamespace(a) ?? "").localeCompare(this.localizeNamespace(b) ?? ""))
+            }
+            return groups
         },
         firstNamespace(): Namespace | undefined {
             return this.namespaces[0]
         },
-        applicableVersions(): string[] {
+        applicableVersions(): VersionPossible[] {
             let {namespace, allowSnapshots, translateAs} = useMappingsStore()
             if (!namespace) return []
             let namespaceObj = this.data.namespaces.find(value => value.id === namespace)
@@ -113,9 +181,20 @@ export default defineComponent({
             if (versions && translateAs) {
                 let translateAsObj = this.data.namespaces.find(value => value.id === translateAs)
                 let retain = translateAsObj?.versions?.map(entry => entry.version) ?? []
-                versions = versions.filter(value => retain.includes(value.version))
+                return versions.map(entry => {
+                    return {
+                        version: entry.version,
+                        hasTranslation: retain.includes(entry.version)
+                    }
+                })
+            } else {
+                return versions.map(entry => {
+                    return {
+                        version: entry.version,
+                        hasTranslation: true,
+                    }
+                })
             }
-            return versions.map(entry => entry.version)
         },
     },
     props: {

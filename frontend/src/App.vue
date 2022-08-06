@@ -11,6 +11,7 @@ import {mapActions, mapState} from "pinia"
 
 import Footer from "./components/Footer.vue"
 import Navbar from "./components/Navbar.vue"
+import {useNotificationStore} from "./app/notification-store";
 
 const routes: { [route: string]: any; } = {
     "/": Home,
@@ -31,12 +32,14 @@ export default defineComponent({
             return routes[this.current || "/"] || NotFound
         },
         ...mapState(useAlertsStore, ["alerts"]),
+        ...mapState(useNotificationStore, ["notifications"]),
     },
     methods: {
         getAlertFor(type: string): Alert[] {
             return this.alerts.filter((alert: Alert) => alert.type === type)
         },
         ...mapActions(useAlertsStore, ["removeAlert"]),
+        ...mapActions(useNotificationStore, ["removeNotification"]),
     },
     mounted() {
         let theme = localStorage.getItem("theme")
@@ -90,6 +93,15 @@ export default defineComponent({
                 </div>
             </div>
 
+            <div class="absolute right-10 z-10">
+                <TransitionGroup name="list" tag="div">
+                    <div v-for="notification in Object.keys(notifications)" @click="removeNotification(notification)"
+                         class="toast mt-4 bg-base-100 p-5 shadow-2xl rounded-xl">
+                        {{ notifications[notification].message }}
+                    </div>
+                </TransitionGroup>
+            </div>
+
             <component :is="currentView"/>
         </div>
         <Footer/>
@@ -104,5 +116,17 @@ body {
 .select {
     outline: 0 !important;
     border: 0 !important;
+}
+
+.list-move, /* apply transition to moving elements */
+.list-enter-active,
+.list-leave-active {
+    transition: all 0.5s ease;
+}
+
+.list-enter-from,
+.list-leave-to {
+    opacity: 0;
+    transform: translateX(30px);
 }
 </style>

@@ -1,40 +1,50 @@
 <template>
     <div class="flex flex-col">
-        <SubHeader :add-padding="false" class="pb-2">Loader</SubHeader>
-        <select class="select select-sm font-light p-0"
-                @change="loader = (($event.target as any)?.value?.toLowerCase() ?? loader)" :value="loader ?? ''">
-            <option disabled selected>Select mod loader</option>
-            <option v-for="loader in loaders">
-                {{ loader }}
-            </option>
-        </select>
+        <SubHeader :add-padding="false" class="pb-1">Loader</SubHeader>
+
+        <div v-for="l in loaders" :class="[
+            loader === l ? 'opacity-100 font-bold' : 'opacity-50 font-normal',
+            'cursor-pointer p-2 capitalize rounded transition-all hover:opacity-100 hover:bg-neutral hover:text-white']" @click="loader = l">
+            {{ l }}
+        </div>
+
+        <div v-if="loader === 'forge'">
+            <div class="divider mt-0 mb-0"/>
+            <SubHeader :add-padding="false" class="pb-1">Build System</SubHeader>
+
+            <div :class="[
+            !forgeGradle ? 'opacity-100 font-bold' : 'opacity-50 font-normal',
+            'cursor-pointer p-2 capitalize rounded transition-all hover:opacity-100 hover:bg-neutral hover:text-white']" @click="forgeGradle = false">
+                Architectury Loom
+            </div>
+
+            <div :class="[
+            forgeGradle ? 'opacity-100 font-bold' : 'opacity-50 font-normal',
+            'cursor-pointer p-2 capitalize rounded transition-all hover:opacity-100 hover:bg-neutral hover:text-white']" @click="forgeGradle = true">
+                ForgeGradle
+            </div>
+        </div>
 
         <div class="divider mt-0 mb-0"/>
-        <SubHeader :add-padding="false" class="pb-2">Build System</SubHeader>
-        <select class="select select-sm font-light p-0"
-                @change="forgeGradle = (($event.target as any)?.value === 'ForgeGradle')" :value="forgeGradle ? 'ForgeGradle' : 'Architectury Loom'">
-            <option disabled selected>Select build system</option>
-            <option>Architectury Loom</option>
-            <option>ForgeGradle</option>
-        </select>
-
-        <div class="divider mt-0 mb-0"/>
-        <SubHeader :add-padding="false" class="pb-2">Version</SubHeader>
-        <div class="flex flex-col flex-nowrap justify-center h-full whitespace-nowrap pb-2">
+        <SubHeader :add-padding="false" class="pb-1">Version</SubHeader>
+        <div class="flex flex-col flex-nowrap justify-center h-full whitespace-nowrap pb-2" v-if="loader === 'fabric'">
             <div>
                 <span class="pr-2">Enable snapshots</span>
                 <input type="checkbox" class="checkbox checkbox-primary h-4" :checked="allowSnapshots" aria-label="Enable Snapshots"
                        @input="allowSnapshots = (($event.target as any)?.checked ?? allowSnapshots)"/>
             </div>
         </div>
-        
-        <select class="select select-sm font-light"
-                @change="version = (($event.target as any)?.value ?? version)" :value="version ?? ''">
-            <option disabled selected>Select version</option>
-            <option v-for="v in applicableVersions">
-                {{ v }}
-            </option>
-        </select>
+
+        <div class="bg-base-300 rounded-lg">
+            <div class="px-1 py-2 h-52 overflow-x-clip gradient-mask-b-80 overflow-y-scroll">
+                <p v-for="v in applicableVersions"
+                   :class="[version === v ? 'opacity-100 font-bold' : 'opacity-50 font-normal',
+                    'transition-all hover:opacity-100 hover:bg-neutral hover:text-white px-2 py-1 rounded-md cursor-pointer']"
+                   @click="version = v">
+                    {{ v }}
+                </p>
+            </div>
+        </div>
     </div>
 </template>
 

@@ -8,10 +8,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "copy-to-clipboard": "^3.3.2",
     "daisyui": "^2.15.0",
     "nprogress": "^0.2.0",
     "pinia": "^2.0.0-rc.10",
     "pinia-plugin-persistedstate": "^1.6.1",
+    "tailwind-gradient-mask-image": "^1.0.0",
     "vue": "^3.2.25",
     "vue-axios": "^3.4.1"
   },
