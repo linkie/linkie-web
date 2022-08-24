@@ -278,7 +278,7 @@ export default defineComponent({
             this.$nextTick(() => {
                 for (let entry of Object.entries(this.source.split('\n'))) {
                     if ((entry[1] + "").includes((this.entry.type === "class" ? "class " : " ") + onlyClass(getOptimumName(this.entry)) + (this.entry.type === "method" ? "(" : ""))) {
-                        this.$refs['source-line-' + entry[0]][0].scrollIntoView({behavior: 'smooth', block: 'center'})
+                        (this.$refs['source-line-' + entry[0]] as HTMLFormElement)[0].scrollIntoView({behavior: 'smooth', block: 'center'})
                         break
                     }
                 }
@@ -313,7 +313,7 @@ export default defineComponent({
             this.source = ''
 
             if (this.expandSource) {
-                reqSource(this.namespace.id, this.version, this.entry.ownerNamed ?? this.entry.ownerIntermediary ?? this.entry.named ?? this.entry.intermediary).then(value => {
+                reqSource(this.namespace!!.id, this.version!!, this.entry.ownerNamed ?? this.entry.ownerIntermediary ?? this.entry.named ?? this.entry.intermediary).then(value => {
                     this.source = value.data
                 }).catch(reason => {
                     addAlert({
