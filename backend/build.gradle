@@ -1,6 +1,6 @@
 plugins {
-    id "org.jetbrains.kotlin.jvm" version "1.6.21"
-    id "org.jetbrains.kotlin.plugin.serialization" version "1.6.21"
+    id "org.jetbrains.kotlin.jvm" version "1.7.10"
+    id "org.jetbrains.kotlin.plugin.serialization" version "1.7.10"
     id "com.github.johnrengelman.shadow" version "7.0.0"
 }
 
@@ -28,17 +28,18 @@ configurations {
 }
 
 dependencies {
-    implementation("me.shedaniel:linkie-core:1.0.103")
-    implementation("io.ktor:ktor-server-cors:2.0.1")
-    implementation("io.ktor:ktor-server-content-negotiation:2.0.1")
-    implementation("io.ktor:ktor-server-status-pages:2.0.1")
-    implementation("io.ktor:ktor-client-content-negotiation:2.0.1")
-    implementation("io.ktor:ktor-serialization-kotlinx-json:2.0.1")
+    implementation("me.shedaniel:linkie-core:1.0.105")
+    implementation('io.ktor:ktor-server-cors:2.1.0')
+    implementation('io.ktor:ktor-server-content-negotiation:2.1.0')
+    implementation('io.ktor:ktor-server-status-pages:2.1.0')
+    implementation('io.ktor:ktor-client-content-negotiation:2.1.0')
+    implementation('io.ktor:ktor-serialization-kotlinx-json:2.1.0')
     implementation("io.github.pdvrieze.xmlutil:serialization-jvm:0.84.2")
-    implementation 'io.ktor:ktor-server-core-jvm:2.0.2'
-    implementation 'io.ktor:ktor-server-netty-jvm:2.0.2'
-    implementation 'io.ktor:ktor-client-java-jvm:2.0.2'
-    implementation 'io.ktor:ktor-client-core-jvm:2.0.2'
+    implementation 'io.ktor:ktor-server-core-jvm:2.1.0'
+    implementation 'io.ktor:ktor-server-netty-jvm:2.1.0'
+    implementation 'io.ktor:ktor-client-java-jvm:2.1.0'
+    implementation 'io.ktor:ktor-client-core-jvm:2.1.0'
+    implementation 'com.github.Baw-Appie:ktor-rate-limit:1cf36fe'
 }
 
 jar {

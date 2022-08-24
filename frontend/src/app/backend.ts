@@ -30,6 +30,16 @@ export function reqSearch<T = any>(namespace: string, version: string, query: st
     })
 }
 
+export function reqSource<T = any>(namespace: string, version: string, className: string): Promise<AxiosResponse<T>> {
+    return HTTP.get(`/api/source`, {
+        params: {
+            namespace,
+            'class': className,
+            version,
+        },
+    })
+}
+
 export function reqOss<T = any>(): Promise<AxiosResponse<T>> {
     return HTTP.get(`/api/oss`)
 }

@@ -36,7 +36,7 @@
                         <div v-for="dependency in block.dependencies">
                             <p class="mt-1">
                                 {{ dependency.name }}
-                                <span class="hover:underline cursor-pointer" @click="copyAs(dependency.version)">{{ dependency.version }}</span>
+                                <span class="hover:underline cursor-pointer font-bold" @click="copyAs(dependency.version)">{{ dependency.version }}</span>
                             </p>
                             <CodeBlock :title="undefined">dependencies {<br>
                                 <span>{{ "    " }}</span>

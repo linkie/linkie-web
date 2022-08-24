@@ -10,9 +10,21 @@
             </div>
             <div class="col-[2/span_2] min-w-0">
                 <MappingsSearchBlock/>
-                <MappingsEntryBlock v-for="entry in infoData.entries" :namespace="mappingsData.namespaces.find(value => value.id === infoData.namespace)"
-                                    :translated-to-namespace="infoData.translateAs ? mappingsData.namespaces.find(value => value.id === infoData.translateAs) : undefined"
-                                    :entry="entry"/>
+                <div v-if="infoData.entries.length > 0">
+                    <MappingsEntryBlock v-for="entry in infoData.entries" :namespace="mappingsData.namespaces.find(value => value.id === infoData.namespace)"
+                                        :translated-to-namespace="infoData.translateAs ? mappingsData.namespaces.find(value => value.id === infoData.translateAs) : undefined"
+                                        :entry="entry" :version="version"/>
+                </div>
+                <div v-else class="m-10 flex flex-col items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-ban m-4" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                        <circle cx="12" cy="12" r="9"></circle>
+                        <line x1="5.7" y1="5.7" x2="18.3" y2="18.3"></line>
+                    </svg>
+                    <p class="font-bold">No Results</p>
+                    <p v-if="!infoData.query">Try searching something?</p>
+                    <p v-else>Did you make a mistake in your search?</p>
+                </div>
             </div>
         </div>
     </div>
@@ -37,6 +49,7 @@ export interface Namespace {
     supportsAW: boolean,
     supportsMixin: boolean,
     supportsFieldDescription: boolean,
+    supportsSource?: boolean,
 }
 
 export interface MappingsData {

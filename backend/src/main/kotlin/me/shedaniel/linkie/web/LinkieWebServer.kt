@@ -1,5 +1,7 @@
 package me.shedaniel.linkie.web
 
+import guru.zoroark.ratelimit.RateLimit
+import guru.zoroark.ratelimit.rateLimited
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
@@ -10,6 +12,7 @@ import io.ktor.server.plugins.cors.routing.*
 import io.ktor.server.plugins.statuspages.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
@@ -49,6 +52,7 @@ import me.shedaniel.linkie.web.deps.startLinkie
 import nl.adaptivity.xmlutil.serialization.XML
 import nl.adaptivity.xmlutil.serialization.XmlElement
 import nl.adaptivity.xmlutil.serialization.XmlSerialName
+import java.io.File
 import kotlin.math.max
 import kotlin.math.min
 
@@ -56,6 +60,7 @@ val xml = XML {
     autoPolymorphic = true
 }
 
+@OptIn(ExperimentalSerializationApi::class)
 val json = Json {
     prettyPrint = false
     isLenient = true
@@ -72,6 +77,11 @@ fun main() {
         install(ContentNegotiation) {
             json(json)
         }
+        install(RateLimit) {
+            timeBeforeReset = java.time.Duration.ofMinutes(1)
+            limit = 75
+            limitMessage = """{"message":"You are being rate limited.","retry_after":{{retryAfter}}}"""
+        }
         install(StatusPages) {
             exception<Throwable> { call, cause ->
                 call.respondText(text = "500: $cause", status = HttpStatusCode.InternalServerError)
@@ -79,114 +89,131 @@ fun main() {
             }
         }
         routing {
-            get("/api/versions") {
-                call.respond(getVersions())
-            }
-            get("/api/versions/{loader}") {
-                val loader = call.parameters["loader"]?.lowercase() ?: throw IllegalArgumentException("No loader specified")
-                if (loader == "all") {
-                    call.respond(buildJsonObject {
-                        val versions = getVersions()
-                        json.encodeToJsonElement(versions).jsonObject.forEach { loader, versionsArray ->
-                            val loaderVersions: MutableMap<String, MutableMap<String, DependencyData>> = getLoaderVersions(loader)
-                            this.putJsonArray(loader) {
-                                for (versionElement in versionsArray.jsonArray) {
-                                    addJsonObject {
-                                        versionElement.jsonObject.forEach { key, value -> this.put(key, value) }
-                                        val version = versionElement.jsonObject["version"]?.jsonPrimitive?.content
+            rateLimited {
+                get("/api/versions") {
+                    call.respond(getVersions())
+                }
+                get("/api/versions/{loader}") {
+                    val loader = call.parameters["loader"]?.lowercase() ?: throw IllegalArgumentException("No loader specified")
+                    if (loader == "all") {
+                        call.respond(buildJsonObject {
+                            val versions = getVersions()
+                            json.encodeToJsonElement(versions).jsonObject.forEach { loader, versionsArray ->
+                                val loaderVersions: MutableMap<String, MutableMap<String, DependencyData>> = getLoaderVersions(loader)
+                                this.putJsonArray(loader) {
+                                    for (versionElement in versionsArray.jsonArray) {
+                                        addJsonObject {
+                                            versionElement.jsonObject.forEach { key, value -> this.put(key, value) }
+                                            val version = versionElement.jsonObject["version"]?.jsonPrimitive?.content
 
-                                        val blocks: MutableMap<String, DependencyData>? = loaderVersions[version]
-                                        blocks?.let { element ->
-                                            put("blocks", json.encodeToJsonElement(element))
+                                            val blocks: MutableMap<String, DependencyData>? = loaderVersions[version]
+                                            blocks?.let { element ->
+                                                put("blocks", json.encodeToJsonElement(element))
+                                            }
                                         }
                                     }
                                 }
                             }
-                        }
-                    })
-                } else {
-                    call.respond(getLoaderVersions(loader))
-                }
-            }
-            get("api/oss") {
-                call.respond(xml.decodeFromString(OssEntries.serializer(), this.javaClass.getResource("/licenses.xml")!!.readText())
-                    .oss.map { it.copy(license = it.license.trim()) })
-            }
-            get("api/namespaces") {
-                call.respond(Namespaces.namespaces.map { (id, namespace) ->
-                    NamespaceEntry(
-                        id, namespace.getAllSortedVersions().map { version ->
-                            VersionInfo(version, stable = version.tryToVersion()?.let { it.snapshot == null } == true)
-                        }, namespace.supportsAT(), namespace.supportsAW(),
-                        namespace.supportsMixin(), namespace.supportsFieldDescription()
-                    )
-                })
-            }
-            get("api/search") {
-                val namespaceStr = call.parameters["namespace"]?.lowercase() ?: throw IllegalArgumentException("No namespace specified")
-                val query = call.parameters["query"]
-                    ?.replace('.', '/')?.replace('#', '/') ?: throw IllegalArgumentException("No query specified")
-                val version = call.parameters["version"]
-                val limit = call.parameters["limit"]?.toInt() ?: 100
-                val allowClasses = call.parameters["allowClasses"]?.toBoolean() ?: true
-                val allowMethods = call.parameters["allowMethods"]?.toBoolean() ?: true
-                val allowFields = call.parameters["allowFields"]?.toBoolean() ?: true
-                val translateNsStr = call.parameters["translate"]?.lowercase()
-                require(limit in 1..1000) { "Limit must be between 1 and 1000" }
-                val namespace = Namespaces.namespaces[namespaceStr] ?: throw IllegalArgumentException("No namespace found for $namespaceStr")
-                val translateNamespace = translateNsStr?.let { Namespaces.namespaces[it] ?: throw IllegalArgumentException("No namespace found for $it") }
-
-                val allVersions = namespace.getAllSortedVersions().toMutableList()
-                if (translateNamespace != null) {
-                    allVersions.retainAll(translateNamespace.getAllSortedVersions())
-                }
-
-                val defaultVersion = namespace.defaultVersion.takeIf { it in allVersions } ?: (translateNamespace?.defaultVersion?.takeIf { it in allVersions } ?: allVersions.first())
-
-                val provider = version?.let { namespace.getProvider(it) } ?: namespace.getProvider(defaultVersion)
-                val mappings = provider.get()
-                try {
-                    val result = MappingsQueryUtils.query(mappings, query, *buildList {
-                        if (allowClasses) add(MappingsEntryType.CLASS)
-                        if (allowMethods) add(MappingsEntryType.METHOD)
-                        if (allowFields) add(MappingsEntryType.FIELD)
-                    }.toTypedArray(), limit = limit)
-                    if (translateNamespace == null) {
-                        call.respond(
-                            SearchResultEntries(
-                                entries = result.results.asSequence().take(limit).mapNotNull {
-                                    toJsonFromEntry(mappings, it.value, it.score)
-                                }.toList(),
-                                fuzzy = result.fuzzy,
-                            )
-                        )
+                        })
                     } else {
-                        val target = translateNamespace.getProvider(provider.version!!).get()
-                        val elements = mutableListOf<JsonElement>()
-                        translate(mappings, target, result.results.asSequence().take(limit)) { from, to, score ->
-                            toJsonFromEntry(mappings, from, score)?.also { obj ->
-                                val translated = toJsonFromEntry(target, to, score)
-                                if (translated == null) elements.add(obj)
-                                else {
-                                    elements.add(buildJsonObject {
-                                        obj.forEach { key, value -> this.put(key, value) }
-                                        put("l", translated)
-                                    })
+                        call.respond(getLoaderVersions(loader))
+                    }
+                }
+                get("api/oss") {
+                    call.respond(xml.decodeFromString(OssEntries.serializer(), this.javaClass.getResource("/licenses.xml")!!.readText())
+                        .oss.map { it.copy(license = it.license.trim()) })
+                }
+                get("api/namespaces") {
+                    call.respond(Namespaces.namespaces.map { (id, namespace) ->
+                        NamespaceEntry(
+                            id,
+                            namespace.getAllSortedVersions().map { version ->
+                                VersionInfo(version, stable = version.tryToVersion()?.let { it.snapshot == null } == true)
+                            },
+                            namespace.supportsAT(), namespace.supportsAW(), namespace.supportsMixin(),
+                            namespace.supportsFieldDescription(), namespace.supportsSource() && false,
+                        )
+                    })
+                }
+                get("api/search") {
+                    val namespaceStr = call.parameters["namespace"]?.lowercase() ?: throw IllegalArgumentException("No namespace specified")
+                    val query = call.parameters["query"]
+                        ?.replace('.', '/')?.replace('#', '/') ?: throw IllegalArgumentException("No query specified")
+                    val version = call.parameters["version"]
+                    val limit = call.parameters["limit"]?.toInt() ?: 100
+                    val allowClasses = call.parameters["allowClasses"]?.toBoolean() ?: true
+                    val allowMethods = call.parameters["allowMethods"]?.toBoolean() ?: true
+                    val allowFields = call.parameters["allowFields"]?.toBoolean() ?: true
+                    val translateNsStr = call.parameters["translate"]?.lowercase()
+                    require(limit in 1..1000) { "Limit must be between 1 and 1000" }
+                    val namespace = Namespaces.namespaces[namespaceStr] ?: throw IllegalArgumentException("No namespace found for $namespaceStr")
+                    val translateNamespace = translateNsStr?.let { Namespaces.namespaces[it] ?: throw IllegalArgumentException("No namespace found for $it") }
+
+                    val allVersions = namespace.getAllSortedVersions().toMutableList()
+                    if (translateNamespace != null) {
+                        allVersions.retainAll(translateNamespace.getAllSortedVersions())
+                    }
+
+                    val defaultVersion = namespace.defaultVersion.takeIf { it in allVersions } ?: (translateNamespace?.defaultVersion?.takeIf { it in allVersions } ?: allVersions.first())
+
+                    val provider = version?.let { namespace.getProvider(it) } ?: namespace.getProvider(defaultVersion)
+                    val mappings = provider.get()
+                    try {
+                        val result = MappingsQueryUtils.query(mappings, query, *buildList {
+                            if (allowClasses) add(MappingsEntryType.CLASS)
+                            if (allowMethods) add(MappingsEntryType.METHOD)
+                            if (allowFields) add(MappingsEntryType.FIELD)
+                        }.toTypedArray(), limit = limit)
+                        if (translateNamespace == null) {
+                            call.respond(
+                                SearchResultEntries(
+                                    entries = result.results.asSequence().take(limit).mapNotNull {
+                                        toJsonFromEntry(mappings, it.value, it.score)
+                                    }.toList(),
+                                    fuzzy = result.fuzzy,
+                                )
+                            )
+                        } else {
+                            val target = translateNamespace.getProvider(provider.version!!).get()
+                            val elements = mutableListOf<JsonElement>()
+                            translate(mappings, target, result.results.asSequence().take(limit)) { from, to, score ->
+                                toJsonFromEntry(mappings, from, score)?.also { obj ->
+                                    val translated = toJsonFromEntry(target, to, score)
+                                    if (translated == null) elements.add(obj)
+                                    else {
+                                        elements.add(buildJsonObject {
+                                            obj.forEach { key, value -> this.put(key, value) }
+                                            put("l", translated)
+                                        })
+                                    }
                                 }
                             }
-                        }
-                        call.respond(
-                            SearchResultEntries(
-                                entries = elements,
-                                fuzzy = result.fuzzy,
+                            call.respond(
+                                SearchResultEntries(
+                                    entries = elements,
+                                    fuzzy = result.fuzzy,
+                                )
                             )
-                        )
+                        }
+                    } catch (error: NullPointerException) {
+                        call.respond(buildJsonObject {
+                            put("error", error.message ?: error.toString())
+                        })
+                        error.printStackTrace()
                     }
-                } catch (error: NullPointerException) {
-                    call.respond(buildJsonObject {
-                        put("error", error.message ?: error.toString())
-                    })
-                    error.printStackTrace()
+                }
+                get("api/source") {
+                    val namespaceStr = call.parameters["namespace"]?.lowercase() ?: throw IllegalArgumentException("No namespace specified")
+                    val className = call.parameters["class"]?.replace('.', '/') ?: throw IllegalArgumentException("No class specified")
+                    val version = call.parameters["version"] ?: throw IllegalArgumentException("No version specified")
+                    val namespace = Namespaces.namespaces[namespaceStr] ?: throw IllegalArgumentException("No namespace found for $namespaceStr")
+                    val provider = namespace.getProvider(version).takeIf { !it.isEmpty() } ?: throw IllegalArgumentException("No provider found for $version")
+                    val file = File(provider.getSources(className).absolutePath)
+                    if (file.exists()) {
+                        call.respondText(file.readText())
+                    } else {
+                        throw IllegalArgumentException("No source found for $className")
+                    }
                 }
             }
         }
@@ -263,6 +290,7 @@ fun toJsonFromEntry(mappings: MappingsContainer, entry: Any?, score: Double): Js
                 memberType = "c",
             )
         ) as JsonObject
+
         is MemberEntry<*> -> json.encodeToJsonElement(
             SearchResultMemberEntry.serializer(), SearchResultMemberEntry(
                 obf = entry.member.obfMergedName,
@@ -284,6 +312,7 @@ fun toJsonFromEntry(mappings: MappingsContainer, entry: Any?, score: Double): Js
                 memberType = if (entry.member is Field) "f" else "m"
             )
         ) as JsonObject
+
         else -> null
     }
 }
@@ -301,6 +330,7 @@ private fun translate(
                 val targetClass = target.getClassByObfName(obfName) ?: return@forEach
                 callback(value, targetClass, score)
             }
+
             value is MemberEntry<*> && value.member is Field -> {
                 val parent = value.owner
                 val field = value.member as Field
@@ -312,6 +342,7 @@ private fun translate(
 
                 callback(value, MemberEntry(targetParent, targetField), score)
             }
+
             value is MemberEntry<*> && value.member is Method -> {
                 val parent = value.owner
                 val method = value.member as Method
@@ -431,4 +462,5 @@ data class NamespaceEntry(
     val supportsAW: Boolean,
     val supportsMixin: Boolean,
     val supportsFieldDescription: Boolean,
+    val supportsSource: Boolean,
 )

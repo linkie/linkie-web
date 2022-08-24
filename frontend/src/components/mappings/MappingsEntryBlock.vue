@@ -1,15 +1,27 @@
 <template>
     <Block>
         <SubHeader :addPadding="false">
-            <span class="hover:underline cursor-pointer" @click="copyAs(getDisplayName(entry))">{{ getDisplayName(entry) }}</span>
-            <span v-if="hasTranslation" class="hover:underline cursor-pointer" @click="copyAs(getDisplayName(entry.translatedTo))"> > {{
-                    getDisplayName(entry.translatedTo)
-                }}</span>
-            <div class="badge badge-sm ml-2" :class="{
+            <div class="flex">
+                <div class="flex-1">
+                    <span class="hover:underline cursor-pointer" @click="copyAs(getDisplayName(entry))">{{ getDisplayName(entry) }}</span>
+                    <span v-if="hasTranslation" class="hover:underline cursor-pointer" @click="copyAs(getDisplayName(entry.translatedTo))">
+                    > {{ getDisplayName(entry.translatedTo) }}</span>
+                    <div class="badge badge-sm ml-2" :class="{
                     'badge-primary': entry.type === 'class',
                     'badge-secondary': entry.type === 'field',
                     'badge-accent': entry.type === 'method',
-                }">{{ entry.type }}
+                    }">{{ entry.type }}
+                    </div>
+                </div>
+                <div class="cursor-pointer" v-if="namespace?.supportsSource" @click="requestSource()">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-code" width="24" height="24" viewBox="0 0 24 24"
+                         stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                        <polyline points="7 8 3 12 7 16"></polyline>
+                        <polyline points="17 8 21 12 17 16"></polyline>
+                        <line x1="14" y1="4" x2="10" y2="20"></line>
+                    </svg>
+                </div>
             </div>
         </SubHeader>
         <div class="text-sm breadcrumbs" v-if="breadcrumbs.length > 1">
@@ -46,6 +58,14 @@
                 <span class="hover:underline cursor-pointer" @click="copyAs(awText(entry.translatedTo))">{{ awText(entry.translatedTo) }}</span>
             </EntryDetails>
         </div>
+
+        <div :class="['rounded-lg bg-base-300 p-3 text-sm mt-2 mb-1 h-[20rem]', source === '' ? 'animate-pulse' : '']" v-if="expandSource">
+            <pre class="pl-2 pb-1 overflow-x-auto h-[20rem]"><code
+                    v-for="[index, line] of Object.entries(source.split('\n'))"
+                    :class="['block break-all whitespace-pre', (line + '').includes((entry.type === 'class' ? 'class ' : ' ') + onlyClass(getOptimumName(entry)) + (entry.type === 'method' ? '(' : '')) ? 'font-bold' : '']"
+                    id="code-block"
+                    :ref="'source-line-' + index">{{ line === "" ? " " : line }}</code></pre>
+        </div>
     </Block>
 </template>
 
@@ -57,6 +77,9 @@ import Header from "../dependencies/Header.vue"
 import SubHeader from "../dependencies/SubHeader.vue"
 import EntryDetails from "./EntryDetails.vue"
 import {copyAs} from "../../app/copy";
+import CodeBlock from "../dependencies/CodeBlock.vue";
+import {reqSource} from "../../app/backend";
+import {addAlert} from "../../app/alerts";
 
 function getOptimumName(entry: MappingEntry): string {
     return entry.named || entry.intermediary || ""
@@ -231,11 +254,15 @@ function beautifyFieldType(type: string) {
 
 export default defineComponent({
     name: "MappingsEntryBlock",
-    components: {EntryDetails, SubHeader, Header, Block},
+    components: {CodeBlock, EntryDetails, SubHeader, Header, Block},
     data() {
         return {
             getDisplayName,
             copyAs,
+            expandSource: false,
+            source: "",
+            getOptimumName,
+            onlyClass,
         }
     },
     computed: {
@@ -244,6 +271,18 @@ export default defineComponent({
         },
         hasTranslation(): boolean {
             return this.entry.translatedTo !== undefined && this.translatedToNamespace !== undefined
+        },
+    },
+    watch: {
+        source() {
+            this.$nextTick(() => {
+                for (let entry of Object.entries(this.source.split('\n'))) {
+                    if ((entry[1] + "").includes((this.entry.type === "class" ? "class " : " ") + onlyClass(getOptimumName(this.entry)) + (this.entry.type === "method" ? "(" : ""))) {
+                        this.$refs['source-line-' + entry[0]][0].scrollIntoView({behavior: 'smooth', block: 'center'})
+                        break
+                    }
+                }
+            });
         },
     },
     methods: {
@@ -269,6 +308,21 @@ export default defineComponent({
             let desc = getOptimumDesc(entry)
             return beautifyFieldType(desc)
         },
+        requestSource() {
+            this.expandSource = !this.expandSource
+            this.source = ''
+
+            if (this.expandSource) {
+                reqSource(this.namespace.id, this.version, this.entry.ownerNamed ?? this.entry.ownerIntermediary ?? this.entry.named ?? this.entry.intermediary).then(value => {
+                    this.source = value.data
+                }).catch(reason => {
+                    addAlert({
+                        type: "error",
+                        message: `Failed to fetch source: ${reason.message}`,
+                    })
+                })
+            }
+        },
     },
     props: {
         namespace: {
@@ -276,6 +330,9 @@ export default defineComponent({
         },
         translatedToNamespace: {
             type: Object as PropType<Namespace>,
+        },
+        version: {
+            type: String,
         },
         entry: {
             type: Object as PropType<MappingEntry>,
