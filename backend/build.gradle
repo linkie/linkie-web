@@ -28,7 +28,7 @@ configurations {
 }
 
 dependencies {
-    implementation("me.shedaniel:linkie-core:1.0.105")
+    implementation("me.shedaniel:linkie-core:1.0.106")
     implementation('io.ktor:ktor-server-cors:2.1.0')
     implementation('io.ktor:ktor-server-content-negotiation:2.1.0')
     implementation('io.ktor:ktor-server-status-pages:2.1.0')
