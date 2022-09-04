@@ -1,22 +1,31 @@
 <template>
     <div class="max-w-[calc(62rem+var(--sidebar-width))] mx-auto">
         <div v-if="mappingsData.namespaces.length !== 0" class="grid-setup">
-            <div class="col-[1] px-5 pt-6 sm:pr-0 sm:w-[var(--sidebar-width)] sm:min-w-[var(--sidebar-width)] sm:absolute">
-                <div class="p-5 card bg-base-100 shadow-xl rounded-lg sm:max-h-[calc(100vh-12rem)]">
-                    <div class="sm:gradient-mask-b-90 sm:overflow-y-auto no-scrollbar sm:pb-12">
-                        <MappingsFilterBlock :data="mappingsData"/>
-                    </div>
+            <div class="col-[1] px-5 pt-6 sm:pr-0 sm:w-[var(--sidebar-width)] sm:min-w-[var(--sidebar-width)]">
+                <div class="p-5 card bg-base-100 shadow-xl rounded-lg mb-10">
+                    <MappingsFilterBlock :data="mappingsData"/>
                 </div>
             </div>
             <div class="col-[2/span_2] min-w-0">
                 <MappingsSearchBlock/>
+                <span>{{JSON.stringify(this.reqNamespacesPromise)}}</span>
                 <div v-if="infoData.entries.length > 0">
                     <MappingsEntryBlock v-for="entry in infoData.entries" :namespace="mappingsData.namespaces.find(value => value.id === infoData.namespace)"
                                         :translated-to-namespace="infoData.translateAs ? mappingsData.namespaces.find(value => value.id === infoData.translateAs) : undefined"
                                         :entry="entry" :version="version"/>
                 </div>
+                <div v-else-if="this.searchController" class="m-10 flex flex-col items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search m-4" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                        <circle cx="10" cy="10" r="7"></circle>
+                        <line x1="21" y1="21" x2="15" y2="15"></line>
+                    </svg>
+                    <p class="font-bold">Searching Results</p>
+                    <p>Feeling Lucky?</p>
+                </div>
                 <div v-else class="m-10 flex flex-col items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-ban m-4" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-ban m-4" width="24" height="24" viewBox="0 0 24 24"
+                         stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                         <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
                         <circle cx="12" cy="12" r="9"></circle>
                         <line x1="5.7" y1="5.7" x2="18.3" y2="18.3"></line>
@@ -243,6 +252,8 @@ export default defineComponent({
                             this.infoData.entries = []
                             this.infoData.fuzzy = false
                         }
+                    }).finally(() => {
+                        this.searchController = undefined
                     })
                 }
             } else {

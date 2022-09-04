@@ -77,7 +77,7 @@
         </div>
 
         <div class="divider mt-0 mb-0"/>
-        <div class="my-2">
+        <div class="mt-2">
             <div :class="[
                 translateAs === undefined ? 'font-bold' : '',
                 'bg-base-300 cursor-pointer px-2 py-1 transition-all hover:bg-stone-300 rounded-t-lg text-lg']" 
