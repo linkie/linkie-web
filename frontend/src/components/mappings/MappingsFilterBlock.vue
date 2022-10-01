@@ -57,26 +57,6 @@
         </div>
 
         <div class="divider mt-0 mb-0"/>
-        <SubHeader :add-padding="false" class="pb-1">Search Type</SubHeader>
-        <div class="flex flex-col flex-nowrap justify-center h-full whitespace-nowrap pb-2">
-            <div>
-                <input type="checkbox" class="checkbox checkbox-primary h-4" :checked="allowClasses" aria-label="Allow Classes"
-                       @input="allowClasses = ($event.target as any)?.checked ?? allowClasses"/>
-                <span class="pl-2">Classes</span>
-            </div>
-            <div>
-                <input type="checkbox" class="checkbox checkbox-primary h-4" :checked="allowMethods" aria-label="Allow Methods"
-                       @input="allowMethods = ($event.target as any)?.checked ?? allowMethods"/>
-                <span class="pl-2">Methods</span>
-            </div>
-            <div>
-                <input type="checkbox" class="checkbox checkbox-primary h-4" :checked="allowFields" aria-label="Allow Fields"
-                       @input="allowFields = ($event.target as any)?.checked ?? allowFields"/>
-                <span class="pl-2">Fields</span>
-            </div>
-        </div>
-
-        <div class="divider mt-0 mb-0"/>
         <div class="mt-2">
             <div :class="[
                 translateAs === undefined ? 'font-bold' : '',
@@ -142,7 +122,7 @@ export default defineComponent({
         }
     },
     computed: {
-        ...mapWritableState(useMappingsStore, ["namespace", "version", "allowSnapshots", "allowClasses", "allowFields", "allowMethods", "translateAs"]),
+        ...mapWritableState(useMappingsStore, ["namespace", "version", "allowSnapshots", "translateAs"]),
         namespaces(): Namespace[] {
             return this.data.namespaces
         },
