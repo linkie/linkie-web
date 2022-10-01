@@ -2,8 +2,8 @@
     <div class="px-5 pt-6">
         <div class="card bg-base-100 shadow-xl rounded-lg overflow-x-auto">
             <div class="flex pl-2 pt-2">
-                <span class="flex items-center justify-center ml-2 mr-3 font-bold">Search Type: </span>
-                <a :class="['m-1 p-1 select-none cursor-pointer text-center rounded-full bg-base-200 shadow transition-all', allowClasses ? 'bg-neutral text-white font-medium' : 'filter-chips']"
+                <span class="flex items-center justify-center ml-2 mr-3 font-bold whitespace-nowrap">Search Type: </span>
+                <a :class="['mx-1 p-1 select-none cursor-pointer text-center rounded-full bg-base-200 shadow transition-all', allowClasses ? 'bg-neutral text-white font-medium' : 'hover:brightness-90']"
                    @click="allowClasses = !allowClasses">
                     <div class="flex mx-2">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
@@ -14,7 +14,7 @@
                         <span class="w-20">Classes</span>
                     </div>
                 </a>
-                <a :class="['m-1 p-1 select-none cursor-pointer text-center rounded-full bg-base-200 shadow transition-all', allowMethods ? 'bg-neutral text-white font-medium' : 'filter-chips']"
+                <a :class="['mx-1 p-1 select-none cursor-pointer text-center rounded-full bg-base-200 shadow transition-all', allowMethods ? 'bg-neutral text-white font-medium' : 'hover:brightness-90']"
                    @click="allowMethods = !allowMethods">
                     <div class="flex mx-2">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
@@ -25,7 +25,7 @@
                         <span class="w-20">Methods</span>
                     </div>
                 </a>
-                <a :class="['m-1 p-1 select-none cursor-pointer text-center rounded-full bg-base-200 shadow transition-all', allowFields ? 'bg-neutral text-white font-medium' : 'filter-chips']"
+                <a :class="['mx-1 p-1 select-none cursor-pointer text-center rounded-full bg-base-200 shadow transition-all', allowFields ? 'bg-neutral text-white font-medium' : 'hover:brightness-90']"
                    @click="allowFields = !allowFields">
                     <div class="flex mx-2">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
@@ -86,9 +86,5 @@ export default defineComponent({
 .input {
     outline: 0 !important;
     border: 0 !important;
-}
-
-.filter-chips:hover {
-    filter: brightness(0.87);
 }
 </style>
