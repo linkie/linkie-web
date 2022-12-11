@@ -49,11 +49,11 @@
 </template>
 
 <script lang="ts">
-import {DependencySearchData} from "../../routes/Dependencies.vue"
 import {defineComponent, PropType} from "vue"
 import {useDependencySearchStore} from "../../app/dependency-store"
 import {mapWritableState} from "pinia"
 import SubHeader from "./SubHeader.vue"
+import {DependencySearchData} from "../../app/dependencies-data"
 
 export default defineComponent({
     name: "DependencyFilterBlock",
@@ -78,6 +78,18 @@ export default defineComponent({
             type: Object as PropType<DependencySearchData>,
             required: true,
         },
+    },
+    mounted() {
+        const urlParams = new URLSearchParams(window.location.search)
+        if (this.loaders.includes(urlParams.get("loader") ?? "")) {
+            this.loader = urlParams.get("loader")
+
+            if (this.applicableVersions.includes(urlParams.get("version") ?? "")) {
+                this.version = urlParams.get("version")
+            }
+
+            history.pushState({}, "", "/dependencies")
+        }
     },
 })
 </script>
