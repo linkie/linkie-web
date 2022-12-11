@@ -82,10 +82,10 @@ export default defineComponent({
     mounted() {
         const urlParams = new URLSearchParams(window.location.search)
         if (this.loaders.includes(urlParams.get("loader") ?? "")) {
-            this.loader = urlParams.get("loader")
+            useDependencySearchStore().loader = (urlParams.get("loader") ?? "") as string
 
             if (this.applicableVersions.includes(urlParams.get("version") ?? "")) {
-                this.version = urlParams.get("version")
+                useDependencySearchStore().version = (urlParams.get("version") ?? "") as string
             }
 
             history.pushState({}, "", "/dependencies")

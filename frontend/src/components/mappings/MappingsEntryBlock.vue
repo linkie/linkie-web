@@ -71,7 +71,6 @@
 
 <script lang="ts">
 import {defineComponent, PropType} from "vue"
-import {MappingEntry, Namespace} from "../../routes/Mappings.vue"
 import Block from "../Block.vue"
 import Header from "../dependencies/Header.vue"
 import SubHeader from "../dependencies/SubHeader.vue"
@@ -80,6 +79,7 @@ import {copyAs} from "../../app/copy";
 import CodeBlock from "../dependencies/CodeBlock.vue";
 import {reqSource} from "../../app/backend";
 import {addAlert} from "../../app/alerts";
+import {MappingEntry, Namespace} from "../../app/mappings-data"
 
 function getOptimumName(entry: MappingEntry): string {
     return entry.named || entry.intermediary || ""

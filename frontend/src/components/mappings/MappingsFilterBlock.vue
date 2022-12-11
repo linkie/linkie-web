@@ -181,11 +181,11 @@ export default defineComponent({
     mounted() {
         const urlParams = new URLSearchParams(window.location.search)
         if (this.namespaces.map(namespace => namespace.id).includes(urlParams.get("namespace") ?? "")) {
-            this.namespace = urlParams.get("namespace")
-            this.translateAs = undefined
+            useMappingsStore().namespace = (urlParams.get("namespace") ?? "") as string
+            useMappingsStore().translateAs = undefined
 
             if (this.applicableVersions.map(version => version.version).includes(urlParams.get("version") ?? "")) {
-                this.version = urlParams.get("version")
+                useMappingsStore().version = (urlParams.get("version") ?? "") as string
             }
 
             history.pushState({}, "", "/mappings")

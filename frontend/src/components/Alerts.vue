@@ -1,5 +1,5 @@
 <template>
-    <div class="max-w-4xl px-5 pt-6 mx-auto" v-for="alert in (alerts as Alert[])">
+    <div class="max-w-4xl px-5 pt-6 mx-auto" v-for="alert in alerts">
         <div class="alert shadow-lg rounded-lg" :class="{
                         'alert-success': alert.type === 'success',
                         'alert-warning': alert.type === 'warning',
