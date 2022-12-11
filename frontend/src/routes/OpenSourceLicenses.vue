@@ -2,7 +2,7 @@
     <div v-if="entries.length !== 0">
         <div class="max-w-[calc(62rem+var(--sidebar-width))] mx-auto">
             <div class="grid-setup">
-                <div class="col-[1] px-5 pt-6 sm:pr-0 sm:w-[var(--sidebar-width)] sm:min-w-[var(--sidebar-width)] sm:absolute">
+                <div class="col-[1] px-5 sm:pr-0 sm:w-[var(--sidebar-width)] sm:min-w-[var(--sidebar-width)] sm:absolute">
                     <div class="p-5 card bg-base-100 shadow-xl rounded-lg">
                         <SubHeader :add-padding="false">Table of Contents</SubHeader>
                         <ol class="list-decimal pl-6 mt-2">

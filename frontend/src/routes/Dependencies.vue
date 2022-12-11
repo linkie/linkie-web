@@ -2,7 +2,7 @@
     <div v-if="Object.keys(searchData.versions).length !== 0">
         <div class="max-w-[calc(62rem+var(--sidebar-width))] mx-auto">
             <div class="grid-setup">
-                <div class="col-[1] px-5 pt-6 sm:pr-0 sm:w-[var(--sidebar-width)] sm:min-w-[var(--sidebar-width)] sm:absolute">
+                <div class="col-[1] px-5 sm:pr-0 sm:w-[var(--sidebar-width)] sm:min-w-[var(--sidebar-width)] sm:absolute">
                     <div class="p-5 card bg-base-100 shadow-xl rounded-lg">
                         <DependencyFilterBlock :searchData="searchData"/>
                     </div>
@@ -64,127 +64,61 @@ import DependencyBlock from "../components/dependencies/DependencyBlock.vue"
 import DependencyFilterBlock from "../components/dependencies/DependencyFilterBlock.vue"
 import CodeBlock from "../components/dependencies/CodeBlock.vue"
 import SubHeader from "../components/dependencies/SubHeader.vue"
-import {DependencyType, formatBlock, formatDependency, formatMaven, tab} from "../app/dep-format"
-import {reqVersions} from "../app/backend"
+import {formatBlock, formatDependency, formatMaven, tab} from "../app/dep-format"
 import Block from "../components/Block.vue"
 import {defineComponent} from "vue"
 import {useDependencySearchStore} from "../app/dependency-store"
 import {mapState} from "pinia"
-import {addAlert} from "../app/alerts"
-import {copyAs} from "../app/copy";
-
-export interface VersionEntry {
-    version: string,
-    stable: boolean,
-    blocks: DependencyBlocks,
-}
-
-export interface DependencyEntry {
-    name: string,
-    type: DependencyType,
-    notation: string,
-    version: string,
-}
-
-export interface MavenInfo {
-    subtitle?: string,
-    url: string,
-}
-
-export interface DependencyBlock {
-    mavens: MavenInfo[],
-    dependencies: DependencyEntry[],
-}
-
-export type DependencyBlocks = { [name: string]: DependencyBlock }
-
-export interface DependencySearchData {
-    versions: { [loader: string]: VersionEntry[]; }
-}
+import {copyAs} from "../app/copy"
+import {DependencyBlockData, ensureDependencyData, updateDependencyData, useDependenciesDataStore} from "../app/dependencies-data"
 
 export default defineComponent({
     name: "Dependencies",
     components: {Block, CodeBlock, DependencyBlock, DependencyFilterBlock, SubHeader},
     data() {
         return {
-            searchData: {
-                versions: {},
-            } as DependencySearchData,
             formatMaven,
             formatDependency,
             formatBlock,
             tab,
-            reqVersionsPromise: undefined as Promise<any> | undefined,
             copyAs,
         }
     },
     computed: {
-        dependencyBlocks(): [string, DependencyBlock][] {
+        dependencyBlocks(): [string, DependencyBlockData][] {
             let {loader, version} = useDependencySearchStore()
-            return Object.entries(this.searchData.versions[loader ?? ""]
+            let {searchData} = useDependenciesDataStore()
+            return Object.entries(searchData.versions[loader ?? ""]
                     ?.find(entry => entry.version === version)
                     ?.blocks ?? {})
         },
+        ...mapState(useDependenciesDataStore, ["searchData"]),
         ...mapState(useDependencySearchStore, ["loader", "version", "allowSnapshots"]),
     },
     watch: {
         loader: {
             handler() {
-                this.updateDependencyData()
-                this.ensureDependencyData()
+                updateDependencyData()
+                ensureDependencyData()
             },
             immediate: true,
         },
         version: {
             handler() {
-                this.ensureDependencyData()
+                ensureDependencyData()
             },
             immediate: true,
         },
         allowSnapshots: {
             handler() {
-                this.ensureDependencyData()
+                ensureDependencyData()
             },
             immediate: true,
         },
     },
     mounted() {
-        this.updateDependencyData()
-        this.ensureDependencyData()
-    },
-    methods: {
-        updateDependencyData() {
-            if (Object.keys(this.searchData.versions).length == 0 && !this.reqVersionsPromise) {
-                this.reqVersionsPromise = reqVersions().then(value => {
-                    this.searchData.versions = value.data
-                    this.ensureDependencyData()
-                }).catch(reason => {
-                    addAlert({
-                        type: "error",
-                        message: `Failed to fetch versions: ${reason.message}`,
-                    })
-                }).finally(() => {
-                    this.reqVersionsPromise = undefined
-                })
-            }
-        },
-        ensureDependencyData() {
-            let {loader, version, allowSnapshots} = useDependencySearchStore()
-            if (!loader) {
-                loader = Object.keys(this.searchData.versions)[0]
-                useDependencySearchStore().loader = loader
-            }
-            let applicable_versions = this.searchData.versions[loader!!]
-            if (applicable_versions) {
-                if (!allowSnapshots) {
-                    applicable_versions = applicable_versions.filter(entry => entry.stable)
-                }
-                if (!version || !applicable_versions.find(entry => entry.version === version)) {
-                    version = applicable_versions.find(entry => entry.stable)?.version
-                    useDependencySearchStore().version = version
-                }
-            }
-        },
+        updateDependencyData()
+        ensureDependencyData()
     },
 })
 </script>

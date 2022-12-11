@@ -3,20 +3,15 @@
         <SubHeader :add-padding="false" class="pb-1">Namespace</SubHeader>
 
         <div v-for="[group, nses] in Object.entries(namespacesGrouped)" class="pb-1">
-            <Transition
-                    enter-active-class="duration-200 ease-out"
-                    enter-from-class="transform opacity-0 translate-x-full"
-                    enter-to-class="opacity-100 translate-x-0">
-                <div v-if="group !== 'Others' || expandNamespaces">
-                    <p class="text-sm font-bold">{{ group }}</p>
-                    <div v-for="ns in nses" :class="[
+            <div v-if="group !== 'Others' || expandNamespaces">
+                <p class="text-sm font-bold">{{ group }}</p>
+                <div v-for="ns in nses" :class="[
                     namespace === ns.id ? 'opacity-100 font-bold' : 'opacity-60 hover:font-normal',
                     'cursor-pointer px-2 py-1 capitalize rounded transition-all hover:opacity-100 hover:bg-neutral hover:text-white']"
-                         @click="namespace = ns.id">
-                        {{ localizeNamespace(ns) ?? '' }}
-                    </div>
+                     @click="namespace = ns.id">
+                    {{ localizeNamespace(ns) ?? "" }}
                 </div>
-            </Transition>
+            </div>
         </div>
 
         <div class="px-2 py-1 justify-center cursor-pointer flex opacity-60 hover:opacity-100 transition-all rounded hover:bg-neutral hover:text-white"
@@ -51,7 +46,7 @@
                     v.hasTranslation ? 'transition-all hover:opacity-100 hover:bg-neutral hover:text-white rounded-md cursor-pointer' : 'cursor-not-allowed line-through',
                     'px-2 py-1']"
                    @click="version = v.hasTranslation ? v.version : version">
-                    {{ v.hasTranslation ? v.version : v.version + ' (no translation)' }}
+                    {{ v.hasTranslation ? v.version : v.version + " (no translation)" }}
                 </p>
             </div>
         </div>
@@ -60,22 +55,22 @@
         <div class="mt-2">
             <div :class="[
                 translateAs === undefined ? 'font-bold' : '',
-                'bg-base-300 cursor-pointer px-2 py-1 transition-all hover:bg-stone-300 rounded-t-lg text-lg']" 
+                'bg-base-300 cursor-pointer px-2 py-1 transition-all hover:bg-stone-300 rounded-t-lg text-lg']"
                  @click="translateAs = undefined">
                 Do Not Translate
             </div>
             <div class="px-2 py-1 transition-all rounded-b-lg bg-base-200">
                 <div :class="['text-lg mb-1', translateAs === undefined ? '' : 'font-bold']">Translate To</div>
                 <div v-for="[group, nses] in Object.entries(namespacesGrouped)" class="pb-1">
-                        <p class="text-sm font-bold">{{ group }}</p>
-                        <div v-for="ns in nses">
-                            <div v-if="ns?.id !== namespace" :class="[
+                    <p class="text-sm font-bold">{{ group }}</p>
+                    <div v-for="ns in nses">
+                        <div v-if="ns?.id !== namespace" :class="[
                         translateAs === ns.id ? 'opacity-100 font-bold' : 'opacity-60 hover:font-normal',
                         'cursor-pointer px-2 py-1 capitalize rounded transition-all hover:opacity-100 hover:bg-neutral hover:text-white']"
-                                 @click="translateAs = ns.id">
-                                {{ localizeNamespace(ns) ?? '' }}
-                            </div>
+                             @click="translateAs = ns.id">
+                            {{ localizeNamespace(ns) ?? "" }}
                         </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -86,9 +81,9 @@
 import {defineComponent, PropType} from "vue"
 import {mapWritableState} from "pinia"
 import {useMappingsStore} from "../../app/mappings-store"
-import {MappingsData, Namespace} from "../../routes/Mappings.vue"
 import SubHeader from "../dependencies/SubHeader.vue"
 import {namespaceGroups, namespaceLocalizations} from "../../app/backend"
+import {MappingsData, Namespace} from "../../app/mappings-data"
 
 interface VersionPossible {
     version: string
@@ -119,7 +114,7 @@ export default defineComponent({
                     .find(([id, name]) => name === string)
                     ?.[0] ?? this.namespace
             return this.namespaces.find(ns => ns.id === id) ?? (this.namespace ?? this.namespaces[0])
-        }
+        },
     },
     computed: {
         ...mapWritableState(useMappingsStore, ["namespace", "version", "allowSnapshots", "translateAs"]),
@@ -164,7 +159,7 @@ export default defineComponent({
                 return versions.map(entry => {
                     return {
                         version: entry.version,
-                        hasTranslation: retain.includes(entry.version)
+                        hasTranslation: retain.includes(entry.version),
                     }
                 })
             } else {
@@ -182,6 +177,19 @@ export default defineComponent({
             type: Object as PropType<MappingsData>,
             required: true,
         },
+    },
+    mounted() {
+        const urlParams = new URLSearchParams(window.location.search)
+        if (this.namespaces.map(namespace => namespace.id).includes(urlParams.get("namespace") ?? "")) {
+            this.namespace = urlParams.get("namespace")
+            this.translateAs = undefined
+
+            if (this.applicableVersions.map(version => version.version).includes(urlParams.get("version") ?? "")) {
+                this.version = urlParams.get("version")
+            }
+
+            history.pushState({}, "", "/mappings")
+        }
     },
 })
 </script>

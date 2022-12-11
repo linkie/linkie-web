@@ -1,6 +1,6 @@
 <template>
-    <div class="px-5 pt-6">
-        <div class="card bg-base-100 shadow-xl rounded-lg overflow-x-auto">
+    <div class="px-5 pb-6">
+        <div class="bg-base-100 shadow-xl rounded-lg overflow-x-auto">
             <div class="flex pl-2 pt-2">
                 <span class="flex items-center justify-center ml-2 mr-3 font-bold whitespace-nowrap">Search Type: </span>
                 <a :class="['mx-1 p-1 select-none cursor-pointer text-center rounded-full bg-base-200 shadow transition-all', allowClasses ? 'bg-neutral text-white font-medium' : 'hover:brightness-90']"
