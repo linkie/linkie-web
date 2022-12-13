@@ -29,8 +29,8 @@ export default defineComponent({
         currentView() {
             return routes[this.current || "/"] || NotFound
         },
-        theme() {
-            return localStorage.getItem("theme")
+        theme(): string {
+            return localStorage.getItem("theme") ?? ""
         },
     },
     mounted() {
