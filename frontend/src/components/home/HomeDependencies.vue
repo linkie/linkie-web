@@ -1,7 +1,7 @@
 <template>
-    <div class="flex gap-x-4 gap-y-2 flex-wrap">
-        <div class="p-4 cursor-pointer bg-base-content text-base-100 rounded-lg whitespace-nowrap hover:scale-110 transition-all" 
-               v-for="version in versions.slice(0, 16)" @click="select(version[0], version[1])">{{ version[0] }} {{ version[1] }}</div>
+    <div class="flex gap-x-4 gap-y-3 flex-wrap">
+        <a class="px-4 py-2 cursor-pointer border-2 border-base-content font-medium rounded-xl whitespace-nowrap hover:scale-110 transition-all" 
+               v-for="version in versions.slice(0, 16)" :href="select(version[0], version[1])">{{ version[0] }} {{ version[1] }}</a>
     </div>
 </template>
 
@@ -15,8 +15,8 @@ export default defineComponent({
     name: "HomeDependencies",
     components: {Block},
     methods: {
-        select(loader: string, version: string) {
-            location.href = `/dependencies?loader=${loader.toLowerCase()}&version=${version}`
+        select(loader: string, version: string): string {
+            return `/dependencies?loader=${loader.toLowerCase()}&version=${version}`
         },
     },
     computed: {

@@ -2,10 +2,10 @@
     <div class="flex flex-col gap-4">
         <div v-for="vers in versions">
             <div class="font-bold text-xl mb-2">{{ namespaceLocalizations[vers[0][0]] ?? vers[0][0] }}</div>
-            <div class="flex gap-x-4 gap-y-2 flex-wrap">
-                <div class="p-4 cursor-pointer bg-base-content text-base-100 rounded-lg whitespace-nowrap hover:scale-110 transition-all"
-                     v-for="version in vers.slice(0, 16)" @click="select(version[0], version[1])">{{ version[1] }}
-                </div>
+            <div class="flex gap-x-4 gap-y-3 flex-wrap">
+                <a class="px-4 py-2 cursor-pointer border-2 border-base-content font-medium rounded-xl whitespace-nowrap hover:scale-110 transition-all"
+                     v-for="version in vers.slice(0, 16)" :href="select(version[0], version[1])">{{ version[1] }}
+                </a>
             </div>
         </div>
     </div>
@@ -27,8 +27,8 @@ export default defineComponent({
         }
     },
     methods: {
-        select(namespace: string, version: string) {
-            location.href = `/mappings?namespace=${namespace.toLowerCase()}&version=${version}`
+        select(namespace: string, version: string): string {
+            return `/mappings?namespace=${namespace.toLowerCase()}&version=${version}`
         },
     },
     computed: {

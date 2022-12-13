@@ -29,6 +29,9 @@ export default defineComponent({
         currentView() {
             return routes[this.current || "/"] || NotFound
         },
+        theme() {
+            return localStorage.getItem("theme")
+        },
     },
     mounted() {
         let theme = localStorage.getItem("theme")
@@ -44,14 +47,16 @@ export default defineComponent({
 </script>
 
 <template>
-    <div class="w-screen h-screen overflow-x-hidden">
-        <Navbar :class="`navbar-${current}`"/>
+    <meta name="theme-color" :key="theme" :content="theme === 'cupcake' ? '#efeae6' : '#242933'">
+    <div class="w-screen overflow-x-hidden">
+        <Navbar class="top-0 fixed z-10" :class="`navbar-${current}`"/>
 
-        <Alerts/>
-        <div class="min-h-full flex flex-col justify-between">
+        <div class="w-screen min-h-screen flex flex-col justify-between bg-base-200">
             <component :is="currentView"/>
             <Footer/>
         </div>
+
+        <Alerts/>
     </div>
 </template>
 

@@ -1,5 +1,5 @@
 <template>
-    <div class="flex justify-center px-2 py-1 min-h-16 top-0 absolute z-10 w-full backdrop-blur-md">
+    <div class="flex justify-center px-2 py-1 min-h-16 w-full backdrop-blur-md">
         <div class="max-w-[78rem] mx-auto w-full flex justify-between min-h-16">
             <div class="flex overflow-x-auto">
                 <NavbarButton href="/" :bold="true">Linkie</NavbarButton>

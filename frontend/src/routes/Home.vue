@@ -67,10 +67,6 @@ export default defineComponent({
 </style>
 <style>
 .navbar-\/ {
-    background: linear-gradient(135deg, #1f005c, #5b0060, #870160, #ac255e, #ca485c, #e16b5c, #f39060, #ffb56b) fixed;
-}
-
-.navbar-\/ {
     color: white !important;
 }
 </style>
