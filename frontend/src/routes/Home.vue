@@ -1,6 +1,6 @@
 <template>
     <div class="w-full flex flex-col">
-        <h1 class="pt-20 pb-28 text-center text-6xl font-bold title-home text-white">Welcome to Linkie</h1>
+        <h1 class="pt-40 pb-28 text-center text-6xl font-bold title-home text-white">Welcome to Linkie</h1>
 
         <div class="pl-4 pr-10">
             <div class="max-w-[78rem] mx-auto mt-8 flex-1">

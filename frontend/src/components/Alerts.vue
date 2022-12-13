@@ -33,10 +33,10 @@
         </div>
     </div>
 
-    <div class="absolute right-10 z-10">
+    <div class="absolute top-24 right-10 z-10">
         <TransitionGroup name="list" tag="div">
             <div v-for="notification in Object.keys(notifications)" :key="notifications[notification as unknown as number].message" @click="removeNotification(notification as unknown as number)"
-                 class="toast mt-4 bg-base-100 p-5 shadow-2xl rounded-xl">
+                 class="relative toast mt-4 bg-base-100 p-3 shadow-2xl rounded-xl border-2 border-accent-content">
                 {{ notifications[notification as unknown as number].message }}
             </div>
         </TransitionGroup>
@@ -51,6 +51,11 @@ import {useNotificationStore} from "../app/notification-store"
 
 export default defineComponent({
     name: "Alerts",
+    data() {
+        return {
+            timer: undefined as any,
+        }
+    },
     computed: {
         ...mapState(useAlertsStore, ["alerts"]),
         ...mapState(useNotificationStore, ["notifications"]),
@@ -60,8 +65,8 @@ export default defineComponent({
             return this.alerts.filter((alert: Alert) => alert.type === type)
         },
         ...mapActions(useAlertsStore, ["removeAlert"]),
-        ...mapActions(useNotificationStore, ["removeNotification"]),
-    },
+        ...mapActions(useNotificationStore, ["removeNotification"])
+    }
 })
 </script>
 

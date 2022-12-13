@@ -1,41 +1,11 @@
 <template>
     <div class="px-5 pb-6">
         <div class="bg-base-100 shadow-xl rounded-lg overflow-x-auto">
-            <div class="flex pl-2 pt-2">
+            <div class="flex px-2 pt-2">
                 <span class="flex items-center justify-center ml-2 mr-3 font-bold whitespace-nowrap">Search Type: </span>
-                <a :class="['mx-1 p-1 select-none cursor-pointer text-center rounded-full bg-base-200 shadow transition-all', allowClasses ? 'bg-neutral text-white font-medium' : 'hover:brightness-90']"
-                   @click="allowClasses = !allowClasses">
-                    <div class="flex mx-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                            <line v-if="!allowClasses" x1="3" y1="3" x2="21" y2="21"></line>
-                            <path d="M5.5 5h13a1 1 0 0 1 .5 1.5l-5 5.5l0 7l-4 -3l0 -4l-5 -5.5a1 1 0 0 1 .5 -1.5"></path>
-                        </svg>
-                        <span class="w-20">Classes</span>
-                    </div>
-                </a>
-                <a :class="['mx-1 p-1 select-none cursor-pointer text-center rounded-full bg-base-200 shadow transition-all', allowMethods ? 'bg-neutral text-white font-medium' : 'hover:brightness-90']"
-                   @click="allowMethods = !allowMethods">
-                    <div class="flex mx-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                            <line v-if="!allowMethods" x1="3" y1="3" x2="21" y2="21"></line>
-                            <path d="M5.5 5h13a1 1 0 0 1 .5 1.5l-5 5.5l0 7l-4 -3l0 -4l-5 -5.5a1 1 0 0 1 .5 -1.5"></path>
-                        </svg>
-                        <span class="w-20">Methods</span>
-                    </div>
-                </a>
-                <a :class="['mx-1 p-1 select-none cursor-pointer text-center rounded-full bg-base-200 shadow transition-all', allowFields ? 'bg-neutral text-white font-medium' : 'hover:brightness-90']"
-                   @click="allowFields = !allowFields">
-                    <div class="flex mx-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                            <line v-if="!allowFields" x1="3" y1="3" x2="21" y2="21"></line>
-                            <path d="M5.5 5h13a1 1 0 0 1 .5 1.5l-5 5.5l0 7l-4 -3l0 -4l-5 -5.5a1 1 0 0 1 .5 -1.5"></path>
-                        </svg>
-                        <span class="w-20">Fields</span>
-                    </div>
-                </a>
+                <MappingsFilterPill :enabled="allowClasses" text="Classes" @click="allowClasses = !allowClasses"/>
+                <MappingsFilterPill :enabled="allowMethods" text="Methods" @click="allowMethods = !allowMethods"/>
+                <MappingsFilterPill :enabled="allowFields" text="Fields" @click="allowFields = !allowFields"/>
             </div>
             <div class="flex flex-wrap items-center">
                 <div class="flex-none px-4">
@@ -58,6 +28,7 @@
 import {defineComponent} from "vue"
 import {mapState, mapWritableState} from "pinia"
 import {useMappingsStore} from "../../app/mappings-store"
+import MappingsFilterPill from "./MappingsFilterPill.vue"
 
 export default defineComponent({
     name: "MappingsSearchBlock",
@@ -65,6 +36,9 @@ export default defineComponent({
         return {
             timer: undefined as any,
         }
+    },
+    components: {
+        MappingsFilterPill,
     },
     computed: {
         ...mapWritableState(useMappingsStore, ["allowClasses", "allowFields", "allowMethods"]),

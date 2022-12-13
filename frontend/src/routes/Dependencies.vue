@@ -1,4 +1,5 @@
 <template>
+    <div class="pt-20"/>
     <div v-if="Object.keys(searchData.versions).length !== 0">
         <div class="max-w-[calc(62rem+var(--sidebar-width))] mx-auto">
             <div class="grid-setup">
@@ -17,7 +18,7 @@
                     </div>
                 </div>
 
-                <div class="col-[2/span_2] min-w-0">
+                <div class="col-[2/span_2] min-w-0 pt-6 sm:pt-0">
                     <DependencyBlock v-for="[blockName, block] in dependencyBlocks" :title="blockName"
                                      :id="'dep-' + dependencyBlocks.findIndex(entry => entry[0] === blockName)">
                         <div v-if="block.mavens.length > 0">

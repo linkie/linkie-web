@@ -1,4 +1,5 @@
 <template>
+    <div class="pt-20"/>
     <div v-if="entries.length !== 0">
         <div class="max-w-[calc(62rem+var(--sidebar-width))] mx-auto">
             <div class="grid-setup">

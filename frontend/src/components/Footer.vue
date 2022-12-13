@@ -1,8 +1,8 @@
 <template>
-    <div class="bg-base-300 w-full mt-6">
+    <div class="bg-base-300 px-4 w-full mt-6">
         <footer class="max-w-[78rem] w-full mx-auto">
             <div class="items-center font-medium py-4 flex">
-                <p class="flex-1">Copyright Linkie & shedaniel © 2020 - 2022. All right reserved.</p>
+                <p class="flex-1"><span class="whitespace-nowrap">Copyright Linkie & shedaniel</span> <span class="whitespace-nowrap">© 2020 - 2022.</span> <span class="whitespace-nowrap">All right reserved.</span></p>
                 <a href="/oss">
                     <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-open-source" width="24" height="24" viewBox="0 0 24 24"
                          stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-label="Open Source Licenses">

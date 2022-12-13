@@ -44,15 +44,13 @@ export default defineComponent({
 </script>
 
 <template>
-    <div class="h-screen flex flex-col">
+    <div class="w-screen h-screen overflow-x-hidden">
         <Navbar :class="`navbar-${current}`"/>
 
-        <div class="flex-1 overflow-y-auto overflow-x-auto">
-            <Alerts/>
-            <div class="min-h-full flex flex-col">
-                <component class="flex-1" :is="currentView"/>
-                <Footer/>
-            </div>
+        <Alerts/>
+        <div class="min-h-full flex flex-col justify-between">
+            <component :is="currentView"/>
+            <Footer/>
         </div>
     </div>
 </template>

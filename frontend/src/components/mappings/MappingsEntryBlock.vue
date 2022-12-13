@@ -2,7 +2,7 @@
     <Block>
         <SubHeader :addPadding="false">
             <div class="flex">
-                <div class="flex-1">
+                <div class="flex-1 overflow-x-auto flex flex-nowrap items-center">
                     <span class="hover:underline cursor-pointer" @click="copyAs(getDisplayName(entry))">{{ getDisplayName(entry) }}</span>
                     <span v-if="hasTranslation" class="hover:underline cursor-pointer" @click="copyAs(getDisplayName(entry.translatedTo))">
                     > {{ getDisplayName(entry.translatedTo) }}</span>
