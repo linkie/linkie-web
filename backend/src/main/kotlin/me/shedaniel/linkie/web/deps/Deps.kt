@@ -34,6 +34,7 @@ data class VersionIdentifier(
 val allDeps = listOf(
     FabricDeps,
     ForgeDeps,
+    LegacyFabricDeps,
     CFDeps(
         "Architectury API", 419699,
         loaders = { _, _ -> listOf("fabric", "forge") },
