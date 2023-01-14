@@ -1,6 +1,6 @@
 <template>
     <div class="flex flex-col">
-        <SubHeader :add-padding="false" class="pb-1">Namespace</SubHeader>
+        <SubHeader :add-padding="false" class="pb-1"> {{ $t("mappings.namespace") }} </SubHeader>
 
         <div v-for="[group, nses] in Object.entries(namespacesGrouped)" class="pb-1">
             <div v-if="group !== 'Others' || expandNamespaces">
@@ -22,18 +22,18 @@
                 <polyline points="6 9 12 15 18 9"></polyline>
             </svg>
             <span v-if="!expandNamespaces">
-                Show More...
+                {{ $t("mappings.namespace.show.more") }} 
             </span>
             <span v-else>
-                Show Less...
+                {{ $t("mappings.namespace.show.less") }} 
             </span>
         </div>
 
         <div class="divider mt-0 mb-0"/>
-        <SubHeader :add-padding="false" class="pb-1">Version</SubHeader>
+        <SubHeader :add-padding="false" class="pb-1"> {{ $t("mappings.version") }} </SubHeader>
         <div class="flex flex-col flex-nowrap justify-center h-full whitespace-nowrap pb-2">
             <div>
-                <span class="pr-2">Enable snapshots</span>
+                <span class="pr-2"> {{ $t("mappings.version.snapshots") }} </span>
                 <input type="checkbox" class="checkbox checkbox-primary h-4" :checked="allowSnapshots" aria-label="Enable Snapshots"
                        @input="allowSnapshots = ($event.target as any)?.checked ?? allowSnapshots"/>
             </div>
@@ -46,20 +46,20 @@
                     v.hasTranslation ? 'transition-all hover:opacity-100 hover:bg-neutral hover:text-white rounded-md cursor-pointer' : 'cursor-not-allowed line-through',
                     'px-2 py-1']"
                    @click="version = v.hasTranslation ? v.version : version">
-                    {{ v.hasTranslation ? v.version : v.version + " (no translation)" }}
+                    {{ !v.hasTranslation ? $t("mappings.version.no.translation", { version: v.version }) : v.version }}
                 </p>
             </div>
         </div>
 
         <div class="divider mt-0 mb-0"/>
         <div class="mt-2">
-            <SubHeader :add-padding="false" class="pb-2">Translation</SubHeader>
-            <p class="text-sm font-bold">No Translation</p>
+            <SubHeader :add-padding="false" class="pb-2"> {{ $t("mappings.translation") }} </SubHeader>
+            <p class="text-sm font-bold"> {{ $t("mappings.translation.none") }} </p>
             <div :class="[
                 translateAs === undefined ? 'opacity-100 font-bold' : 'opacity-60 hover:font-normal',
                 'cursor-pointer px-2 py-1 capitalize rounded transition-all hover:opacity-100 hover:bg-neutral hover:text-white']"
                  @click="translateAs = undefined">
-                N/A
+                {{ $t("mappings.translation.n/a") }}
             </div>
             <div v-for="[group, nses] in Object.entries(namespacesGrouped)" class="pb-1">
                 <p class="text-sm font-bold">{{ group }}</p>

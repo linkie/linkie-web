@@ -1,6 +1,6 @@
 <template>
     <div class="flex flex-col">
-        <SubHeader :add-padding="false" class="pb-1">Loader</SubHeader>
+        <SubHeader :add-padding="false" class="pb-1"> {{ $t("dependencies.loader") }} </SubHeader>
 
         <div v-for="l in loaders" :class="[
             loader === l ? 'opacity-100 font-bold' : 'opacity-50 font-normal',
@@ -10,26 +10,26 @@
 
         <div v-if="loader === 'forge'">
             <div class="divider mt-0 mb-0"/>
-            <SubHeader :add-padding="false" class="pb-1">Build System</SubHeader>
+            <SubHeader :add-padding="false" class="pb-1"> {{ $t("dependencies.build.system") }} </SubHeader>
 
             <div :class="[
             !forgeGradle ? 'opacity-100 font-bold' : 'opacity-50 font-normal',
             'cursor-pointer p-2 capitalize rounded transition-all hover:opacity-100 hover:bg-neutral hover:text-white']" @click="forgeGradle = false">
-                Architectury Loom
+                {{ $t("dependencies.build.system.architectury.loom") }}
             </div>
 
             <div :class="[
             forgeGradle ? 'opacity-100 font-bold' : 'opacity-50 font-normal',
             'cursor-pointer p-2 capitalize rounded transition-all hover:opacity-100 hover:bg-neutral hover:text-white']" @click="forgeGradle = true">
-                ForgeGradle
+                {{ $t("dependencies.build.system.forge.gradle") }}
             </div>
         </div>
 
         <div class="divider mt-0 mb-0"/>
-        <SubHeader :add-padding="false" class="pb-1">Version</SubHeader>
+        <SubHeader :add-padding="false" class="pb-1"> {{ $t("dependencies.version") }} </SubHeader>
         <div class="flex flex-col flex-nowrap justify-center h-full whitespace-nowrap pb-2" v-if="loader === 'fabric'">
             <div>
-                <span class="pr-2">Enable snapshots</span>
+                <span class="pr-2"> {{ $t("dependencies.version.snapshots") }} </span>
                 <input type="checkbox" class="checkbox checkbox-primary h-4" :checked="allowSnapshots" aria-label="Enable Snapshots"
                        @input="allowSnapshots = (($event.target as any)?.checked ?? allowSnapshots)"/>
             </div>

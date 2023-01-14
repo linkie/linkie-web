@@ -14,7 +14,7 @@
                     'badge-primary': entry.type === 'class',
                     'badge-secondary': entry.type === 'field',
                     'badge-accent': entry.type === 'method',
-                    }">{{ entry.type }}
+                    }">{{ $t(`mappings.entry.type.${entry.type}`) }}
                     </div>
                 </div>
                 <div class="cursor-pointer" v-if="namespace?.supportsSource" @click="requestSource()">
@@ -36,31 +36,31 @@
             </ul>
         </div>
         <div class="divider mt-0 mb-0"/>
-        <EntryDetails v-if="entry.type === 'field' && namespace.supportsFieldDescription" title="Type:" :code="false">
+        <EntryDetails v-if="entry.type === 'field' && namespace.supportsFieldDescription" :title="$t('mappings.entry.type')" :code="false">
             <Copyable :copy="fieldType(entry)" strokeWidth="1">{{ fieldType(entry) }}</Copyable>
         </EntryDetails>
-        <EntryDetails v-if="entry.type !== 'class' && namespace.supportsMixin" title="Mixin Target:">
+        <EntryDetails v-if="entry.type !== 'class' && namespace.supportsMixin" :title="$t('mappings.entry.mixin.target')">
             <Copyable :copy="mixinTarget(entry)" strokeWidth="1">{{ mixinTarget(entry) }}</Copyable>
         </EntryDetails>
-        <EntryDetails v-if="namespace.supportsAT" title="AT:">
+        <EntryDetails v-if="namespace.supportsAT" :title="$t('mappings.entry.at')">
             <Copyable :copy="atText(entry)" strokeWidth="1">{{ atText(entry) }}</Copyable>
         </EntryDetails>
-        <EntryDetails v-if="namespace.supportsAW" title="AW:">
+        <EntryDetails v-if="namespace.supportsAW" :title="$t('mappings.entry.aw')">
             <Copyable :copy="awText(entry)" strokeWidth="1">{{ awText(entry) }}</Copyable>
         </EntryDetails>
 
         <div v-if="hasTranslation">
             <div class="divider mt-0 mb-0"/>
-            <EntryDetails v-if="entry.type === 'field' && translatedToNamespace.supportsFieldDescription" title="Type:" :code="false">
+            <EntryDetails v-if="entry.type === 'field' && translatedToNamespace.supportsFieldDescription" :title="$t('mappings.entry.type')" :code="false">
                 <Copyable :copy="fieldType(entry.translatedTo)" strokeWidth="1">{{ fieldType(entry.translatedTo) }}</Copyable>
             </EntryDetails>
-            <EntryDetails v-if="entry.type !== 'class' && translatedToNamespace.supportsMixin" title="Mixin Target:">
+            <EntryDetails v-if="entry.type !== 'class' && translatedToNamespace.supportsMixin" :title="$t('mappings.entry.mixin.target')">
                 <Copyable :copy="mixinTarget(entry.translatedTo)" strokeWidth="1">{{ mixinTarget(entry.translatedTo) }}</Copyable>
             </EntryDetails>
-            <EntryDetails v-if="translatedToNamespace.supportsAT" title="AT:">
+            <EntryDetails v-if="translatedToNamespace.supportsAT" :title="$t('mappings.entry.at')">
                 <Copyable :copy="atText(entry.translatedTo)" strokeWidth="1">{{ atText(entry.translatedTo) }}</Copyable>
             </EntryDetails>
-            <EntryDetails v-if="translatedToNamespace.supportsAW" title="AW:">
+            <EntryDetails v-if="translatedToNamespace.supportsAW" :title="$t('mappings.entry.aw')">
                 <Copyable :copy="awText(entry.translatedTo)" strokeWidth="1">{{ awText(entry.translatedTo) }}</Copyable>
             </EntryDetails>
         </div>

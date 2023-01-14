@@ -2,10 +2,10 @@
     <div class="px-5 pb-6">
         <div class="bg-base-100 shadow-xl rounded-lg overflow-x-auto">
             <div class="flex px-2 pt-2">
-                <span class="flex items-center justify-center ml-2 mr-3 font-bold whitespace-nowrap">Search Type: </span>
-                <MappingsFilterPill :enabled="allowClasses" text="Classes" @click="allowClasses = !allowClasses"/>
-                <MappingsFilterPill :enabled="allowMethods" text="Methods" @click="allowMethods = !allowMethods"/>
-                <MappingsFilterPill :enabled="allowFields" text="Fields" @click="allowFields = !allowFields"/>
+                <span class="flex items-center justify-center ml-2 mr-3 font-bold whitespace-nowrap"> {{ $t("mappings.search.type") }} </span>
+                <MappingsFilterPill :enabled="allowClasses" :text="$t('mappings.search.type.classes')" @click="allowClasses = !allowClasses"/>
+                <MappingsFilterPill :enabled="allowMethods" :text="$t('mappings.search.type.methods')" @click="allowMethods = !allowMethods"/>
+                <MappingsFilterPill :enabled="allowFields" :text="$t('mappings.search.type.fields')" @click="allowFields = !allowFields"/>
                 <div class="border-base-100 border-[0.25rem] border-solid"/>
             </div>
             <div class="flex flex-wrap items-center">

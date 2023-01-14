@@ -10,6 +10,7 @@ import NotFound from "./routes/NotFound.vue"
 import Footer from "./components/Footer.vue"
 import Navbar from "./components/Navbar.vue"
 import Alerts from "./components/Alerts.vue"
+import {useI18nStore} from "./app/i18n-store"
 
 const routes: { [route: string]: any; } = {
     "/": Home,
@@ -32,8 +33,13 @@ export default defineComponent({
         theme(): string {
             return localStorage.getItem("theme") ?? ""
         },
+        locale(): string {
+            return this.$i18n.locale
+        }
     },
     mounted() {
+        this.$i18n.locale = this.$i18n.availableLocales.find((locale: string) => locale === useI18nStore().locale) ?? "en_US"
+        
         let theme = localStorage.getItem("theme")
         if (theme) {
             document.documentElement.setAttribute("data-theme", theme)
@@ -48,7 +54,7 @@ export default defineComponent({
 
 <template>
     <meta name="theme-color" :key="theme" :content="theme === 'cupcake' ? '#efeae6' : '#242933'">
-    <div class="overflow-x-hidden">
+    <div class="overflow-x-hidden" :key="locale">
         <Navbar class="top-0 fixed z-10" :class="`navbar-${current}`"/>
 
         <div class="min-h-screen flex flex-col justify-between bg-base-200">

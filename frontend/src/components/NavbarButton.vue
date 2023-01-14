@@ -1,7 +1,8 @@
 <template>
     <a :class="[
-            'px-4 py-3 rounded-lg hover:opacity-70 transition-all normal-case flex items-center',
+            'px-4 py-3 rounded-lg transition-all normal-case flex items-center',
             bold ? 'text-xl font-bold' : 'font-medium',
+            hoverDim ? 'hover:opacity-70' : '',
     ]" :href="href">
         <slot/>
     </a>
@@ -18,6 +19,10 @@ export default defineComponent({
         bold: {
             type: Boolean,
             default: false,
+        },
+        hoverDim: {
+            type: Boolean,
+            default: true,
         },
     },
 })

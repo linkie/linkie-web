@@ -9,7 +9,7 @@
                     </div>
 
                     <div class="p-5 mt-6 card bg-base-100 shadow-xl rounded-lg">
-                        <SubHeader :add-padding="false">Table of Contents</SubHeader>
+                        <SubHeader :add-padding="false"> {{ $t("dependencies.toc") }} </SubHeader>
                         <ol class="list-decimal pl-6 mt-2">
                             <li v-for="entry in dependencyBlocks">
                                 <a :href="'#dep-' + dependencyBlocks.indexOf(entry)">{{ entry[0] }}</a>
@@ -23,7 +23,7 @@
                                      :id="'dep-' + dependencyBlocks.findIndex(entry => entry[0] === blockName)">
                         <div v-if="block.mavens.length > 0">
                             <div v-for="maven in block.mavens">
-                                <SubHeader v-if="block.mavens.indexOf(maven) === 0 && !maven.subtitle">Maven Repository</SubHeader>
+                                <SubHeader v-if="block.mavens.indexOf(maven) === 0 && !maven.subtitle"> {{ $t("dependencies.maven.repo") }} </SubHeader>
 
                                 <CodeBlock :title="maven.subtitle ?? ''">
                                     <Copyable :copy="formatMaven(maven.url)" stroke-width="1">

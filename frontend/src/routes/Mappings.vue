@@ -20,8 +20,8 @@
                         <circle cx="10" cy="10" r="7"></circle>
                         <line x1="21" y1="21" x2="15" y2="15"></line>
                     </svg>
-                    <p class="font-bold">Searching Results</p>
-                    <p>Feeling Lucky?</p>
+                    <p class="font-bold"> {{ $t("mappings.searching") }} </p>
+                    <p> {{ $t("mappings.searching.subtitle") }} </p>
                 </div>
                 <div v-else class="m-10 flex flex-col items-center">
                     <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-ban m-4" width="24" height="24" viewBox="0 0 24 24"
@@ -30,9 +30,9 @@
                         <circle cx="12" cy="12" r="9"></circle>
                         <line x1="5.7" y1="5.7" x2="18.3" y2="18.3"></line>
                     </svg>
-                    <p class="font-bold">No Results</p>
-                    <p v-if="!infoData.query">Try searching something?</p>
-                    <p v-else>Did you make a mistake in your search?</p>
+                    <p class="font-bold"> {{ $t("mappings.searching.none") }} </p>
+                    <p v-if="!infoData.query"> {{ $t("mappings.searching.none.try") }} </p>
+                    <p v-else> {{ $t("mappings.searching.none.mistake") }} </p>
                 </div>
             </div>
         </div>
