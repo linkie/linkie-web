@@ -33,10 +33,10 @@
         </div>
     </div>
 
-    <div class="absolute top-24 right-10 z-10">
+    <div class="fixed top-20 right-10 z-5">
         <TransitionGroup name="list" tag="div">
             <div v-for="notification in Object.keys(notifications)" :key="notifications[notification as unknown as number].message" @click="removeNotification(notification as unknown as number)"
-                 class="relative toast mt-4 bg-base-100 p-3 shadow-2xl rounded-xl border-2 border-accent-content">
+                 class="mt-4 bg-base-100 p-3 shadow-lg rounded-md ring-4 ring-black ring-opacity-20">
                 {{ notifications[notification as unknown as number].message }}
             </div>
         </TransitionGroup>

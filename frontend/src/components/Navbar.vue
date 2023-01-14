@@ -26,7 +26,7 @@
                                     enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75"
                                     leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
                             <div v-if="dropdownVisible"
-                                 class="absolute right-0 z-10 mt-3 w-56 origin-top-right rounded-md bg-base-100 shadow-xl ring-4 ring-black ring-opacity-5">
+                                 class="locale-dropdown absolute right-0 z-10 mt-3 w-56 origin-top-right rounded-md bg-base-100 shadow-xl ring-4 ring-black ring-opacity-20">
                                 <div class="py-1">
                                     <a @click="locale = 'en_US'; $i18n.locale = locale; dropdownVisible = false"
                                        class="cursor-pointer block px-4 py-2 hover:bg-base-300 transition-colors flex gap-2 items-center">

@@ -67,4 +67,8 @@ export default defineComponent({
 .navbar-\/ {
     color: white !important;
 }
+
+.locale-dropdown {
+    @apply text-base-content;
+}
 </style>
