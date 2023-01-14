@@ -48,10 +48,10 @@ export default defineComponent({
 
 <template>
     <meta name="theme-color" :key="theme" :content="theme === 'cupcake' ? '#efeae6' : '#242933'">
-    <div class="w-screen overflow-x-hidden">
+    <div class="overflow-x-hidden">
         <Navbar class="top-0 fixed z-10" :class="`navbar-${current}`"/>
 
-        <div class="w-screen min-h-screen flex flex-col justify-between bg-base-200">
+        <div class="min-h-screen flex flex-col justify-between bg-base-200">
             <component :is="currentView"/>
             <Footer/>
         </div>

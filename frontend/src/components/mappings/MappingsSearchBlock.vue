@@ -6,6 +6,7 @@
                 <MappingsFilterPill :enabled="allowClasses" text="Classes" @click="allowClasses = !allowClasses"/>
                 <MappingsFilterPill :enabled="allowMethods" text="Methods" @click="allowMethods = !allowMethods"/>
                 <MappingsFilterPill :enabled="allowFields" text="Fields" @click="allowFields = !allowFields"/>
+                <div class="border-base-100 border-[0.25rem] border-solid"/>
             </div>
             <div class="flex flex-wrap items-center">
                 <div class="flex-none px-4">

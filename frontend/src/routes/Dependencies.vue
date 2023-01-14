@@ -26,25 +26,22 @@
                                 <SubHeader v-if="block.mavens.indexOf(maven) === 0 && !maven.subtitle">Maven Repository</SubHeader>
 
                                 <CodeBlock :title="maven.subtitle ?? ''">
-                                    <span class="hover:underline cursor-pointer"
-                                          @click="copyAs(formatMaven(maven.url))">
+                                    <Copyable :copy="formatMaven(maven.url)" stroke-width="1">
                                         {{ formatMaven(maven.url) }}
-                                    </span>
+                                    </Copyable>
                                 </CodeBlock>
                             </div>
                         </div>
 
                         <div v-for="dependency in block.dependencies">
-                            <p class="mt-1">
+                            <p class="mt-1 flex gap-x-1">
                                 {{ dependency.name }}
-                                <span class="hover:underline cursor-pointer font-bold" @click="copyAs(dependency.version)">{{ dependency.version }}</span>
+                                <Copyable class="font-bold" :copy="dependency.version">{{ dependency.version }}</Copyable>
                             </p>
                             <CodeBlock :title="undefined">dependencies {<br>
-                                <span>{{ "    " }}</span>
-                                <span class="hover:underline cursor-pointer" @click="copyAs(formatDependency(dependency.type, dependency.notation, false))">
-                                {{ formatDependency(dependency.type, dependency.notation, false) }}
-                            </span>
-                                <br>}
+                                <Copyable :copy="formatDependency(dependency.type, dependency.notation, false)" stroke-width="1" class="pl-8">
+                                        {{ formatDependency(dependency.type, dependency.notation, false) }}
+                                </Copyable>}
                             </CodeBlock>
                         </div>
                     </DependencyBlock>
@@ -72,10 +69,11 @@ import {useDependencySearchStore} from "../app/dependency-store"
 import {mapState} from "pinia"
 import {copyAs} from "../app/copy"
 import {DependencyBlockData, ensureDependencyData, updateDependencyData, useDependenciesDataStore} from "../app/dependencies-data"
+import Copyable from "../components/Copyable.vue"
 
 export default defineComponent({
     name: "Dependencies",
-    components: {Block, CodeBlock, DependencyBlock, DependencyFilterBlock, SubHeader},
+    components: {Copyable, Block, CodeBlock, DependencyBlock, DependencyFilterBlock, SubHeader},
     data() {
         return {
             formatMaven,

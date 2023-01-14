@@ -53,23 +53,22 @@
 
         <div class="divider mt-0 mb-0"/>
         <div class="mt-2">
+            <SubHeader :add-padding="false" class="pb-2">Translation</SubHeader>
+            <p class="text-sm font-bold">No Translation</p>
             <div :class="[
-                translateAs === undefined ? 'font-bold' : '',
-                'bg-base-300 cursor-pointer px-2 py-1 transition-all hover:bg-stone-300 rounded-t-lg text-lg']"
+                translateAs === undefined ? 'opacity-100 font-bold' : 'opacity-60 hover:font-normal',
+                'cursor-pointer px-2 py-1 capitalize rounded transition-all hover:opacity-100 hover:bg-neutral hover:text-white']"
                  @click="translateAs = undefined">
-                Do Not Translate
+                N/A
             </div>
-            <div class="px-2 py-1 transition-all rounded-b-lg bg-base-200">
-                <div :class="['text-lg mb-1', translateAs === undefined ? '' : 'font-bold']">Translate To</div>
-                <div v-for="[group, nses] in Object.entries(namespacesGrouped)" class="pb-1">
-                    <p class="text-sm font-bold">{{ group }}</p>
-                    <div v-for="ns in nses">
-                        <div v-if="ns?.id !== namespace" :class="[
+            <div v-for="[group, nses] in Object.entries(namespacesGrouped)" class="pb-1">
+                <p class="text-sm font-bold">{{ group }}</p>
+                <div v-for="ns in nses">
+                    <div v-if="ns?.id !== namespace" :class="[
                         translateAs === ns.id ? 'opacity-100 font-bold' : 'opacity-60 hover:font-normal',
                         'cursor-pointer px-2 py-1 capitalize rounded transition-all hover:opacity-100 hover:bg-neutral hover:text-white']"
-                             @click="translateAs = ns.id">
-                            {{ localizeNamespace(ns) ?? "" }}
-                        </div>
+                         @click="translateAs = ns.id">
+                        {{ localizeNamespace(ns) ?? "" }}
                     </div>
                 </div>
             </div>

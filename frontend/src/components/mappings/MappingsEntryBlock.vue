@@ -3,9 +3,13 @@
         <SubHeader :addPadding="false">
             <div class="flex">
                 <div class="flex-1 overflow-x-auto flex flex-nowrap items-center">
-                    <span class="hover:underline cursor-pointer" @click="copyAs(getDisplayName(entry))">{{ getDisplayName(entry) }}</span>
-                    <span v-if="hasTranslation" class="hover:underline cursor-pointer" @click="copyAs(getDisplayName(entry.translatedTo))">
-                    > {{ getDisplayName(entry.translatedTo) }}</span>
+                    <Copyable :copy="getDisplayName(entry)">{{ getDisplayName(entry) }}</Copyable>
+                    <svg v-if="hasTranslation" xmlns="http://www.w3.org/2000/svg" class="mx-1 min-w-[22px]" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                        <polyline points="7 7 12 12 7 17"></polyline>
+                        <polyline points="13 7 18 12 13 17"></polyline>
+                    </svg>
+                    <Copyable v-if="hasTranslation" :copy="getDisplayName(entry.translatedTo)">{{ getDisplayName(entry.translatedTo) }}</Copyable>
                     <div class="badge badge-sm ml-2" :class="{
                     'badge-primary': entry.type === 'class',
                     'badge-secondary': entry.type === 'field',
@@ -26,36 +30,38 @@
         </SubHeader>
         <div class="text-sm breadcrumbs" v-if="breadcrumbs.length > 1">
             <ul>
-                <li v-for="breadcrumb in breadcrumbs" class="hover:underline cursor-pointer" @click="copyAs(breadcrumb)">{{ breadcrumb }}</li>
+                <li v-for="breadcrumb in breadcrumbs">
+                    <Copyable :copy="breadcrumb" strokeWidth="1">{{ breadcrumb }}</Copyable>
+                </li>
             </ul>
         </div>
         <div class="divider mt-0 mb-0"/>
         <EntryDetails v-if="entry.type === 'field' && namespace.supportsFieldDescription" title="Type:" :code="false">
-            <span class="hover:underline cursor-pointer" @click="copyAs(fieldType(entry))">{{ fieldType(entry) }}</span>
+            <Copyable :copy="fieldType(entry)" strokeWidth="1">{{ fieldType(entry) }}</Copyable>
         </EntryDetails>
         <EntryDetails v-if="entry.type !== 'class' && namespace.supportsMixin" title="Mixin Target:">
-            <span class="hover:underline cursor-pointer" @click="copyAs(mixinTarget(entry))">{{ mixinTarget(entry) }}</span>
+            <Copyable :copy="mixinTarget(entry)" strokeWidth="1">{{ mixinTarget(entry) }}</Copyable>
         </EntryDetails>
         <EntryDetails v-if="namespace.supportsAT" title="AT:">
-            <span class="hover:underline cursor-pointer" @click="copyAs(atText(entry))">{{ atText(entry) }}</span>
+            <Copyable :copy="atText(entry)" strokeWidth="1">{{ atText(entry) }}</Copyable>
         </EntryDetails>
         <EntryDetails v-if="namespace.supportsAW" title="AW:">
-            <span class="hover:underline cursor-pointer" @click="copyAs(awText(entry))">{{ awText(entry) }}</span>
+            <Copyable :copy="awText(entry)" strokeWidth="1">{{ awText(entry) }}</Copyable>
         </EntryDetails>
 
         <div v-if="hasTranslation">
             <div class="divider mt-0 mb-0"/>
             <EntryDetails v-if="entry.type === 'field' && translatedToNamespace.supportsFieldDescription" title="Type:" :code="false">
-                <span class="hover:underline cursor-pointer" @click="copyAs(fieldType(entry.translatedTo))">{{ fieldType(entry.translatedTo) }}</span>
+                <Copyable :copy="fieldType(entry.translatedTo)" strokeWidth="1">{{ fieldType(entry.translatedTo) }}</Copyable>
             </EntryDetails>
             <EntryDetails v-if="entry.type !== 'class' && translatedToNamespace.supportsMixin" title="Mixin Target:">
-                <span class="hover:underline cursor-pointer" @click="copyAs(mixinTarget(entry.translatedTo))">{{ mixinTarget(entry.translatedTo) }}</span>
+                <Copyable :copy="mixinTarget(entry.translatedTo)" strokeWidth="1">{{ mixinTarget(entry.translatedTo) }}</Copyable>
             </EntryDetails>
             <EntryDetails v-if="translatedToNamespace.supportsAT" title="AT:">
-                <span class="hover:underline cursor-pointer" @click="copyAs(atText(entry.translatedTo))">{{ atText(entry.translatedTo) }}</span>
+                <Copyable :copy="atText(entry.translatedTo)" strokeWidth="1">{{ atText(entry.translatedTo) }}</Copyable>
             </EntryDetails>
             <EntryDetails v-if="translatedToNamespace.supportsAW" title="AW:">
-                <span class="hover:underline cursor-pointer" @click="copyAs(awText(entry.translatedTo))">{{ awText(entry.translatedTo) }}</span>
+                <Copyable :copy="awText(entry.translatedTo)" strokeWidth="1">{{ awText(entry.translatedTo) }}</Copyable>
             </EntryDetails>
         </div>
 
@@ -80,6 +86,7 @@ import CodeBlock from "../dependencies/CodeBlock.vue";
 import {reqSource} from "../../app/backend";
 import {addAlert} from "../../app/alerts";
 import {MappingEntry, Namespace} from "../../app/mappings-data"
+import Copyable from "../Copyable.vue"
 
 function getOptimumName(entry: MappingEntry): string {
     return entry.named || entry.intermediary || ""
@@ -254,7 +261,7 @@ function beautifyFieldType(type: string) {
 
 export default defineComponent({
     name: "MappingsEntryBlock",
-    components: {CodeBlock, EntryDetails, SubHeader, Header, Block},
+    components: {Copyable, CodeBlock, EntryDetails, SubHeader, Header, Block},
     data() {
         return {
             getDisplayName,
