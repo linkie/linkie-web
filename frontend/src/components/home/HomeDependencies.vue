@@ -1,6 +1,7 @@
 <template>
     <div class="flex gap-x-4 gap-y-3 flex-wrap">
-        <a class="px-4 py-2 cursor-pointer border-2 border-base-content font-medium rounded-xl whitespace-nowrap hover:scale-110 transition-all" 
+        <a class="px-4 py-2 cursor-pointer border-2 border-base-content dark:border-base-dark-content
+        font-medium rounded-xl whitespace-nowrap hover:scale-110 transition-all" 
                v-for="version in versions.slice(0, 16)" :href="select(version[0], version[1])">{{ version[0] }} {{ version[1] }}</a>
     </div>
 </template>

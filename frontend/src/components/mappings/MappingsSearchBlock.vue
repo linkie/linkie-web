@@ -1,13 +1,13 @@
 <template>
     <div class="pb-6">
-        <div class="bg-base-100 shadow-xl rounded-lg overflow-x-auto">
+        <div class="bg-base-100 dark:bg-base-dark-200 shadow-xl rounded-lg overflow-x-auto">
             <div class="flex px-2 pt-2">
                 <span class="flex-1 items-center justify-start grid ml-2 mr-3 font-bold whitespace-nowrap"> {{ $t("mappings.search.type") }} </span>
                 <div class="flex">
                     <MappingsFilterPill :enabled="allowClasses" :text="$t('mappings.search.type.classes')" @click="allowClasses = !allowClasses"/>
                     <MappingsFilterPill :enabled="allowMethods" :text="$t('mappings.search.type.methods')" @click="allowMethods = !allowMethods"/>
                     <MappingsFilterPill :enabled="allowFields" :text="$t('mappings.search.type.fields')" @click="allowFields = !allowFields"/>
-                    <div class="border-base-100 border-[0.25rem] border-solid"/>
+                    <div class="border-base-100 dark:border-base-dark-200 border-[0.25rem] border-solid"/>
                 </div>
             </div>
             <div class="flex flex-nowrap items-center">
@@ -20,7 +20,7 @@
                         <line x1="21" y1="21" x2="15" y2="15"></line>
                     </svg>
                 </div>
-                <input type="text" placeholder="Search..." class="input rounded-lg flex-1 px-0 text-lg" :value="searchText"
+                <input type="text" placeholder="Search..." class="input h-12 bg-transparent rounded-lg flex-1 px-0 text-lg" :value="searchText"
                        @keyup="searchTimeOut($event)" @keydown.space.prevent autofocus/>
             </div>
         </div>

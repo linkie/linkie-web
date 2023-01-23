@@ -7,14 +7,14 @@
                 <p class="text-sm font-bold">{{ group }}</p>
                 <div v-for="ns in nses" :class="[
                     namespace === ns.id ? 'opacity-100 font-bold' : 'opacity-60 hover:font-normal',
-                    'cursor-pointer px-2 py-1 capitalize rounded transition-all hover:opacity-100 hover:bg-neutral hover:text-white']"
+                    'cursor-pointer px-2 py-1 capitalize rounded transition-all hover:opacity-100 hover:bg-neutral dark:hover:bg-base-dark-300 hover:text-white']"
                      @click="namespace = ns.id">
                     {{ localizeNamespace(ns) ?? "" }}
                 </div>
             </div>
         </div>
 
-        <div class="px-2 py-1 justify-center cursor-pointer flex opacity-60 hover:opacity-100 transition-all rounded hover:bg-neutral hover:text-white"
+        <div class="px-2 py-1 justify-center cursor-pointer flex opacity-60 hover:opacity-100 transition-all rounded hover:bg-neutral dark:hover:bg-base-dark-300 hover:text-white"
              @click="expandNamespaces=!expandNamespaces">
             <svg xmlns="http://www.w3.org/2000/svg" :class="[expandNamespaces ? 'rotate-180' : '']" width="24" height="24" viewBox="0 0 24 24"
                  stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
@@ -39,11 +39,11 @@
             </div>
         </div>
 
-        <div class="bg-base-300 rounded-lg">
+        <div class="bg-base-300 dark:bg-base-dark-300 rounded-lg">
             <div class="p-3 h-40 overflow-x-clip gradient-mask-b-80 overflow-y-scroll">
                 <p v-for="v in applicableVersions"
                    :class="[version === v.version && v.hasTranslation ? 'opacity-100 font-bold' : 'opacity-60 hover:font-normal',
-                    v.hasTranslation ? 'transition-all hover:opacity-100 hover:bg-neutral hover:text-white rounded-md cursor-pointer' : 'cursor-not-allowed line-through',
+                    v.hasTranslation ? 'transition-all hover:opacity-100 hover:bg-neutral dark:hover:bg-base-dark-400 hover:text-white rounded-md cursor-pointer' : 'cursor-not-allowed line-through',
                     'px-2 py-1']"
                    @click="version = v.hasTranslation ? v.version : version">
                     {{ !v.hasTranslation ? $t("mappings.version.no.translation", { version: v.version }) : v.version }}
@@ -57,7 +57,7 @@
             <p class="text-sm font-bold"> {{ $t("mappings.translation.none") }} </p>
             <div :class="[
                 translateAs === undefined ? 'opacity-100 font-bold' : 'opacity-60 hover:font-normal',
-                'cursor-pointer px-2 py-1 capitalize rounded transition-all hover:opacity-100 hover:bg-neutral hover:text-white']"
+                'cursor-pointer px-2 py-1 capitalize rounded transition-all hover:opacity-100 hover:bg-neutral dark:hover:bg-base-dark-300 hover:text-white']"
                  @click="translateAs = undefined">
                 {{ $t("mappings.translation.n/a") }}
             </div>
@@ -66,7 +66,7 @@
                 <div v-for="ns in nses">
                     <div v-if="ns?.id !== namespace" :class="[
                         translateAs === ns.id ? 'opacity-100 font-bold' : 'opacity-60 hover:font-normal',
-                        'cursor-pointer px-2 py-1 capitalize rounded transition-all hover:opacity-100 hover:bg-neutral hover:text-white']"
+                        'cursor-pointer px-2 py-1 capitalize rounded transition-all hover:opacity-100 hover:bg-neutral dark:hover:bg-base-dark-300 hover:text-white']"
                          @click="translateAs = ns.id">
                         {{ localizeNamespace(ns) ?? "" }}
                     </div>

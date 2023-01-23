@@ -4,7 +4,7 @@
 
         <div v-for="l in loaders" :class="[
             loader === l ? 'opacity-100 font-bold' : 'opacity-50 font-normal',
-            'cursor-pointer p-2 capitalize rounded transition-all hover:opacity-100 hover:bg-neutral hover:text-white']" @click="loader = l">
+            'cursor-pointer p-2 capitalize rounded transition-all hover:opacity-100 hover:bg-neutral dark:hover:bg-base-dark-300 hover:text-white']" @click="loader = l">
             {{ l }}
         </div>
 
@@ -14,13 +14,13 @@
 
             <div :class="[
             !forgeGradle ? 'opacity-100 font-bold' : 'opacity-50 font-normal',
-            'cursor-pointer p-2 capitalize rounded transition-all hover:opacity-100 hover:bg-neutral hover:text-white']" @click="forgeGradle = false">
+            'cursor-pointer p-2 capitalize rounded transition-all hover:opacity-100 hover:bg-neutral dark:hover:bg-base-dark-300 hover:text-white']" @click="forgeGradle = false">
                 {{ $t("dependencies.build.system.architectury.loom") }}
             </div>
 
             <div :class="[
             forgeGradle ? 'opacity-100 font-bold' : 'opacity-50 font-normal',
-            'cursor-pointer p-2 capitalize rounded transition-all hover:opacity-100 hover:bg-neutral hover:text-white']" @click="forgeGradle = true">
+            'cursor-pointer p-2 capitalize rounded transition-all hover:opacity-100 hover:bg-neutral dark:hover:bg-base-dark-300 hover:text-white']" @click="forgeGradle = true">
                 {{ $t("dependencies.build.system.forge.gradle") }}
             </div>
         </div>
@@ -35,11 +35,11 @@
             </div>
         </div>
 
-        <div class="bg-base-300 rounded-lg">
+        <div class="bg-base-300 dark:bg-base-dark-300 rounded-lg">
             <div class="px-1 py-2 h-52 overflow-x-clip gradient-mask-b-80 overflow-y-scroll">
                 <p v-for="v in applicableVersions"
                    :class="[version === v ? 'opacity-100 font-bold' : 'opacity-50 font-normal',
-                    'transition-all hover:opacity-100 hover:bg-neutral hover:text-white px-2 py-1 rounded-md cursor-pointer']"
+                    'transition-all hover:opacity-100 hover:bg-neutral dark:hover:bg-base-dark-400 hover:text-white px-2 py-1 rounded-md cursor-pointer']"
                    @click="version = v">
                     {{ v }}
                 </p>

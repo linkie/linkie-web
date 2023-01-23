@@ -1,6 +1,6 @@
 <template>
     <div class="pb-6">
-        <div class="p-5 card bg-base-100 shadow-lg rounded-lg">
+        <div class="p-5 card bg-base-100 dark:bg-base-dark-200 shadow-lg rounded-lg">
             <slot></slot>
         </div>
     </div>

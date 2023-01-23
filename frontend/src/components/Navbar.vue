@@ -26,10 +26,10 @@
                                     enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75"
                                     leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
                             <div v-if="dropdownVisible"
-                                 class="locale-dropdown absolute right-0 z-10 mt-3 min-w-56 max-w-80 divide-y-2 divide-black/20 origin-top-right rounded-md bg-base-100 shadow-xl ring-4 ring-black ring-opacity-20">
+                                 class="locale-dropdown absolute right-0 z-10 mt-3 min-w-56 max-w-80 divide-y-2 divide-black/20 origin-top-right rounded-md bg-base-100 dark:bg-base-dark-300 dark:text-base-dark-content shadow-xl ring-4 ring-black ring-opacity-20">
                                 <div class="py-1">
                                     <a @click="locale = 'en_US'; $i18n.locale = locale; dropdownVisible = false"
-                                       class="cursor-pointer block px-4 py-2 hover:bg-base-300 transition-colors flex gap-2 items-center">
+                                       class="cursor-pointer block px-4 py-2 hover:bg-base-300 dark:hover:bg-base-dark-400 transition-colors flex gap-2 items-center">
                                         <p class="flex-1 pr-2">English (US)</p>
                                         <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" preserveAspectRatio="xMidYMid meet"
                                              viewBox="0 0 36 36">
@@ -43,7 +43,7 @@
                                         </svg>
                                     </a>
                                     <a @click="locale = 'en_GB'; $i18n.locale = locale; dropdownVisible = false"
-                                       class="cursor-pointer block px-4 py-2 hover:bg-base-300 transition-colors flex gap-2 items-center">
+                                       class="cursor-pointer block px-4 py-2 hover:bg-base-300 dark:hover:bg-base-dark-400 transition-colors flex gap-2 items-center">
                                         <p class="flex-1 pr-2">English (UK)</p>
                                         <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" preserveAspectRatio="xMidYMid meet"
                                              viewBox="0 0 36 36">
@@ -57,7 +57,7 @@
                                         </svg>
                                     </a>
                                     <a @click="locale = 'zh_CN'; $i18n.locale = locale; dropdownVisible = false"
-                                       class="cursor-pointer block px-4 py-2 hover:bg-base-300 transition-colors flex gap-2 items-center">
+                                       class="cursor-pointer block px-4 py-2 hover:bg-base-300 dark:hover:bg-base-dark-400 transition-colors flex gap-2 items-center">
                                         <p class="flex-1 pr-2">中文 (中国)</p>
                                         <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" preserveAspectRatio="xMidYMid meet"
                                              viewBox="0 0 36 36">
@@ -67,7 +67,7 @@
                                         </svg>
                                     </a>
                                     <a @click="locale = 'zh_TW'; $i18n.locale = locale; dropdownVisible = false"
-                                       class="cursor-pointer block px-4 py-2 hover:bg-base-300 transition-colors flex gap-2 items-center">
+                                       class="cursor-pointer block px-4 py-2 hover:bg-base-300 dark:hover:bg-base-dark-400 transition-colors flex gap-2 items-center">
                                         <p class="flex-1 pr-2">中文 (台灣)</p>
                                         <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" preserveAspectRatio="xMidYMid meet"
                                              viewBox="0 0 36 36">
@@ -82,7 +82,7 @@
                                 </div>
                                 <div class="py-1">
                                     <a href="https://github.com/linkie/linkie-web/tree/master/frontend/src/locales"
-                                       class="cursor-pointer block px-4 py-2 hover:bg-base-300 transition-colors flex gap-2 items-center">
+                                       class="cursor-pointer block px-4 py-2 hover:bg-base-300 dark:hover:bg-base-dark-400 transition-colors flex gap-2 items-center">
                                         <div class="flex-1 pr-2">
                                             <p class="whitespace-nowrap"> {{ $t("navbar.locale.help.0") }} </p>
                                             <p class="whitespace-nowrap"> {{ $t("navbar.locale.help.1") }} </p>
@@ -144,7 +144,15 @@ export default defineComponent({
         },
         setDarkMode(darkMode: boolean) {
             localStorage.setItem("theme", darkMode ? "dark" : "cupcake")
-            document.documentElement.setAttribute("data-theme", localStorage.getItem("theme")!)
+            if (localStorage.getItem("theme") === "dark") {
+                document.documentElement.setAttribute("data-theme", "dark")
+                document.documentElement.classList.add("dark")
+                document.documentElement.style.setProperty("--color-scheme", "dark")
+            } else {
+                document.documentElement.removeAttribute("data-theme")
+                document.documentElement.classList.remove("dark")
+                document.documentElement.style.setProperty("--color-scheme", "light")
+            }
             this.componentKey++
         },
     },

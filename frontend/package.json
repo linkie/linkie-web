@@ -10,7 +10,6 @@
   "dependencies": {
     "@highlightjs/vue-plugin": "^2.1.0",
     "copy-to-clipboard": "^3.3.2",
-    "daisyui": "^2.24.0",
     "highlight.js": "^11.6.0",
     "nprogress": "^0.2.0",
     "pinia": "^2.0.20",

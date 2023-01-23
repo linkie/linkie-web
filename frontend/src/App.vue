@@ -35,17 +35,27 @@ export default defineComponent({
         },
         locale(): string {
             return this.$i18n.locale
-        }
+        },
     },
     mounted() {
         this.$i18n.locale = this.$i18n.availableLocales.find((locale: string) => locale === useI18nStore().locale) ?? "en_US"
-        
+
         let theme = localStorage.getItem("theme")
         if (theme) {
-            document.documentElement.setAttribute("data-theme", theme)
+            if (theme === "cupcake") {
+                document.documentElement.removeAttribute("data-theme")
+                document.documentElement.classList.remove("dark")
+                document.documentElement.style.setProperty("--color-scheme", "light")
+            } else {
+                document.documentElement.setAttribute("data-theme", "dark")
+                document.documentElement.classList.add("dark")
+                document.documentElement.style.setProperty("--color-scheme", "dark")
+            }
         } else {
             localStorage.setItem("theme", "cupcake")
-            document.documentElement.setAttribute("data-theme", "cupcake")
+            document.documentElement.removeAttribute("data-theme")
+            document.documentElement.classList.remove("dark")
+            document.documentElement.style.setProperty("--color-scheme", "light")
         }
     },
 })
@@ -54,10 +64,10 @@ export default defineComponent({
 
 <template>
     <meta name="theme-color" :key="theme" :content="theme === 'cupcake' ? '#efeae6' : '#242933'">
-    <div class="overflow-x-hidden" :key="locale">
+    <div class="overflow-x-hidden text-base-content dark:text-base-dark-content" :key="locale">
         <Navbar class="top-0 fixed z-10" :class="`navbar-${current}`"/>
 
-        <div class="min-h-screen flex flex-col justify-between bg-base-200">
+        <div class="min-h-screen flex flex-col justify-between bg-base-200 dark:bg-base-dark-100">
             <component :is="currentView"/>
             <Footer/>
         </div>
@@ -70,11 +80,20 @@ export default defineComponent({
 @import url('https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
 
 body {
-    @apply bg-base-200
+    @apply bg-base-100 dark:bg-base-dark-100;
 }
 
 .select {
     outline: 0 !important;
     border: 0 !important;
 }
+
+:root > * {
+    color-scheme: var(--color-scheme) !important;
+}
+
+:root {
+    color-scheme: var(--color-scheme) !important;
+}
+
 </style>

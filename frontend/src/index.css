@@ -1,3 +1,19 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.divider {
+    @apply flex flex-row items-center self-stretch h-4 whitespace-nowrap;
+}
+
+.divider::before,
+.divider::after {
+    content: "";
+    @apply flex-grow;
+    @apply h-0.5 w-full;
+    @apply bg-base-content/10 dark:bg-base-dark-content/10;
+}
+
+.divider:not(:empty) {
+    @apply gap-4;
+}

@@ -1,5 +1,5 @@
 <template>
-    <div class="text-center h-full items-center justify-center grid">
+    <div class="text-center h-[calc(100vh-56px-24px)] items-center justify-center grid">
         <div>
             <h1 class="font-bold text-9xl">404</h1>
             <p class="font-light text-xl py-6">Not Found!</p>

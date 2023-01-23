@@ -1,5 +1,5 @@
 <template>
-    <div class="bg-base-300 px-4 w-full mt-6">
+    <div class="bg-base-300 dark:bg-base-dark-200 px-4 w-full mt-6">
         <footer class="max-w-[78rem] w-full mx-auto">
             <div class="items-center font-medium py-4 flex">
                 <p class="flex-1"><span class="whitespace-nowrap">Copyright Linkie & shedaniel</span> <span class="whitespace-nowrap">© 2020 - 2023.</span> <span class="whitespace-nowrap">All right reserved.</span></p>

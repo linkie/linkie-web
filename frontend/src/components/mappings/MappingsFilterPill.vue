@@ -1,6 +1,6 @@
 <template>
-    <a :class="['mx-1 p-1 select-none cursor-pointer text-center rounded-full bg-base-200 shadow transition-all',
-    enabled ? 'bg-neutral text-white font-medium' : 'hover:brightness-90']">
+    <a :class="['mx-1 p-1 select-none cursor-pointer text-center rounded-full bg-base-200 dark:bg-base-dark-100 shadow transition-all',
+    enabled ? 'bg-neutral dark:bg-base-dark-300 text-white font-medium' : 'hover:brightness-90']">
         <div class="flex mx-2">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"
                  stroke-linecap="round" stroke-linejoin="round">

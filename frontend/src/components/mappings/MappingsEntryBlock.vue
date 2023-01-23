@@ -4,17 +4,19 @@
             <div class="flex">
                 <div class="flex-1 overflow-x-auto flex flex-nowrap items-center">
                     <Copyable :copy="getDisplayName(entry)">{{ getDisplayName(entry) }}</Copyable>
-                    <svg v-if="hasTranslation" xmlns="http://www.w3.org/2000/svg" class="mx-1 min-w-[22px]" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <svg v-if="hasTranslation" xmlns="http://www.w3.org/2000/svg" class="mx-1 min-w-[22px]" width="24" height="24" viewBox="0 0 24 24"
+                         stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                         <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
                         <polyline points="7 7 12 12 7 17"></polyline>
                         <polyline points="13 7 18 12 13 17"></polyline>
                     </svg>
                     <Copyable v-if="hasTranslation" :copy="getDisplayName(entry.translatedTo)">{{ getDisplayName(entry.translatedTo) }}</Copyable>
-                    <div class="badge badge-sm ml-2" :class="{
-                    'badge-primary': entry.type === 'class',
-                    'badge-secondary': entry.type === 'field',
-                    'badge-accent': entry.type === 'method',
-                    }">{{ $t(`mappings.entry.type.${entry.type}`) }}
+                    <div class="rounded-full text-[.75rem] px-[.438rem] inline-flex items-center justify-center h-4 ml-2 text-base-content"
+                         :class="{
+                            'bg-primary': entry.type === 'class',
+                            'bg-secondary': entry.type === 'field',
+                            'bg-tertiary': entry.type === 'method',
+                        }">{{ $t(`mappings.entry.type.${entry.type}`) }}
                     </div>
                 </div>
                 <div class="cursor-pointer" v-if="namespace?.supportsSource" @click="requestSource()">
@@ -28,9 +30,9 @@
                 </div>
             </div>
         </SubHeader>
-        <div class="text-sm breadcrumbs" v-if="breadcrumbs.length > 1">
-            <ul>
-                <li v-for="breadcrumb in breadcrumbs">
+        <div class="breadcrumbs text-sm max-w-full overflow-x-auto py-2" v-if="breadcrumbs.length > 1">
+            <ul class="flex items-center whitespace-nowrap">
+                <li v-for="breadcrumb in breadcrumbs" class="flex items-center">
                     <Copyable :copy="breadcrumb" strokeWidth="1">{{ breadcrumb }}</Copyable>
                 </li>
             </ul>
@@ -65,7 +67,7 @@
             </EntryDetails>
         </div>
 
-        <div :class="['rounded-lg bg-base-300 p-3 text-sm mt-2 mb-1 h-[20rem]', source === '' ? 'animate-pulse' : '']" v-if="expandSource">
+        <div :class="['rounded-lg bg-base-300 dark:bg-base-dark-300 p-3 text-sm mt-2 mb-1 h-[20rem]', source === '' ? 'animate-pulse' : '']" v-if="expandSource">
             <pre class="pl-2 pb-1 overflow-x-auto h-[20rem]"><code
                     v-for="[index, line] of Object.entries(source.split('\n'))"
                     :class="['block break-all whitespace-pre', (line + '').includes((entry.type === 'class' ? 'class ' : ' ') + onlyClass(getOptimumName(entry)) + (entry.type === 'method' ? '(' : '')) ? 'font-bold' : '']"
@@ -81,10 +83,10 @@ import Block from "../Block.vue"
 import Header from "../dependencies/Header.vue"
 import SubHeader from "../dependencies/SubHeader.vue"
 import EntryDetails from "./EntryDetails.vue"
-import {copyAs} from "../../app/copy";
-import CodeBlock from "../dependencies/CodeBlock.vue";
-import {reqSource} from "../../app/backend";
-import {addAlert} from "../../app/alerts";
+import {copyAs} from "../../app/copy"
+import CodeBlock from "../dependencies/CodeBlock.vue"
+import {reqSource} from "../../app/backend"
+import {addAlert} from "../../app/alerts"
 import {MappingEntry, Namespace} from "../../app/mappings-data"
 import Copyable from "../Copyable.vue"
 
@@ -283,13 +285,13 @@ export default defineComponent({
     watch: {
         source() {
             this.$nextTick(() => {
-                for (let entry of Object.entries(this.source.split('\n'))) {
+                for (let entry of Object.entries(this.source.split("\n"))) {
                     if ((entry[1] + "").includes((this.entry.type === "class" ? "class " : " ") + onlyClass(getOptimumName(this.entry)) + (this.entry.type === "method" ? "(" : ""))) {
-                        (this.$refs['source-line-' + entry[0]] as HTMLFormElement)[0].scrollIntoView({behavior: 'smooth', block: 'center'})
+                        (this.$refs["source-line-" + entry[0]] as HTMLFormElement)[0].scrollIntoView({behavior: "smooth", block: "center"})
                         break
                     }
                 }
-            });
+            })
         },
     },
     methods: {
@@ -317,7 +319,7 @@ export default defineComponent({
         },
         requestSource() {
             this.expandSource = !this.expandSource
-            this.source = ''
+            this.source = ""
 
             if (this.expandSource) {
                 reqSource(this.namespace!!.id, this.version!!, this.entry.ownerNamed ?? this.entry.ownerIntermediary ?? this.entry.named ?? this.entry.intermediary).then(value => {
@@ -350,4 +352,15 @@ export default defineComponent({
 </script>
 
 <style scoped>
+.breadcrumbs > ul > li + *:before {
+    content: "";
+    @apply mx-2 block opacity-40;
+    height: 0.375rem;
+    width: 0.375rem;
+    --tw-rotate: 45deg;
+    transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skew(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+    border-top: 1px solid;
+    border-right: 1px solid;
+    background-color: transparent;
+}
 </style>
