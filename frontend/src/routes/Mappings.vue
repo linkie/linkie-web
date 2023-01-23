@@ -1,40 +1,22 @@
 <template>
     <div class="pt-20"/>
-    <div class="sm:max-w-[calc(62rem+var(--sidebar-width))] sm:mx-auto">
-        <div v-if="mappingsData.namespaces.length !== 0" class="grid-setup">
-            <div class="col-[1] px-5 sm:pr-0 sm:w-[var(--sidebar-width)] sm:min-w-[var(--sidebar-width)]">
-                <div class="p-5 card bg-base-100 shadow-xl rounded-lg mb-10">
-                    <MappingsFilterBlock :data="mappingsData"/>
-                </div>
+    <div v-if="mappingsData.namespaces.length !== 0" class="max-w-[80rem] mx-auto w-full px-5 sm:flex sm:gap-5">
+        <div class="sm:w-[var(--sidebar-width)] sm:min-w-[var(--sidebar-width)]">
+            <div class="p-5 card bg-base-100 shadow-xl rounded-lg mb-10">
+                <MappingsFilterBlock :data="mappingsData"/>
             </div>
-            <div class="col-[2/span_2] min-w-0 max-w-[62rem]">
-                <MappingsSearchBlock/>
-                <div v-if="infoData.entries.length > 0">
-                    <MappingsEntryBlock v-for="entry in infoData.entries" :namespace="mappingsData.namespaces.find(value => value.id === infoData.namespace)"
-                                        :translated-to-namespace="infoData.translateAs ? mappingsData.namespaces.find(value => value.id === infoData.translateAs) : undefined"
-                                        :entry="entry" :version="version"/>
-                </div>
-                <div v-else-if="searchController" class="m-10 flex flex-col items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search m-4" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                        <circle cx="10" cy="10" r="7"></circle>
-                        <line x1="21" y1="21" x2="15" y2="15"></line>
-                    </svg>
-                    <p class="font-bold"> {{ $t("mappings.searching") }} </p>
-                    <p> {{ $t("mappings.searching.subtitle") }} </p>
-                </div>
-                <div v-else class="m-10 flex flex-col items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-ban m-4" width="24" height="24" viewBox="0 0 24 24"
-                         stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                        <circle cx="12" cy="12" r="9"></circle>
-                        <line x1="5.7" y1="5.7" x2="18.3" y2="18.3"></line>
-                    </svg>
-                    <p class="font-bold"> {{ $t("mappings.searching.none") }} </p>
-                    <p v-if="!infoData.query"> {{ $t("mappings.searching.none.try") }} </p>
-                    <p v-else> {{ $t("mappings.searching.none.mistake") }} </p>
-                </div>
+        </div>
+        <div class="flex-1 min-w-0">
+            <MappingsSearchBlock/>
+            <div v-if="infoData.entries.length > 0">
+                <MappingsEntryBlock v-for="entry in infoData.entries"
+                                    :namespace="mappingsData.namespaces.find(value => value.id === infoData.namespace)"
+                                    :translated-to-namespace="infoData.translateAs ? mappingsData.namespaces.find(value => value.id === infoData.translateAs) : undefined"
+                                    :entry="entry" :version="version"/>
             </div>
+            <MappingsSearchPlaceholder v-else
+                                       :searching="!!searchController"
+                                       :has-query="!!infoData.query"/>
         </div>
     </div>
 </template>
@@ -47,10 +29,11 @@ import MappingsSearchBlock from "../components/mappings/MappingsSearchBlock.vue"
 import MappingsEntryBlock from "../components/mappings/MappingsEntryBlock.vue"
 import MappingsFilterBlock from "../components/mappings/MappingsFilterBlock.vue"
 import {ensureMappingsData, updateMappingsData, updateMappingsInfo, useMappingsDataStore} from "../app/mappings-data"
+import MappingsSearchPlaceholder from "../components/mappings/MappingsSearchPlaceholder.vue"
 
 export default defineComponent({
     name: "Mappings",
-    components: {MappingsFilterBlock, MappingsSearchBlock, MappingsEntryBlock},
+    components: {MappingsSearchPlaceholder, MappingsFilterBlock, MappingsSearchBlock, MappingsEntryBlock},
     computed: {
         ...mapState(useMappingsDataStore, ["mappingsData", "infoData", "searchController"]),
         ...mapState(useMappingsStore, ["namespace", "version", "allowSnapshots", "searchText", "allowClasses", "allowMethods", "allowFields", "translateAs"]),

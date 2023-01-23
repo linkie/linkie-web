@@ -2,6 +2,8 @@
     "navbar./": "Linkie",
     "navbar./dependencies": "Dependencies",
     "navbar./mappings": "Mappings",
+    "navbar.locale.help.0": "Don't find your language?",
+    "navbar.locale.help.1": "Help add it!",
     "home.welcome": "Welcome to Linkie",
     "home.quick.access": "Quick Access",
     "home.dependencies": "Dependencies",

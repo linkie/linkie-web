@@ -2,6 +2,8 @@
     "navbar./dependencies": "配置",
     "navbar./mappings": "搜尋",
     "home.welcome": "歡迎使用 Linkie",
+    "navbar.locale.help.0": "找不到你的語言？",
+    "navbar.locale.help.1": "點擊此處協助翻譯！",
     "home.quick.access": "快速入門",
     "home.dependencies": "配置",
     "home.mappings": "搜尋",

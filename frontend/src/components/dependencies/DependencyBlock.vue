@@ -1,5 +1,5 @@
 <template>
-    <Block>
+    <Block class="px-5">
         <Header>{{ title }}</Header>
         <slot/>
     </Block>

@@ -51,7 +51,7 @@
     </div>
 
     <div v-else class="max-w-4xl mx-auto">
-        <Block>
+        <Block class="px-5">
             <progress class="progress progress-accent w-80 mx-auto"></progress>
         </Block>
     </div>

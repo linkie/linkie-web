@@ -2,7 +2,7 @@
     <div class="bg-base-300 px-4 w-full mt-6">
         <footer class="max-w-[78rem] w-full mx-auto">
             <div class="items-center font-medium py-4 flex">
-                <p class="flex-1"><span class="whitespace-nowrap">Copyright Linkie & shedaniel</span> <span class="whitespace-nowrap">© 2020 - 2022.</span> <span class="whitespace-nowrap">All right reserved.</span></p>
+                <p class="flex-1"><span class="whitespace-nowrap">Copyright Linkie & shedaniel</span> <span class="whitespace-nowrap">© 2020 - 2023.</span> <span class="whitespace-nowrap">All right reserved.</span></p>
                 <a href="https://github.com/linkie/linkie-web/">
                     <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                         <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
