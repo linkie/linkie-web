@@ -58,7 +58,7 @@
                                     </a>
                                     <a @click="locale = 'zh_CN'; $i18n.locale = locale; dropdownVisible = false"
                                        class="cursor-pointer block px-4 py-2 hover:bg-base-300 dark:hover:bg-base-dark-400 transition-colors flex gap-2 items-center">
-                                        <p class="flex-1 pr-2">中文 (中国)</p>
+                                        <p class="flex-1 pr-2">中文（中国大陆）</p>
                                         <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" preserveAspectRatio="xMidYMid meet"
                                              viewBox="0 0 36 36">
                                             <path fill="#DE2910" d="M36 27a4 4 0 0 1-4 4H4a4 4 0 0 1-4-4V9a4 4 0 0 1 4-4h28a4 4 0 0 1 4 4v18z"/>
@@ -68,7 +68,7 @@
                                     </a>
                                     <a @click="locale = 'zh_TW'; $i18n.locale = locale; dropdownVisible = false"
                                        class="cursor-pointer block px-4 py-2 hover:bg-base-300 dark:hover:bg-base-dark-400 transition-colors flex gap-2 items-center">
-                                        <p class="flex-1 pr-2">中文 (台灣)</p>
+                                        <p class="flex-1 pr-2">中文（台灣）</p>
                                         <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" preserveAspectRatio="xMidYMid meet"
                                              viewBox="0 0 36 36">
                                             <path fill="#FE0000" d="M32 5H17v13H0v9a4 4 0 0 0 4 4h28a4 4 0 0 0 4-4V9a4 4 0 0 0-4-4z"/>
