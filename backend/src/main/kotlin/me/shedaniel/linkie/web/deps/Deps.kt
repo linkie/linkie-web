@@ -106,7 +106,7 @@ val allDeps = listOf(
                 "com.terraformersmc:modmenu:$version"
             }
         },
-        versionGrabber = { file -> file.fileName.substringAfterLast("-").replace(".jar", "") },
+        versionGrabber = { file -> file.fileName.substringAfterLast("u-").replace(".jar", "") },
         mavens = listOf(
             Deps.MavenData(
                 url = "https://maven.terraformersmc.com/releases/",
