@@ -4,8 +4,8 @@
 
         <div v-for="l in loaders" :class="[
             loader === l ? 'opacity-100 font-bold' : 'opacity-50 font-normal',
-            'cursor-pointer p-2 capitalize rounded transition-all hover:opacity-100 hover:bg-neutral dark:hover:bg-base-dark-300 hover:text-white']" @click="loader = l">
-            {{ l }}
+            'cursor-pointer p-2 rounded transition-all hover:opacity-100 hover:bg-neutral dark:hover:bg-base-dark-300 hover:text-white']" @click="loader = l">
+            {{ $t("loader." + l) }}
         </div>
 
         <div v-if="loader === 'forge'">

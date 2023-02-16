@@ -12,6 +12,7 @@ import me.shedaniel.linkie.web.httpClient
 
 abstract class AbstractFabricDeps(
     name: String,
+    private val loader: String,
     private val metaUrl: String,
     val curseforgeId: Int,
     private val mappingsName: String,
@@ -31,7 +32,7 @@ abstract class AbstractFabricDeps(
             val mappingsObj = mappings.firstOrNull { it.jsonObject["gameVersion"]!!.jsonPrimitive.content == version }?.jsonObject ?: return@forEach
             val yarnVersion = mappingsObj["version"]!!.jsonPrimitive.content
             val versionIdentifier = VersionIdentifier(
-                loader = "fabric",
+                loader = loader,
                 version = version,
                 stable = release,
             )

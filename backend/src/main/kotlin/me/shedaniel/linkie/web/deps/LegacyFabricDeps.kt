@@ -6,6 +6,7 @@ import me.shedaniel.linkie.web.curseforge.Pagination
 
 object LegacyFabricDeps : AbstractFabricDeps(
     "Legacy Fabric",
+    "legacy-fabric",
     "https://meta.legacyfabric.net/v2/versions",
     400281,
     "Legacy Yarn",

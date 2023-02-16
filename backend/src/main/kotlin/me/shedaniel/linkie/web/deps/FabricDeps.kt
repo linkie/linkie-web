@@ -6,6 +6,7 @@ import me.shedaniel.linkie.web.curseforge.Pagination
 
 object FabricDeps : AbstractFabricDeps(
     "Fabric",
+    "fabric",
     "https://meta.fabricmc.net/v2/versions",
     306612,
     "Yarn",
