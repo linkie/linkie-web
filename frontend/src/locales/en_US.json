@@ -48,6 +48,7 @@
     "namespace.mcp": "MCP",
     "namespace.quilt-mappings": "Quilt Mappings",
     "namespace.legacy-yarn": "Legacy Yarn",
+    "namespace.barn": "Barn",
     "namespace.yarrn": "Yarrn",
     "namespace.plasma": "Plasma",
     "loader.fabric": "Fabric",

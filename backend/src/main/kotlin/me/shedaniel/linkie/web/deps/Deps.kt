@@ -8,6 +8,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import me.shedaniel.linkie.LinkieConfig
 import me.shedaniel.linkie.Namespaces
+import me.shedaniel.linkie.namespaces.BarnNamespace
 import me.shedaniel.linkie.namespaces.LegacyYarnNamespace
 import me.shedaniel.linkie.namespaces.MCPNamespace
 import me.shedaniel.linkie.namespaces.MojangHashedNamespace
@@ -150,6 +151,7 @@ fun startLinkie() {
                     LegacyYarnNamespace,
                     YarrnNamespace,
                     PlasmaNamespace,
+                    BarnNamespace,
                 )
             )
         )

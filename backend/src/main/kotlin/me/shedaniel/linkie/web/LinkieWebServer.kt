@@ -67,6 +67,7 @@ val json = Json {
     explicitNulls = false
 }
 
+@Suppress("ExtractKtorModule")
 fun main() {
     depsCycle()
     startDepsCycle()
