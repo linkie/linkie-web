@@ -37,7 +37,7 @@
     "mappings.entry.type.class": "类",
     "mappings.entry.type.method": "方法",
     "mappings.entry.type.field": "字段",
-    "mappings.entry.type": "类型；:",
+    "mappings.entry.type": "类型：",
     "mappings.entry.mixin.target": "Mixin 目标:",
     "mappings.entry.at": "AT：",
     "mappings.entry.aw": "AW：",
