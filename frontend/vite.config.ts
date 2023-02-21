@@ -2,6 +2,7 @@ import {defineConfig} from "vite"
 import vue from "@vitejs/plugin-vue"
 import mkcert from "vite-plugin-mkcert"
 import {VitePWA} from "vite-plugin-pwa"
+import prismjsPlugin from "vite-plugin-prismjs"
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -45,6 +46,11 @@ export default defineConfig({
                 cleanupOutdatedCaches: false,
                 sourcemap: true,
             },
+        }),
+        prismjsPlugin({
+            languages: ["java", "groovy", "kotlin", "gradle"],
+            css: true,
+            theme: "tomorrow",
         }),
     ],
 })

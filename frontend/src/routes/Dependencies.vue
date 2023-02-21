@@ -75,7 +75,6 @@ import Block from "../components/Block.vue"
 import {defineComponent} from "vue"
 import {useDependencySearchStore} from "../app/dependency-store"
 import {mapState} from "pinia"
-import {copyAs} from "../app/copy"
 import {DependencyBlockData, ensureDependencyData, updateDependencyData, useDependenciesDataStore} from "../app/dependencies-data"
 import Copyable from "../components/Copyable.vue"
 
@@ -88,7 +87,6 @@ export default defineComponent({
             formatDependency,
             formatBlock,
             tab,
-            copyAs,
         }
     },
     computed: {

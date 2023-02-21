@@ -67,12 +67,22 @@
             </EntryDetails>
         </div>
 
-        <div :class="['rounded-lg bg-base-300 dark:bg-base-dark-300 p-3 text-sm mt-2 mb-1 h-[20rem]', source === '' ? 'animate-pulse' : '']" v-if="expandSource">
-            <pre class="pl-2 pb-1 overflow-x-auto h-[20rem]"><code
-                    v-for="[index, line] of Object.entries(source.split('\n'))"
-                    :class="['block break-all whitespace-pre', (line + '').includes((entry.type === 'class' ? 'class ' : ' ') + onlyClass(getOptimumName(entry)) + (entry.type === 'method' ? '(' : '')) ? 'font-bold' : '']"
-                    id="code-block"
-                    :ref="'source-line-' + index">{{ line === "" ? " " : line }}</code></pre>
+        <div class="rounded-lg bg-base-dark-300 p-3 text-sm mt-2 mb-1 h-[28rem] overflow-x-auto resize-y" v-if="expandSource === namespace?.id + ' ' + version + ' ' + query">
+            <div class="h-full items-center justify-center grid" v-if="source === ''">
+                <div class="flex gap-4 items-center justify-center animate-pulse animate-bounce text-base-dark-content" ref="source-loading">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="animate-spin" width="24" height="24" viewBox="0 0 24 24" stroke-width="2"
+                         stroke="currentColor"
+                         fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                        <path d="M10 17a3 3 0 1 1 -1.543 -2.623l2.087 -3.754a3 3 0 0 1 1.456 -5.623a3 3 0 0 1 1.457 5.623l2.087 3.754a3 3 0 1 1 -1.538 2.8l-.006 -.177h-4z"></path>
+                        <path d="M17 17v.01"></path>
+                        <path d="M7 17v.01"></path>
+                        <path d="M12 8v.01"></path>
+                    </svg>
+                    <p class="font-medium text-xl">Generating Sources... This is slow on the first run</p>
+                </div>
+            </div>
+            <code ref="source" class="whitespace-pre text-base-dark-content"></code>
         </div>
     </Block>
 </template>
@@ -83,12 +93,12 @@ import Block from "../Block.vue"
 import Header from "../dependencies/Header.vue"
 import SubHeader from "../dependencies/SubHeader.vue"
 import EntryDetails from "./EntryDetails.vue"
-import {copyAs} from "../../app/copy"
 import CodeBlock from "../dependencies/CodeBlock.vue"
 import {reqSource} from "../../app/backend"
 import {addAlert} from "../../app/alerts"
 import {MappingEntry, Namespace} from "../../app/mappings-data"
 import Copyable from "../Copyable.vue"
+import Prism, {TokenStream} from "prismjs"
 
 function getOptimumName(entry: MappingEntry): string {
     return entry.named || entry.intermediary || ""
@@ -267,8 +277,7 @@ export default defineComponent({
     data() {
         return {
             getDisplayName,
-            copyAs,
-            expandSource: false,
+            expandSource: null as string | null,
             source: "",
             getOptimumName,
             onlyClass,
@@ -286,11 +295,72 @@ export default defineComponent({
         source() {
             this.$nextTick(() => {
                 for (let entry of Object.entries(this.source.split("\n"))) {
-                    if ((entry[1] + "").includes((this.entry.type === "class" ? "class " : " ") + onlyClass(getOptimumName(this.entry)) + (this.entry.type === "method" ? "(" : ""))) {
-                        (this.$refs["source-line-" + entry[0]] as HTMLFormElement)[0].scrollIntoView({behavior: "smooth", block: "center"})
+                    if (this.isSourceFocused(entry[1] + "")) {
+                        // (this.$refs["source-line-" + entry[0]] as HTMLFormElement)[0].scrollIntoView({behavior: "smooth", block: "center"})
                         break
                     }
                 }
+                
+                let toFind = onlyClass(getOptimumName(this.entry)) ?? ""
+                if (toFind.includes("."))
+                    toFind = toFind.substring(0, toFind.indexOf("."))
+
+                function extractToken(token: TokenStream): string {
+                    if (typeof token === "string") {
+                        return token
+                    } else if (Array.isArray(token)) {
+                        let result = ""
+                        token.forEach((t) => {
+                            result += extractToken(t)
+                        })
+                        return result
+                    } else {
+                        let classes = "token " + token.type
+                        if (token.alias) {
+                            classes += " " + token.alias
+                        }
+                        return `<span class="${classes}">${extractToken(token.content)}</span>`
+                    }
+                }
+
+                let code = ""
+                Prism.tokenize(this.source, Prism.languages.java).flatMap(extractToken).forEach((token: string) => {
+                    code += token
+                })
+                let sourceElement = this.$refs.source as HTMLFormElement
+                sourceElement.innerHTML = code
+                for (let i = 0; i < sourceElement.children.length; i++) {
+                    let child = sourceElement.children[i]
+                    let tokenType = "field"
+                    for (let key of child.className.split(" ")) {
+                        if (key !== "token") {
+                            tokenType = key
+                        }
+                    }
+                    if (this.entry.type === "class" && tokenType === "class-name" && child.textContent === toFind) {
+                        if (!sourceElement.children[i - 1]?.className?.includes("keyword")) continue
+                        if (sourceElement.children[i - 1]?.textContent !== "class") continue
+                    } else if (this.entry.type === "method" && tokenType === "function" && child.textContent === toFind) {
+                        if (!sourceElement.children[i + 1]?.className?.includes("punctuation")) continue
+                        if (sourceElement.children[i + 1]?.textContent !== "(") continue
+                        if (!(sourceElement.children[i - 1]?.className?.includes("keyword") && sourceElement.children[i - 1]?.textContent !== "return")
+                            && !sourceElement.children[i - 1]?.className?.includes("class-name")
+                            && !sourceElement.children[i - 1]?.className?.includes("generics")) continue
+                    } else if (this.entry.type === "field" && tokenType === "property" && child.textContent === " " + toFind) {
+                    } else continue
+                    child.className += " font-bold bg-base-dark-700"
+                    this.$nextTick(() => {
+                        child.scrollIntoView({behavior: "smooth", block: "center"})
+                    })
+                    break
+                }
+            })
+        },
+        expandSource() {
+            this.$nextTick(() => {
+                let loadingElement = this.$refs["source-loading"] as HTMLFormElement
+                if (!loadingElement || !loadingElement[0]) return
+                loadingElement[0].scrollIntoView({behavior: "smooth", block: "center"})
             })
         },
     },
@@ -318,10 +388,10 @@ export default defineComponent({
             return beautifyFieldType(desc)
         },
         requestSource() {
-            this.expandSource = !this.expandSource
+            this.expandSource = !this.expandSource ? this.namespace?.id + " " + this.version + " " + this.query : null
             this.source = ""
 
-            if (this.expandSource) {
+            if (this.expandSource === this.namespace?.id + " " + this.version + " " + this.query) {
                 reqSource(this.namespace!!.id, this.version!!, this.entry.ownerNamed ?? this.entry.ownerIntermediary ?? this.entry.named ?? this.entry.intermediary).then(value => {
                     this.source = value.data
                 }).catch(reason => {
@@ -331,6 +401,9 @@ export default defineComponent({
                     })
                 })
             }
+        },
+        isSourceFocused(line: string) {
+            return line.includes((this.entry.type === "class" ? "class " : " ") + onlyClass(getOptimumName(this.entry)) + (this.entry.type === "method" ? "(" : ""))
         },
     },
     props: {
@@ -346,6 +419,9 @@ export default defineComponent({
         entry: {
             type: Object as PropType<MappingEntry>,
             required: true,
+        },
+        query: {
+            type: String,
         },
     },
 })

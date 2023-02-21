@@ -52,5 +52,6 @@
     "namespace.plasma": "Plasma",
     "loader.fabric": "Fabric",
     "loader.forge": "Forge",
-    "loader.quilt": "Quilt"
+    "loader.quilt": "Quilt",
+    "message.copy.clipboard": "已复制到剪贴板"
 }

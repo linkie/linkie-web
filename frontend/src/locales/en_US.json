@@ -54,5 +54,6 @@
     "loader.fabric": "Fabric",
     "loader.forge": "Forge",
     "loader.quilt": "Quilt",
-    "loader.legacy-fabric": "Legacy Fabric"
+    "loader.legacy-fabric": "Legacy Fabric",
+    "message.copy.clipboard": "Copied to clipboard"
 }

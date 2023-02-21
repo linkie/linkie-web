@@ -101,7 +101,7 @@ val allDeps = listOf(
         notation = { _, _, version ->
             if (version.contains("+build.")) {
                 "io.github.prospector:modmenu:$version"
-            } else if (version.contains("-")) {
+            } else if (version.matches("[^-]+-\\d\\d?\\d?".toRegex())) {
                 "io.github.prospector.modmenu:ModMenu:$version"
             } else {
                 "com.terraformersmc:modmenu:$version"

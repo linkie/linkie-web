@@ -8,19 +8,20 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@highlightjs/vue-plugin": "^2.1.0",
     "copy-to-clipboard": "^3.3.2",
-    "highlight.js": "^11.6.0",
     "nprogress": "^0.2.0",
     "pinia": "^2.0.20",
     "pinia-plugin-persistedstate": "^1.6.3",
+    "prismjs": "^1.29.0",
     "tailwind-gradient-mask-image": "^1.0.0",
+    "vite-plugin-prismjs": "^0.0.8",
     "vue": "^3.2.25",
     "vue-axios": "^3.4.1",
     "vue-i18n": "^9.2.2"
   },
   "devDependencies": {
     "@types/node": "^17.0.45",
+    "@types/prismjs": "^1.26.0",
     "@vitejs/plugin-vue": "^3.0.3",
     "autoprefixer": "^10.4.8",
     "postcss": "^8.4.16",

@@ -1,5 +1,5 @@
 <template>
-    <div class="whitespace-nowrap flex copy items-center" @click="copyAs(copy)">
+    <div class="whitespace-nowrap flex copy items-center" @click="copyAs($i18n, copy)">
         <span><slot/></span>
         <svg xmlns="http://www.w3.org/2000/svg" :class="['min-w-[20px] w-[20px] ml-[1px] mr-[-.3rem]', `stroke-${strokeWidth ?? '2'}`]" width="24" height="24" viewBox="0 0 24 24" stroke-width="2"
              stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
@@ -23,8 +23,7 @@ export default defineComponent({
     },
     props: {
         copy: {
-            type: Object as PropType<String | undefined>,
-            required: true,
+            type: String,
         },
         strokeWidth: {
             type: String,

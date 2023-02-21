@@ -12,7 +12,7 @@
                 <MappingsEntryBlock v-for="entry in infoData.entries"
                                     :namespace="mappingsData.namespaces.find(value => value.id === infoData.namespace)"
                                     :translated-to-namespace="infoData.translateAs ? mappingsData.namespaces.find(value => value.id === infoData.translateAs) : undefined"
-                                    :entry="entry" :version="version"/>
+                                    :entry="entry" :version="version" :query="searchText"/>
             </div>
             <MappingsSearchPlaceholder v-else
                                        :searching="!!searchController"
