@@ -1,31 +1,29 @@
 <template>
     <div class="pt-20"/>
-    <div v-if="entries.length !== 0">
-        <div class="max-w-[calc(62rem+var(--sidebar-width))] mx-auto">
-            <div class="grid-setup">
-                <div class="col-[1] px-5 pb-6 sm:pb-0 sm:pr-0 sm:w-[var(--sidebar-width)] sm:min-w-[var(--sidebar-width)] sm:absolute">
-                    <div class="p-5 card bg-base-100 dark:bg-base-dark-200 shadow-xl rounded-lg">
-                        <SubHeader :add-padding="false">Table of Contents</SubHeader>
-                        <ol class="list-decimal pl-6 mt-2">
-                            <li v-for="entry in entries">
-                                <a :href="'#oss-' + entries.indexOf(entry)">{{ entry.name }}</a>
-                            </li>
-                        </ol>
-                    </div>
-                </div>
+    <PageWidthLimiter v-if="entries.length !== 0">
+        <PageSidebar>
+            <Block>
+                <SubHeader>Table of Contents</SubHeader>
+                <ol class="list-decimal pl-6 mt-2">
+                    <li v-for="entry in entries">
+                        <a :href="'#oss-' + entries.indexOf(entry)">{{ entry.name }}</a>
+                    </li>
+                </ol>
+            </Block>
+        </PageSidebar>
 
-                <div class="col-[2/span_2] min-w-0">
-                    <DependencyBlock v-for="entry in entries" :title="entry.name" :id="'oss-' + entries.indexOf(entry)">
-                            <span class="whitespace-pre-line">
-                                {{ entry.license }}
-                            </span>
-                        <div class="divider mt-0 mb-0"/>
-                        <a class="btn btn-ghost btn-sm normal-case" :href="entry.link">More about {{ entry.name }}</a>
-                    </DependencyBlock>
-                </div>
-            </div>
-        </div>
-    </div>
+        <PageContent class="flex flex-col gap-y-6">
+            <Block v-for="entry in entries" :title="entry.name" :id="'oss-' + entries.indexOf(entry)">
+                <Header>{{ entry.name }}</Header>
+                <span class="whitespace-pre-line">
+                    {{ entry.license }}
+                </span>
+                <br/>
+                <br/>
+                <a class="underline" :href="entry.link">More about {{ entry.name }}</a>
+            </Block>
+        </PageContent>
+    </PageWidthLimiter>
 
     <div v-else class="text-center h-[calc(100vh-56px-24px-5rem)] items-center justify-center grid">
         <div class="flex gap-4 items-center justify-center animate-pulse animate-bounce">
@@ -43,12 +41,15 @@
 </template>
 
 <script lang="ts">
-import DependencyBlock from "../components/dependencies/DependencyBlock.vue"
 import {reqOss} from "../app/backend"
 import Block from "../components/Block.vue"
 import SubHeader from "../components/dependencies/SubHeader.vue"
 import {defineComponent} from "vue"
 import {addAlert} from "../app/alerts"
+import PageWidthLimiter from "../components/PageWidthLimiter.vue"
+import PageSidebar from "../components/PageSidebar.vue"
+import PageContent from "../components/PageContent.vue"
+import Header from "../components/dependencies/Header.vue"
 
 interface OssEntry {
     name: string,
@@ -58,7 +59,7 @@ interface OssEntry {
 
 export default defineComponent({
     name: "Dependencies",
-    components: {SubHeader, Block, DependencyBlock},
+    components: {Header, PageContent, PageSidebar, PageWidthLimiter, SubHeader, Block},
     data() {
         return {
             entries: [] as OssEntry[],
@@ -78,14 +79,4 @@ export default defineComponent({
 </script>
 
 <style scoped>
-div {
-    --sidebar-width: 18rem;
-}
-
-@media (min-width: 640px) {
-    .grid-setup {
-        grid-template-columns: auto 0 minmax(0, calc(100% - var(--sidebar-width)));
-        @apply grid grid-flow-col;
-    }
-}
 </style>

@@ -1,6 +1,6 @@
 <template>
     <div class="flex flex-col">
-        <SubHeader :add-padding="false" class="pb-1"> {{ $t("dependencies.loader") }} </SubHeader>
+        <SubHeader class="pb-1"> {{ $t("dependencies.loader") }} </SubHeader>
 
         <div v-for="l in loaders" :class="[
             loader === l ? 'opacity-100 font-bold' : 'opacity-50 font-normal',
@@ -10,7 +10,7 @@
 
         <div v-if="loader === 'forge'">
             <div class="divider mt-0 mb-0"/>
-            <SubHeader :add-padding="false" class="pb-1"> {{ $t("dependencies.build.system") }} </SubHeader>
+            <SubHeader class="pb-1"> {{ $t("dependencies.build.system") }} </SubHeader>
 
             <div :class="[
             !forgeGradle ? 'opacity-100 font-bold' : 'opacity-50 font-normal',
@@ -26,7 +26,7 @@
         </div>
 
         <div class="divider mt-0 mb-0"/>
-        <SubHeader :add-padding="false" class="pb-1"> {{ $t("dependencies.version") }} </SubHeader>
+        <SubHeader class="pb-1"> {{ $t("dependencies.version") }} </SubHeader>
         <div class="flex flex-col flex-nowrap justify-center h-full whitespace-nowrap pb-2" v-if="loader === 'fabric'">
             <div>
                 <span class="pr-2"> {{ $t("dependencies.version.snapshots") }} </span>
@@ -78,19 +78,7 @@ export default defineComponent({
             type: Object as PropType<DependencySearchData>,
             required: true,
         },
-    },
-    mounted() {
-        const urlParams = new URLSearchParams(window.location.search)
-        if (this.loaders.includes(urlParams.get("loader") ?? "")) {
-            useDependencySearchStore().loader = (urlParams.get("loader") ?? "") as string
-
-            if (this.applicableVersions.includes(urlParams.get("version") ?? "")) {
-                useDependencySearchStore().version = (urlParams.get("version") ?? "") as string
-            }
-
-            history.pushState({}, "", "/dependencies")
-        }
-    },
+    }
 })
 </script>
 

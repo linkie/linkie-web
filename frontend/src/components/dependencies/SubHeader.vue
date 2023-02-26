@@ -1,5 +1,5 @@
 <template>
-    <div class="font-extrabold text-xl" :class="addPadding ? 'py-2' : ''">
+    <div class="font-extrabold text-xl">
         <slot/>
     </div>
 </template>
@@ -9,12 +9,6 @@ import {defineComponent} from "vue"
 
 export default defineComponent({
     name: "SubHeader",
-    props: {
-        addPadding: {
-            type: Boolean,
-            default: () => true,
-        },
-    },
 })
 </script>
 

@@ -1,6 +1,6 @@
 <template>
     <div class="flex flex-col">
-        <SubHeader :add-padding="false" class="pb-1"> {{ $t("mappings.namespace") }} </SubHeader>
+        <SubHeader class="pb-1"> {{ $t("mappings.namespace") }} </SubHeader>
 
         <div v-for="[group, nses] in Object.entries(namespacesGrouped)" class="pb-1">
             <div v-if="group !== 'Others' || expandNamespaces">
@@ -30,7 +30,7 @@
         </div>
 
         <div class="divider mt-0 mb-0"/>
-        <SubHeader :add-padding="false" class="pb-1"> {{ $t("mappings.version") }} </SubHeader>
+        <SubHeader class="pb-1"> {{ $t("mappings.version") }} </SubHeader>
         <div class="flex flex-col flex-nowrap justify-center h-full whitespace-nowrap pb-2">
             <div>
                 <span class="pr-2"> {{ $t("mappings.version.snapshots") }} </span>
@@ -53,7 +53,7 @@
 
         <div class="divider mt-0 mb-0"/>
         <div class="mt-2">
-            <SubHeader :add-padding="false" class="pb-2"> {{ $t("mappings.translation") }} </SubHeader>
+            <SubHeader class="pb-2"> {{ $t("mappings.translation") }} </SubHeader>
             <p class="text-sm font-bold"> {{ $t("mappings.translation.none") }} </p>
             <div :class="[
                 translateAs === undefined ? 'opacity-100 font-bold' : 'opacity-60 hover:font-normal',
@@ -79,15 +79,10 @@
 <script lang="ts">
 import {defineComponent, PropType} from "vue"
 import {mapWritableState} from "pinia"
-import {useMappingsStore} from "../../app/mappings-store"
+import {applicableMappingsVersions, useMappingsStore, VersionPossible} from "../../app/mappings-store"
 import SubHeader from "../dependencies/SubHeader.vue"
 import {namespaceGroups, namespaceLocalizations} from "../../app/backend"
 import {MappingsData, Namespace} from "../../app/mappings-data"
-
-interface VersionPossible {
-    version: string
-    hasTranslation: boolean
-}
 
 export default defineComponent({
     name: "MappingsFilterBlock",
@@ -144,31 +139,7 @@ export default defineComponent({
             return this.namespaces[0]
         },
         applicableVersions(): VersionPossible[] {
-            let {namespace, allowSnapshots, translateAs} = useMappingsStore()
-            if (!namespace) return []
-            let namespaceObj = this.data.namespaces.find(value => value.id === namespace)
-            if (!namespaceObj) return []
-            let versions = namespaceObj.versions
-            if (versions && !allowSnapshots) {
-                versions = versions.filter(entry => entry.stable)
-            }
-            if (versions && translateAs) {
-                let translateAsObj = this.data.namespaces.find(value => value.id === translateAs)
-                let retain = translateAsObj?.versions?.map(entry => entry.version) ?? []
-                return versions.map(entry => {
-                    return {
-                        version: entry.version,
-                        hasTranslation: retain.includes(entry.version),
-                    }
-                })
-            } else {
-                return versions.map(entry => {
-                    return {
-                        version: entry.version,
-                        hasTranslation: true,
-                    }
-                })
-            }
+            return applicableMappingsVersions()
         },
     },
     props: {
@@ -176,19 +147,6 @@ export default defineComponent({
             type: Object as PropType<MappingsData>,
             required: true,
         },
-    },
-    mounted() {
-        const urlParams = new URLSearchParams(window.location.search)
-        if (this.namespaces.map(namespace => namespace.id).includes(urlParams.get("namespace") ?? "")) {
-            useMappingsStore().namespace = (urlParams.get("namespace") ?? "") as string
-            useMappingsStore().translateAs = undefined
-
-            if (this.applicableVersions.map(version => version.version).includes(urlParams.get("version") ?? "")) {
-                useMappingsStore().version = (urlParams.get("version") ?? "") as string
-            }
-
-            history.pushState({}, "", "/mappings")
-        }
     },
 })
 </script>

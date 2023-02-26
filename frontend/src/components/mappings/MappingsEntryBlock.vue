@@ -1,6 +1,6 @@
 <template>
     <Block>
-        <SubHeader :addPadding="false">
+        <SubHeader>
             <div class="flex">
                 <div class="flex-1 overflow-x-auto flex flex-nowrap items-center">
                     <Copyable :copy="getDisplayName(entry)">{{ getDisplayName(entry) }}</Copyable>

@@ -2,11 +2,11 @@
     <div class="flex flex-col">
         <h1 class="pt-40 pb-28 text-center text-6xl font-bold title-home text-white"> {{ $t("home.welcome") }} </h1>
 
-        <div class="max-w-[78rem] mx-auto pl-4 pr-10 flex-1 pt-8">
-            <Header> {{ $t("home.quick.access") }} </Header>
-            <SubHeader class="text-2xl">
-                <a class="flex flex-nowrap gap-2" href="/dependencies">
-                    {{ $t("home.dependencies") }}
+        <PageWidthLimiter class="pt-8">
+            <PageContent>
+                <Header> {{ $t("home.quick.access") }}</Header>
+                <a class="flex flex-nowrap gap-2 pb-2" href="/dependencies">
+                    <SubHeader class="text-2xl">{{ $t("home.dependencies") }}</SubHeader>
                     <div class="flex flex-col">
                         <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler flex-1" width="20" height="20" viewBox="0 0 24 24"
                              stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
@@ -17,14 +17,10 @@
                         </svg>
                     </div>
                 </a>
-            </SubHeader>
-            <HomeDependencies/>
+                <HomeDependencies/>
 
-            <div class="mt-4"/>
-
-            <SubHeader class="text-2xl">
-                <a class="flex flex-nowrap gap-2" href="/mappings">
-                    {{ $t("home.mappings") }}
+                <a class="flex flex-nowrap gap-2 pt-6 pb-2" href="/mappings">
+                    <SubHeader class="text-2xl">{{ $t("home.mappings") }}</SubHeader>
                     <div class="flex flex-col">
                         <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler flex-1" width="20" height="20" viewBox="0 0 24 24"
                              stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
@@ -35,9 +31,9 @@
                         </svg>
                     </div>
                 </a>
-            </SubHeader>
-            <HomeMappings/>
-        </div>
+                <HomeMappings/>
+            </PageContent>
+        </PageWidthLimiter>
     </div>
 </template>
 
@@ -49,10 +45,12 @@ import HomeMappings from "../components/home/HomeMappings.vue"
 import Header from "../components/dependencies/Header.vue"
 import SubHeader from "../components/dependencies/SubHeader.vue"
 import Navbar from "../components/Navbar.vue"
+import PageContent from "../components/PageContent.vue"
+import PageWidthLimiter from "../components/PageWidthLimiter.vue"
 
 export default defineComponent({
     name: "NotFound",
-    components: {Navbar, SubHeader, Header, Block, HomeDependencies, HomeMappings},
+    components: {PageWidthLimiter, PageContent, Navbar, SubHeader, Header, Block, HomeDependencies, HomeMappings},
 })
 </script>
 

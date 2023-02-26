@@ -1,6 +1,6 @@
 <template>
-    <div class="p-5 bg-base-100 dark:bg-base-dark-200 shadow-lg rounded-lg">
-        <slot></slot>
+    <div class="sm:w-[var(--sidebar-width)] sm:min-w-[var(--sidebar-width)]">
+        <slot/>
     </div>
 </template>
 
@@ -8,9 +8,12 @@
 import {defineComponent} from "vue"
 
 export default defineComponent({
-    name: "Block",
+    name: "PageSidebar",
 })
 </script>
 
 <style scoped>
+div {
+    --sidebar-width: 18rem;
+}
 </style>

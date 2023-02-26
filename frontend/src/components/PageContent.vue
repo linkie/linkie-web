@@ -1,6 +1,6 @@
 <template>
-    <div class="p-5 bg-base-100 dark:bg-base-dark-200 shadow-lg rounded-lg">
-        <slot></slot>
+    <div class="flex-1 min-w-0">
+        <slot/>
     </div>
 </template>
 
@@ -8,9 +8,10 @@
 import {defineComponent} from "vue"
 
 export default defineComponent({
-    name: "Block",
+    name: "PageContent",
 })
 </script>
 
 <style scoped>
+
 </style>

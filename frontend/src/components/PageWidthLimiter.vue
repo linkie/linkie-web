@@ -1,6 +1,6 @@
 <template>
-    <div class="p-5 bg-base-100 dark:bg-base-dark-200 shadow-lg rounded-lg">
-        <slot></slot>
+    <div class="max-w-[80rem] mx-auto w-full px-5 sm:flex sm:gap-6">
+        <slot/>
     </div>
 </template>
 
@@ -8,9 +8,10 @@
 import {defineComponent} from "vue"
 
 export default defineComponent({
-    name: "Block",
+    name: "PageWidthLimiter",
 })
 </script>
 
 <style scoped>
+
 </style>
