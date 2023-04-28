@@ -95,23 +95,39 @@ val allDeps = listOf(
             )
         ),
     ),
-    CFDeps(
-        "Mod Menu", 308702,
-        loaders = { _, _ -> listOf("fabric") },
-        notation = { _, _, version ->
-            if (version.contains("+build.")) {
-                "io.github.prospector:modmenu:$version"
-            } else if (version.matches("[^-]+-\\d\\d?\\d?".toRegex())) {
-                "io.github.prospector.modmenu:ModMenu:$version"
-            } else {
-                "com.terraformersmc:modmenu:$version"
-            }
-        },
-        versionGrabber = { file -> file.fileName.substringAfterLast("u-").replace(".jar", "") },
-        mavens = listOf(
-            Deps.MavenData(
-                url = "https://maven.terraformersmc.com/releases/",
+    CombinedDeps(
+        "Mod Menu",
+        CFDeps(
+            "Mod Menu", 308702,
+            loaders = { _, _ -> listOf("fabric") },
+            notation = { _, _, version ->
+                if (version.contains("+build.")) {
+                    "io.github.prospector:modmenu:$version"
+                } else if (version.matches("[^-]+-\\d\\d?\\d?".toRegex())) {
+                    "io.github.prospector.modmenu:ModMenu:$version"
+                } else {
+                    "com.terraformersmc:modmenu:$version"
+                }
+            },
+            versionGrabber = { file -> file.fileName.substringAfterLast("u-").replace(".jar", "") },
+            mavens = listOf(
+                Deps.MavenData(
+                    url = "https://maven.terraformersmc.com/releases/",
+                ),
+            )
+        ),
+        MRDeps(
+            "Mod Menu", "mOgUt4GM",
+            loaders = { _, _ -> listOf("fabric") },
+            notation = { _, _, version -> "com.terraformersmc:modmenu:$version" },
+            versionGrabber = { file -> (file.files.firstOrNull { it.primary } ?: file.files.firstOrNull())
+                ?.filename?.substringAfterLast("u-")?.replace(".jar", "") ?: "UNKNOWN" },
+            mavens = listOf(
+                Deps.MavenData(
+                    url = "https://maven.terraformersmc.com/releases/",
+                ),
             ),
+            fileFilter = { version, _ -> version.tryToVersion()?.isAtLeast(1, 19) == true }
         )
     ),
     CFDeps(
