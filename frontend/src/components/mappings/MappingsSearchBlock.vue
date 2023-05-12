@@ -1,12 +1,12 @@
 <template>
-    <div class="bg-base-100 dark:bg-base-dark-200 shadow-xl rounded-lg overflow-x-auto">
+    <div class="bg-base-l1 shadow-sm rounded-lg overflow-x-auto epic-scroller">
         <div class="flex px-2 pt-2">
             <span class="flex-1 items-center justify-start grid ml-2 mr-3 font-bold whitespace-nowrap"> {{ $t("mappings.search.type") }} </span>
             <div class="flex">
                 <MappingsFilterPill :enabled="allowClasses" :text="$t('mappings.search.type.classes')" @click="allowClasses = !allowClasses"/>
                 <MappingsFilterPill :enabled="allowMethods" :text="$t('mappings.search.type.methods')" @click="allowMethods = !allowMethods"/>
                 <MappingsFilterPill :enabled="allowFields" :text="$t('mappings.search.type.fields')" @click="allowFields = !allowFields"/>
-                <div class="border-base-100 dark:border-base-dark-200 border-[0.25rem] border-solid"/>
+                <div class="border-base-l1 border-[0.25rem] border-solid"/>
             </div>
         </div>
         <div class="flex flex-nowrap items-center">
@@ -61,5 +61,6 @@ export default defineComponent({
 .input {
     outline: 0 !important;
     border: 0 !important;
+    @apply ring-transparent !important;
 }
 </style>

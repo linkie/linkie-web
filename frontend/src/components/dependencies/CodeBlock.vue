@@ -1,12 +1,10 @@
 <template>
-    <p class="mt-1" v-if="!!title">{{ title }}</p>
-    <div class="rounded-lg bg-base-300 dark:bg-base-dark-300 p-3 text-sm mt-2 mb-1">
+    <p v-if="!!title">{{ title }}</p>
+    <div class="rounded-lg bg-base-l2 p-3 text-sm mt-2 mb-1">
         <div class="flex">
-            <div class="flex-1">
-                <CodeLanguageTab v-for="language in languages" :language="language"/>
-            </div>
+            <CodeLanguageTab v-for="language in languages" :language="language"/>
         </div>
-        <pre class="pl-2 pb-1 overflow-x-auto"><code class="inline-block break-all whitespace-pre" id="code-block"><slot/></code></pre>
+        <pre class="pl-2 pb-1 overflow-x-auto epic-scroller"><code class="inline-block break-all whitespace-pre" id="code-block"><slot/></code></pre>
     </div>
 </template>
 

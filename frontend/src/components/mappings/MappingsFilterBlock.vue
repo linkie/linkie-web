@@ -1,20 +1,20 @@
 <template>
     <div class="flex flex-col">
-        <SubHeader class="pb-1"> {{ $t("mappings.namespace") }} </SubHeader>
+        <SubHeader class="mt-[-.25rem] mb-1"> {{ $t("mappings.namespace") }} </SubHeader>
 
         <div v-for="[group, nses] in Object.entries(namespacesGrouped)" class="pb-1">
             <div v-if="group !== 'Others' || expandNamespaces">
-                <p class="text-sm font-bold">{{ group }}</p>
+                <p class="text-xs font-bold uppercase">{{ group }}</p>
                 <div v-for="ns in nses" :class="[
-                    namespace === ns.id ? 'opacity-100 font-bold' : 'opacity-60 hover:font-normal',
-                    'cursor-pointer px-2 py-1 capitalize rounded transition-all hover:opacity-100 hover:bg-neutral dark:hover:bg-base-dark-300 hover:text-white']"
+                    namespace === ns.id ? 'font-medium' : 'font-normal opacity-80 decoration-base-400/50 hover:decoration-base-500/70 dark:decoration-base-dark-400/50 dark:hover:decoration-base-dark-400/70',
+                    'underline underline-offset-2 decoration-2 cursor-pointer mx-[-.5rem] px-2 py-1 rounded transition-all bg-base-500 dark:hover:bg-base-dark-400 bg-opacity-0 hover:bg-opacity-70']"
                      @click="namespace = ns.id">
                     {{ localizeNamespace(ns) ?? "" }}
                 </div>
             </div>
         </div>
 
-        <div class="px-2 py-1 justify-center cursor-pointer flex opacity-60 hover:opacity-100 transition-all rounded hover:bg-neutral dark:hover:bg-base-dark-300 hover:text-white"
+        <div class="mx-[-.5rem] px-2 py-1 justify-center cursor-pointer flex gap-1 transition-all rounded bg-base-500 dark:hover:bg-base-dark-400 bg-opacity-0 hover:bg-opacity-70"
              @click="expandNamespaces=!expandNamespaces">
             <svg xmlns="http://www.w3.org/2000/svg" :class="[expandNamespaces ? 'rotate-180' : '']" width="24" height="24" viewBox="0 0 24 24"
                  stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
@@ -32,19 +32,18 @@
         <div class="divider mt-0 mb-0"/>
         <SubHeader class="pb-1"> {{ $t("mappings.version") }} </SubHeader>
         <div class="flex flex-col flex-nowrap justify-center h-full whitespace-nowrap pb-2">
-            <div>
-                <span class="pr-2"> {{ $t("mappings.version.snapshots") }} </span>
-                <input type="checkbox" class="checkbox checkbox-primary h-4" :checked="allowSnapshots" aria-label="Enable Snapshots"
-                       @input="allowSnapshots = ($event.target as any)?.checked ?? allowSnapshots"/>
+            <div class="flex gap-2 select-none justify-between">
+                <label for="allow-snapshots"> {{ $t("dependencies.version.snapshots") }} </label>
+                <input type="checkbox" v-model="allowSnapshots" id="allow-snapshots" aria-label="Enable Snapshots"/>
             </div>
         </div>
 
-        <div class="bg-base-300 dark:bg-base-dark-300 rounded-lg">
-            <div class="p-3 h-40 overflow-x-clip gradient-mask-b-80 overflow-y-scroll">
+        <div class="mx-[-.25rem] bg-base-l2 rounded-lg">
+            <div class="p-1 h-40 overflow-x-clip gradient-mask-b-80 overflow-y-scroll epic-scroller">
                 <p v-for="v in applicableVersions"
-                   :class="[version === v.version && v.hasTranslation ? 'opacity-100 font-bold' : 'opacity-60 hover:font-normal',
-                    v.hasTranslation ? 'transition-all hover:opacity-100 hover:bg-neutral dark:hover:bg-base-dark-400 hover:text-white rounded-md cursor-pointer' : 'cursor-not-allowed line-through',
-                    'px-2 py-1']"
+                   :class="[version === v.version && v.hasTranslation ? 'font-medium' : 'font-normal opacity-80 decoration-base-500/60 hover:decoration-base-700/60 dark:decoration-base-dark-400/70 dark:hover:decoration-base-dark-600/60',
+                    v.hasTranslation ? 'transition-all bg-base-700 dark:hover:bg-base-dark-600 bg-opacity-0 hover:bg-opacity-60 rounded-md cursor-pointer' : 'cursor-not-allowed line-through decoration-base-content hover:decoration-base-content dark:decoration-base-dark-content dark:hover:decoration-base-dark-content',
+                    'px-2 py-1 underline underline-offset-2 decoration-2']"
                    @click="version = v.hasTranslation ? v.version : version">
                     {{ !v.hasTranslation ? $t("mappings.version.no.translation", { version: v.version }) : v.version }}
                 </p>
@@ -54,19 +53,19 @@
         <div class="divider mt-0 mb-0"/>
         <div class="mt-2">
             <SubHeader class="pb-2"> {{ $t("mappings.translation") }} </SubHeader>
-            <p class="text-sm font-bold"> {{ $t("mappings.translation.none") }} </p>
+            <p class="text-xs font-bold uppercase"> {{ $t("mappings.translation.none") }} </p>
             <div :class="[
-                translateAs === undefined ? 'opacity-100 font-bold' : 'opacity-60 hover:font-normal',
-                'cursor-pointer px-2 py-1 capitalize rounded transition-all hover:opacity-100 hover:bg-neutral dark:hover:bg-base-dark-300 hover:text-white']"
+                translateAs === undefined ? 'font-medium' : 'font-normal opacity-80 decoration-base-400/50 hover:decoration-base-500/70 dark:decoration-base-dark-400/50 dark:hover:decoration-base-dark-400/70',
+                    'underline underline-offset-2 decoration-2 cursor-pointer mx-[-.5rem] px-2 py-1 rounded transition-all bg-base-500 dark:hover:bg-base-dark-400 bg-opacity-0 hover:bg-opacity-70 uppercase']" 
                  @click="translateAs = undefined">
                 {{ $t("mappings.translation.n/a") }}
             </div>
             <div v-for="[group, nses] in Object.entries(namespacesGrouped)" class="pb-1">
-                <p class="text-sm font-bold">{{ group }}</p>
+                <p class="text-xs font-bold uppercase">{{ group }}</p>
                 <div v-for="ns in nses">
                     <div v-if="ns?.id !== namespace" :class="[
-                        translateAs === ns.id ? 'opacity-100 font-bold' : 'opacity-60 hover:font-normal',
-                        'cursor-pointer px-2 py-1 capitalize rounded transition-all hover:opacity-100 hover:bg-neutral dark:hover:bg-base-dark-300 hover:text-white']"
+                        translateAs === ns.id ? 'font-medium' : 'font-normal opacity-80 decoration-base-400/50 hover:decoration-base-500/70 dark:decoration-base-dark-400/50 dark:hover:decoration-base-dark-400/70',
+                        'underline underline-offset-2 decoration-2 cursor-pointer mx-[-.5rem] px-2 py-1 rounded transition-all bg-base-500 dark:hover:bg-base-dark-400 bg-opacity-0 hover:bg-opacity-70']"
                          @click="translateAs = ns.id">
                         {{ localizeNamespace(ns) ?? "" }}
                     </div>

@@ -4,6 +4,20 @@
 
         <PageWidthLimiter class="pt-8">
             <PageContent>
+                <NewsProjectGenerator class="mb-8 hidden"/>
+                <div class="mb-8 p-4 bg-base-400/50 ring-base-500 ring-offset-2 ring-2 rounded-lg flex flex-col hidden">
+                    <span class="text-2xl font-bold mb-2">
+                        News: Linkie Windows Client
+                    </span>
+                    <div>
+                        There is a new desktop client available for download. It is still experimental, but it is already usable.
+                        <br/>It is built with Tauri, a framework for building small web applications using existing platform libraries,
+                        and runs a JVM server in the background for Linkie.
+                        <br/><br/>The total size of the client is about <span class="underline underline-offset-2 decoration-2 font-semibold">50MB</span>, which is a lot smaller than any Electron-based client.
+                        <br/>At idle, the client uses about <span class="underline underline-offset-2 decoration-2 font-semibold">600MB</span> of RAM, which is unfortunately due to the JVM.
+                    </div>
+                </div>
+
                 <Header> {{ $t("home.quick.access") }}</Header>
                 <a class="flex flex-nowrap gap-2 pb-2" href="/dependencies">
                     <SubHeader class="text-2xl">{{ $t("home.dependencies") }}</SubHeader>
@@ -47,10 +61,11 @@ import SubHeader from "../components/dependencies/SubHeader.vue"
 import Navbar from "../components/Navbar.vue"
 import PageContent from "../components/PageContent.vue"
 import PageWidthLimiter from "../components/PageWidthLimiter.vue"
+import NewsProjectGenerator from "../components/NewsProjectGenerator.vue"
 
 export default defineComponent({
     name: "NotFound",
-    components: {PageWidthLimiter, PageContent, Navbar, SubHeader, Header, Block, HomeDependencies, HomeMappings},
+    components: {NewsProjectGenerator, PageWidthLimiter, PageContent, Navbar, SubHeader, Header, Block, HomeDependencies, HomeMappings},
 })
 </script>
 

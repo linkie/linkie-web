@@ -1,12 +1,11 @@
 <template>
-    <div class="pt-20"/>
     <PageWidthLimiter v-if="mappingsData.namespaces.length !== 0">
         <PageSidebar>
             <Block>
                 <MappingsFilterBlock :data="mappingsData"/>
             </Block>
         </PageSidebar>
-        <PageContent class="flex flex-col gap-y-6">
+        <PageContent class="flex flex-col gap-y-5">
             <MappingsSearchBlock/>
             <MappingsEntryBlock v-if="infoData.entries.length > 0" v-for="entry in infoData.entries"
                                 :namespace="mappingsData.namespaces.find(value => value.id === infoData.namespace)"

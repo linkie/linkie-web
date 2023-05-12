@@ -1,13 +1,12 @@
 <template>
-    <div class="pt-20"/>
     <PageWidthLimiter v-if="Object.keys(searchData.versions).length !== 0">
-        <PageSidebar class="flex flex-col gap-y-6">
+        <PageSidebar class="flex flex-col gap-y-5">
             <Block>
                 <DependencyFilterBlock :searchData="searchData"/>
             </Block>
 
             <Block>
-                <SubHeader> {{ $t("dependencies.toc") }}</SubHeader>
+                <SubHeader>{{ $t("dependencies.toc") }}</SubHeader>
                 <ol class="list-decimal pl-6 mt-2">
                     <li v-for="entry in dependencyBlocks">
                         <a :href="'#dep-' + dependencyBlocks.indexOf(entry)">{{ entry[0] }}</a>
@@ -16,13 +15,13 @@
             </Block>
         </PageSidebar>
 
-        <PageContent class="flex flex-col gap-y-6">
+        <PageContent class="flex flex-col gap-y-5">
             <Block v-for="[blockName, block] in dependencyBlocks"
                    :id="'dep-' + dependencyBlocks.findIndex(entry => entry[0] === blockName)">
-                <Header>{{ blockName }}</Header>
-                <div v-if="block.mavens.length > 0">
+                <div class="text-2xl font-extrabold mb-2">{{ blockName }}</div>
+                <div v-if="block.mavens.length > 0" class="flex flex-col gap-1">
                     <div v-for="maven in block.mavens">
-                        <SubHeader v-if="block.mavens.indexOf(maven) === 0 && !maven.subtitle"> {{ $t("dependencies.maven.repo") }}</SubHeader>
+                        <div class="font-bold" v-if="block.mavens.indexOf(maven) === 0 && !maven.subtitle"> {{ $t("dependencies.maven.repo") }}</div>
 
                         <CodeBlock :title="maven.subtitle ?? ''">
                             <Copyable :copy="formatMaven(maven.url)" stroke-width="1">
@@ -32,17 +31,19 @@
                     </div>
                 </div>
 
-                <div v-for="dependency in block.dependencies">
-                    <p class="mt-1 flex gap-x-1">
-                        {{ dependency.name }}
-                        <Copyable class="font-bold" :copy="dependency.version">{{ dependency.version }}</Copyable>
-                    </p>
-                    <CodeBlock :title="undefined">dependencies {<br>
-                        <Copyable :copy="formatDependency(dependency.type, dependency.notation, false)" stroke-width="1" class="pl-8">
-                            {{ formatDependency(dependency.type, dependency.notation, false) }}
-                        </Copyable>
-                        }
-                    </CodeBlock>
+                <div class="flex flex-col gap-0.5">
+                    <div v-for="dependency in block.dependencies">
+                        <p class="mt-1 flex gap-x-1">
+                            {{ dependency.name }}
+                            <Copyable class="font-bold" :copy="dependency.version">{{ dependency.version }}</Copyable>
+                        </p>
+                        <CodeBlock :title="undefined">dependencies {<br>
+                            <Copyable :copy="formatDependency(dependency.type, dependency.notation, false)" stroke-width="1" class="pl-8">
+                                {{ formatDependency(dependency.type, dependency.notation, false) }}
+                            </Copyable>
+                            }
+                        </CodeBlock>
+                    </div>
                 </div>
             </Block>
         </PageContent>

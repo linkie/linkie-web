@@ -13,7 +13,7 @@
     "dependencies.build.system.architectury.loom": "Architectury Loom",
     "dependencies.build.system.forge.gradle": "ForgeGradle",
     "dependencies.version": "版本",
-    "dependencies.version.snapshots": "启用快照版：",
+    "dependencies.version.snapshots": "启用快照版",
     "dependencies.maven.repo": "Maven 文件库",
     "dependencies.toc": "目录",
     "mappings.namespace": "反混淆方案",

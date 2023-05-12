@@ -30,7 +30,7 @@
                 </div>
             </div>
         </SubHeader>
-        <div class="breadcrumbs text-sm max-w-full overflow-x-auto py-2" v-if="breadcrumbs.length > 1">
+        <div class="breadcrumbs text-sm max-w-full overflow-x-auto epic-scroller py-2" v-if="breadcrumbs.length > 1">
             <ul class="flex items-center whitespace-nowrap">
                 <li v-for="breadcrumb in breadcrumbs" class="flex items-center">
                     <Copyable :copy="breadcrumb" strokeWidth="1">{{ breadcrumb }}</Copyable>

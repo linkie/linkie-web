@@ -5,7 +5,6 @@ import VueAxios from "vue-axios"
 import App from "./App.vue"
 import "./index.css"
 import "nprogress/nprogress.css"
-import "prismjs/themes/prism-tomorrow.css"
 // @ts-ignore
 import NProgress from "nprogress"
 import {HTTP} from "./app/backend"
@@ -20,7 +19,6 @@ import zhCN from "./locales/zh_CN.json"
 // @ts-ignore
 import zhTW from "./locales/zh_TW.json"
 // @ts-ignore
-import Prism from "prismjs"
 
 Prism.manual = true;
 

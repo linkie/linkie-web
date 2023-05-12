@@ -1,26 +1,26 @@
 <template>
     <div class="flex flex-col">
-        <SubHeader class="pb-1"> {{ $t("dependencies.loader") }} </SubHeader>
+        <SubHeader class="mt-[-.25rem]"> {{ $t("dependencies.loader") }} </SubHeader>
 
         <div v-for="l in loaders" :class="[
-            loader === l ? 'opacity-100 font-bold' : 'opacity-50 font-normal',
-            'cursor-pointer p-2 rounded transition-all hover:opacity-100 hover:bg-neutral dark:hover:bg-base-dark-300 hover:text-white']" @click="loader = l">
+            loader === l ? 'font-medium' : 'font-normal opacity-80 decoration-base-400/50 hover:decoration-base-500/70 dark:decoration-base-dark-400/50 dark:hover:decoration-base-dark-400/70',
+            'underline underline-offset-2 decoration-2 cursor-pointer mx-[-.5rem] px-2 py-1 rounded transition-all bg-base-500 dark:hover:bg-base-dark-400 bg-opacity-0 hover:bg-opacity-70']" @click="loader = l">
             {{ $t("loader." + l) }}
         </div>
 
         <div v-if="loader === 'forge'">
             <div class="divider mt-0 mb-0"/>
-            <SubHeader class="pb-1"> {{ $t("dependencies.build.system") }} </SubHeader>
+            <SubHeader> {{ $t("dependencies.build.system") }} </SubHeader>
 
             <div :class="[
-            !forgeGradle ? 'opacity-100 font-bold' : 'opacity-50 font-normal',
-            'cursor-pointer p-2 capitalize rounded transition-all hover:opacity-100 hover:bg-neutral dark:hover:bg-base-dark-300 hover:text-white']" @click="forgeGradle = false">
+            !forgeGradle ? 'font-medium' : 'font-normal opacity-80 decoration-base-400/50 hover:decoration-base-500/70 dark:decoration-base-dark-400/50 dark:hover:decoration-base-dark-400/70',
+            'underline underline-offset-2 decoration-2 cursor-pointer mx-[-.5rem] px-2 py-1 capitalize rounded transition-all bg-base-500 dark:hover:bg-base-dark-400 bg-opacity-0 hover:bg-opacity-70']" @click="forgeGradle = false">
                 {{ $t("dependencies.build.system.architectury.loom") }}
             </div>
 
             <div :class="[
-            forgeGradle ? 'opacity-100 font-bold' : 'opacity-50 font-normal',
-            'cursor-pointer p-2 capitalize rounded transition-all hover:opacity-100 hover:bg-neutral dark:hover:bg-base-dark-300 hover:text-white']" @click="forgeGradle = true">
+            forgeGradle ? 'font-medium' : 'font-normal opacity-80 decoration-base-400/50 hover:decoration-base-500/70 dark:decoration-base-dark-400/50 dark:hover:decoration-base-dark-400/70',
+            'underline underline-offset-2 decoration-2 cursor-pointer mx-[-.5rem] px-2 py-1 capitalize rounded transition-all bg-base-500 dark:hover:bg-base-dark-400 bg-opacity-0 hover:bg-opacity-70']" @click="forgeGradle = true">
                 {{ $t("dependencies.build.system.forge.gradle") }}
             </div>
         </div>
@@ -28,18 +28,17 @@
         <div class="divider mt-0 mb-0"/>
         <SubHeader class="pb-1"> {{ $t("dependencies.version") }} </SubHeader>
         <div class="flex flex-col flex-nowrap justify-center h-full whitespace-nowrap pb-2" v-if="loader === 'fabric'">
-            <div>
-                <span class="pr-2"> {{ $t("dependencies.version.snapshots") }} </span>
-                <input type="checkbox" class="checkbox checkbox-primary h-4" :checked="allowSnapshots" aria-label="Enable Snapshots"
-                       @input="allowSnapshots = (($event.target as any)?.checked ?? allowSnapshots)"/>
+            <div class="flex gap-2 select-none justify-between">
+                <label for="allow-snapshots"> {{ $t("dependencies.version.snapshots") }} </label>
+                <input type="checkbox" v-model="allowSnapshots" id="allow-snapshots" aria-label="Enable Snapshots"/>
             </div>
         </div>
 
-        <div class="bg-base-300 dark:bg-base-dark-300 rounded-lg">
-            <div class="px-1 py-2 h-52 overflow-x-clip gradient-mask-b-80 overflow-y-scroll">
+        <div class="mx-[-.25rem] bg-base-l2 rounded-lg">
+            <div class="p-1 h-52 overflow-x-clip gradient-mask-b-80 overflow-y-scroll epic-scroller">
                 <p v-for="v in applicableVersions"
-                   :class="[version === v ? 'opacity-100 font-bold' : 'opacity-50 font-normal',
-                    'transition-all hover:opacity-100 hover:bg-neutral dark:hover:bg-base-dark-400 hover:text-white px-2 py-1 rounded-md cursor-pointer']"
+                   :class="[version === v ? 'font-medium' : 'font-normal opacity-80 decoration-base-500/60 hover:decoration-base-700/60 dark:decoration-base-dark-400/70 dark:hover:decoration-base-dark-600/60',
+                    'underline underline-offset-2 decoration-2 transition-all bg-base-700 dark:hover:bg-base-dark-600 bg-opacity-0 hover:bg-opacity-60 px-2 py-1 rounded-md cursor-pointer']"
                    @click="version = v">
                     {{ v }}
                 </p>
@@ -83,10 +82,6 @@ export default defineComponent({
 </script>
 
 <style scoped>
-.checkbox {
-    vertical-align: -0.1rem;
-}
-
 .select-label {
     display: flex !important;
 }

@@ -1,9 +1,16 @@
 import axios, {AxiosResponse} from "axios"
+import {isTauri} from "./tauri/tauri"
+
+export const backendServer = "https://linkieapi.shedaniel.me"
+export const localBackendServer = "http://localhost:6969"
 
 export const HTTP = axios.create({
-    baseURL: "https://linkieapi.shedaniel.me",
-    // baseURL: "http://localhost:6969",
+    baseURL: currentBackendServer(),
 })
+
+export function currentBackendServer(): string {
+    return isTauri() ? localBackendServer : backendServer
+}
 
 export function reqVersions<T = any>(): Promise<AxiosResponse<T>> {
     return HTTP.get(`/api/versions/all`)

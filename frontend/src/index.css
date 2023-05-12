@@ -17,3 +17,48 @@
 .divider:not(:empty) {
     @apply gap-4;
 }
+
+input[type=checkbox] {
+    @apply bg-base-600 bg-opacity-50 hover:bg-opacity-100 transition-all p-3 rounded border-0 focus:ring-base-dark-300 dark:focus:ring-base-dark-content ring-offset-2 text-base-dark-300;
+    @apply dark:bg-base-dark-300 dark:hover:bg-base-dark-400;
+}
+
+.bg-base-floor {
+    @apply bg-base-200 dark:bg-base-dark-100;
+}
+
+.bg-base-floor * {
+    @apply ring-offset-base-200 dark:ring-offset-base-dark-100;
+}
+
+.bg-base-l1 {
+    @apply bg-base-400/50 dark:bg-base-dark-200/50;
+}
+
+.border-base-l1 {
+    @apply border-base-400/50 dark:border-base-dark-200/50;
+}
+
+.bg-base-l1 * {
+    @apply ring-offset-base-300 dark:ring-offset-base-dark-300;
+}
+
+.bg-base-l2 {
+    @apply bg-base-500/60 dark:bg-base-dark-400/70;
+}
+
+.bg-base-l2 * {
+    @apply ring-offset-base-400 dark:ring-offset-base-dark-400;
+}
+
+.epic-scroller::-webkit-scrollbar {
+    @apply w-2.5 h-2;
+}
+
+.epic-scroller::-webkit-scrollbar-thumb {
+    @apply bg-base-800 dark:bg-base-dark-900 rounded-full;
+}
+
+.epic-scroller::-webkit-scrollbar-track {
+    @apply bg-base-600/50 dark:bg-base-dark-500/90;
+}

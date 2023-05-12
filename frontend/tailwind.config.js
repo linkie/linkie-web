@@ -23,7 +23,7 @@ module.exports = {
                 700: "#b9b1a3",
                 800: "#aea494",
                 900: "#a39785",
-                content: "#471f2c",
+                content: "#2f2f2f",
                 dark: {
                     100: "#222222",
                     200: "#2f2f2f",
@@ -44,6 +44,9 @@ module.exports = {
             black: colors.black,
             white: colors.white,
             gray: colors.gray,
+            red: colors.red,
+            orange: colors.orange,
+            lime: colors.lime,
         },
         minHeight: {
             "2": "0.5rem",
@@ -59,6 +62,7 @@ module.exports = {
         },
     },
     plugins: [
+        require("@tailwindcss/forms"),
         require("tailwind-gradient-mask-image"),
     ],
     darkMode: "class",
