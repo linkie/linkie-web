@@ -3,26 +3,8 @@ package me.shedaniel.linkie.web
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.buildJsonObject
-import kotlinx.serialization.json.encodeToJsonElement
-import kotlinx.serialization.json.jsonObject
-import me.shedaniel.linkie.Class
-import me.shedaniel.linkie.Field
-import me.shedaniel.linkie.MappingsContainer
-import me.shedaniel.linkie.MappingsEntryType
-import me.shedaniel.linkie.Method
-import me.shedaniel.linkie.Namespaces
-import me.shedaniel.linkie.getClassByObfName
-import me.shedaniel.linkie.getMappedDesc
-import me.shedaniel.linkie.getObfClientDesc
-import me.shedaniel.linkie.getObfMergedDesc
-import me.shedaniel.linkie.getObfServerDesc
-import me.shedaniel.linkie.obfClientName
-import me.shedaniel.linkie.obfMergedName
-import me.shedaniel.linkie.obfServerName
+import kotlinx.serialization.json.*
+import me.shedaniel.linkie.*
 import me.shedaniel.linkie.utils.MemberEntry
 import me.shedaniel.linkie.utils.ResultHolder
 import me.shedaniel.linkie.utils.toVersion
@@ -53,15 +35,19 @@ suspend fun search(
     allowMethods: Boolean, allowFields: Boolean, limit: Int,
 ): SearchResultEntries {
     require(limit in 1..1000) { "Limit must be between 1 and 1000" }
-    val namespace = Namespaces.namespaces[namespaceStr] ?: throw IllegalArgumentException("No namespace found for $namespaceStr")
-    val translateNamespace = translateNsStr?.let { Namespaces.namespaces[it] ?: throw IllegalArgumentException("No namespace found for $it") }
+    val namespace =
+        Namespaces.namespaces[namespaceStr] ?: throw IllegalArgumentException("No namespace found for $namespaceStr")
+    val translateNamespace = translateNsStr?.let {
+        Namespaces.namespaces[it] ?: throw IllegalArgumentException("No namespace found for $it")
+    }
 
     val allVersions = namespace.getAllSortedVersions().toMutableList()
     if (translateNamespace != null) {
         allVersions.retainAll(translateNamespace.getAllSortedVersions())
     }
 
-    val defaultVersion = namespace.defaultVersion.takeIf { it in allVersions } ?: (translateNamespace?.defaultVersion?.takeIf { it in allVersions } ?: allVersions.first())
+    val defaultVersion = namespace.defaultVersion.takeIf { it in allVersions }
+        ?: (translateNamespace?.defaultVersion?.takeIf { it in allVersions } ?: allVersions.first())
 
     val provider = version?.let { namespace.getProvider(it) } ?: namespace.getProvider(defaultVersion)
     val mappings = provider.get()
@@ -100,8 +86,10 @@ suspend fun search(
 }
 
 suspend fun getSources(namespaceStr: String, version: String, className: String): String {
-    val namespace = Namespaces.namespaces[namespaceStr] ?: throw IllegalArgumentException("No namespace found for $namespaceStr")
-    val provider = namespace.getProvider(version).takeIf { !it.isEmpty() } ?: throw IllegalArgumentException("No provider found for $version")
+    val namespace =
+        Namespaces.namespaces[namespaceStr] ?: throw IllegalArgumentException("No namespace found for $namespaceStr")
+    val provider = namespace.getProvider(version).takeIf { !it.isEmpty() }
+        ?: throw IllegalArgumentException("No provider found for $version")
     val file = File(provider.getSources(className).absolutePath)
     if (file.exists()) {
         return file.readText()
@@ -145,28 +133,26 @@ fun getVersions(): MutableMap<String, MutableList<VersionInfo>> {
     return result
 }
 
-fun getAllLoaderVersions(): MutableMap<String, MutableList<MutableMap<String, Any>>> {
-    val result = mutableMapOf<String, MutableList<MutableMap<String, Any>>>()
-    val versions = getVersions()
-    versions.forEach { (loader, versionsArray) ->
-        val loaderVersions: MutableMap<String, MutableMap<String, DependencyData>> = getLoaderVersions(loader)
-        result.getOrPut(loader, ::mutableListOf).also { loaderVersionArray ->
-            for (versionElement in versionsArray) {
-                loaderVersionArray.add(run {
-                    val inner = mutableMapOf<String, Any>()
-                    json.encodeToJsonElement(versionElement).jsonObject.forEach { key, value -> inner.put(key, value) }
-                    val version = versionElement.version
+fun getAllLoaderVersions(): JsonObject {
+    return buildJsonObject {
+        val versions = getVersions()
+        json.encodeToJsonElement(versions).jsonObject.forEach { loader, versionsArray ->
+            val loaderVersions: MutableMap<String, MutableMap<String, DependencyData>> = getLoaderVersions(loader)
+            this.putJsonArray(loader) {
+                for (versionElement in versionsArray.jsonArray) {
+                    addJsonObject {
+                        versionElement.jsonObject.forEach { key, value -> this.put(key, value) }
+                        val version = versionElement.jsonObject["version"]?.jsonPrimitive?.content
 
-                    val blocks: MutableMap<String, DependencyData>? = loaderVersions[version]
-                    blocks?.let { element ->
-                        inner.put("blocks", element)
+                        val blocks: MutableMap<String, DependencyData>? = loaderVersions[version]
+                        blocks?.let { element ->
+                            put("blocks", json.encodeToJsonElement(element))
+                        }
                     }
-                    inner
-                })
+                }
             }
         }
     }
-    return result
 }
 
 fun getLoaderVersions(loader: String): MutableMap<String, MutableMap<String, DependencyData>> {
@@ -177,9 +163,11 @@ fun getLoaderVersions(loader: String): MutableMap<String, MutableMap<String, Dep
                 if (versionIdentifier.version.endsWith("-Snapshot")) {
                     val stable = versionIdentifier.version.substringBefore("-Snapshot").toVersion()
                     val toList = result.keys.toList()
-                    val stables = toList.filter { it.tryToVersion()?.takeIf { version -> version.snapshot == null } != null }
+                    val stables =
+                        toList.filter { it.tryToVersion()?.takeIf { version -> version.snapshot == null } != null }
                     val upperBound = stables.lastOrNull { it.toVersion() >= stable }?.let { toList.indexOf(it) } ?: -1
-                    val lowerBound = stables.firstOrNull { it.toVersion() < stable }?.let { toList.indexOf(it) } ?: toList.size
+                    val lowerBound =
+                        stables.firstOrNull { it.toVersion() < stable }?.let { toList.indexOf(it) } ?: toList.size
                     for (version in toList.subList(min(lowerBound, upperBound) + 1, max(lowerBound, upperBound))) {
                         result[version]?.set(
                             deps.name, DependencyData(
@@ -276,7 +264,9 @@ fun translate(
                 val obfDesc = method.getObfMergedDesc(source)
                 val parentObfName = parent.obfMergedName ?: return@forEach
                 val targetParent = target.getClassByObfName(parentObfName) ?: return@forEach
-                val targetMethod = targetParent.methods.firstOrNull { it.obfMergedName == obfName && it.getObfMergedDesc(target) == obfDesc } ?: return@forEach
+                val targetMethod =
+                    targetParent.methods.firstOrNull { it.obfMergedName == obfName && it.getObfMergedDesc(target) == obfDesc }
+                        ?: return@forEach
 
                 callback(value, MemberEntry(targetParent, targetMethod), score)
             }
