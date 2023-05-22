@@ -9,7 +9,7 @@ use std::fs;
 use std::path::PathBuf;
 
 use dialog::DialogBox;
-use tauri::{AppHandle, Manager, Runtime, State, WindowEvent};
+use tauri::{AppHandle, Manager, RunEvent, Runtime, State};
 use tauri::api::process::{Command, CommandChild, CommandEvent};
 
 fn main() {
@@ -39,25 +39,25 @@ fn main() {
                 .expected(&app.handle(), "Failed to start child process");
             Ok(())
         })
-        .on_window_event(move |event| match event.event() {
-            WindowEvent::Destroyed => {
-                let state: State<ChildProcessState> = event.window().state();
-                terminate_backend(&event.window().app_handle(), state
-                    .mutex
-                    .lock()
-                    .unwrap()
-                    .borrow_mut(),
-                ).expected(&event.window().app_handle(), "Failed to terminate child process");
-            }
-            _ => {}
-        })
         .invoke_handler(tauri::generate_handler![
             start_server,
             stop_server,
             restart_server
         ])
-        .run(tauri::generate_context!())
-        .expect("error while running tauri application");
+        .build(tauri::generate_context!())
+        .expect("error while running tauri application")
+        .run(|apphandle, event| match event {
+            RunEvent::Exit => {
+                let state: State<ChildProcessState> = apphandle.state();
+                terminate_backend(apphandle, state
+                    .mutex
+                    .lock()
+                    .unwrap()
+                    .borrow_mut(),
+                ).expected(&apphandle, "Failed to terminate child process");
+            }
+            _ => {}
+        })
 }
 
 fn send_console<R: Runtime>(app: &AppHandle<R>, message: impl Into<String>) {
