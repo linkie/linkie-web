@@ -18,6 +18,7 @@ import enGB from "./locales/en_GB.json"
 import zhCN from "./locales/zh_CN.json"
 // @ts-ignore
 import zhTW from "./locales/zh_TW.json"
+import {isTauri} from "./app/tauri/tauri";
 // @ts-ignore
 
 Prism.manual = true;
@@ -29,7 +30,9 @@ NProgress.configure({
 const app = createApp(App)
 
 HTTP.interceptors.request.use(config => {
-    NProgress.start()
+    if (!isTauri()) {
+        NProgress.start()
+    }
     return config
 }, error => {
     console.log(error)
@@ -37,7 +40,9 @@ HTTP.interceptors.request.use(config => {
 })
 
 HTTP.interceptors.response.use(response => {
-    NProgress.done()
+    if (!isTauri()) {
+        NProgress.done()
+    }
     return response
 }, error => {
     if (!axios.isCancel(error)) {

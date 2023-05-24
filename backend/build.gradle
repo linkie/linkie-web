@@ -63,3 +63,30 @@ build.finalizedBy shadowJar
 compileKotlin {
     kotlinOptions.jvmTarget = "1.8"
 }
+
+def launcher = javaToolchains.launcherFor {
+    languageVersion.set(JavaLanguageVersion.of(17))
+    vendor.set(JvmVendorSpec.matching("adoptium"))
+}
+
+tasks.register("customJre", Exec) {
+    doFirst {
+        file("build/libs/jdk-17-minjre").deleteDir()
+    }
+    def tmp = File.createTempDir("jdk-17-minjre")
+    tmp.deleteOnExit()
+    workingDir = tmp
+    def exe = new File(launcher.get().executablePath.asFile.parentFile, "jlink.exe")
+    def obj = new File(launcher.get().executablePath.asFile.parentFile, "jlink")
+    def cmd = [(exe.exists() ? exe : obj).absolutePath, "--add-modules", "java.base,java.xml,jdk.unsupported,java.net.http,jdk.crypto.ec,jdk.zipfs",
+               "--output", "jdk-17-minjre", "--strip-debug", "--no-man-pages", "--no-header-files", "--compress=2"]
+    commandLine(cmd)
+    println(String.join(" ", cmd))
+    doLast {
+        copy {
+            from(tmp)
+            into("build/libs")
+        }
+        tmp.deleteDir()
+    }
+}

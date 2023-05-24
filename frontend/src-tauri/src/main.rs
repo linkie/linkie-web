@@ -188,6 +188,8 @@ pub fn start_backend<R: Runtime>(app: &AppHandle<R>, process: &mut ChildProcess)
                 return Err(("Could not find backend jar ".to_owned() + backend_jar.to_str().unwrap()).into());
             }
             let working_dir: PathBuf = app.path_resolver().app_cache_dir().unwrap();
+            send_console(&app, "Working dir at ".to_owned() + working_dir.to_str().unwrap());
+            fs::create_dir_all(working_dir.clone()).expected(&app, "Failed to create working dir");
             fs::copy(backend_jar, working_dir.join("linkie-web-backend.jar"))
                 .expected(&app, "Failed to copy backend jar");
             // java_path can start with \\?\, which is not supported by Command::new

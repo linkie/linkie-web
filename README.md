@@ -15,7 +15,7 @@ This subfolder contains the frontend Vue website. The frontend runs independentl
 
 #### frontend/src-tauri
 
-This subfolder contains the experimental tauri application for a local Linkie experience. (Currently only Windows, with plans for other platforms)
+This subfolder contains the experimental tauri application for a local Linkie experience.
 
 The application fires a JRE process of the backend and connects to it, the frontend is the Vue website.
 
@@ -55,21 +55,19 @@ npm run build
 First, we need to build a custom JRE to bundle along: (Use Java 17)
 
 ```bash
-# Unix-Like
-java/bin/jlink --add-modules java.base,java.xml,jdk.unsupported,java.net.http,jdk.crypto.ec --output jdk-17-minjre --strip-debug --no-man-pages --no-header-files --compress=2
+cd backend
+./gradlew customJre
 ```
 
-```powershell
-# Windows
-java\bin\jlink.exe --add-modules java.base,java.xml,jdk.unsupported,java.net.http,jdk.crypto.ec --output jdk-17-minjre --strip-debug --no-man-pages --no-header-files --compress=2
-```
-
-Place the generated `jdk-17-minjre` at `/backend/build/libs`, and also compile the `backend`. (Instructions above)
+The custom jre is in `build/libs/`.
+Now, also compile the `backend`. (Instructions above)
 
 Build the tauri project: (Requires Rust)
 
 ```bash
+npm install
 npm run tauri build
 ```
 
-Compiled file is at `/frontend/src-tauri/target/release/bundle`.
+Compiled file is at `/frontend/src-tauri/target/release/`.<br>
+Bundled installer/app is at `/frontend/src-tauri/target/release/bundle`.
