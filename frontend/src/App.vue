@@ -78,7 +78,9 @@ export default defineComponent({
 
         <div class="min-h-[100vh] flex flex-col justify-between bg-base-floor">
             <div v-if="current !== '/'" class="pt-[4.5rem]"/>
-            <component :is="currentView"/>
+            <div class="grow shrink-0">
+                <component :is="currentView"/>
+            </div>
             <Footer v-if="!isTauri()"/>
             <div v-else class="h-10"/>
         </div>

@@ -22,8 +22,8 @@
             <line x1="5.7" y1="5.7" x2="18.3" y2="18.3"></line>
         </svg>
         <p class="font-bold pt-4"> {{ $t("mappings.searching.none") }} </p>
-        <p v-if="!hasQuery"> {{ $t("mappings.searching.none.try") }} </p>
-        <p v-else> {{ $t("mappings.searching.none.mistake") }} </p>
+        <p v-if="!hasQuery" class="text-center"> {{ $t("mappings.searching.none.try") }} </p>
+        <p v-else class="text-center"> {{ $t("mappings.searching.none.mistake") }} </p>
     </div>
 </template>
 

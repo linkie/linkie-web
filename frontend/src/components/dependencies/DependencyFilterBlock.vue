@@ -8,7 +8,7 @@
             {{ $t("loader." + l) }}
         </div>
 
-        <div v-if="loader === 'forge'">
+        <div :class="[loader === 'forge' ? 'expanded' : '', 'expand-height']">
             <div class="divider mt-0 mb-0"/>
             <SubHeader> {{ $t("dependencies.build.system") }} </SubHeader>
 
@@ -27,8 +27,8 @@
 
         <div class="divider mt-0 mb-0"/>
         <SubHeader class="pb-1"> {{ $t("dependencies.version") }} </SubHeader>
-        <div class="flex flex-col flex-nowrap justify-center h-full whitespace-nowrap pb-2" v-if="loader === 'fabric'">
-            <div class="flex gap-2 select-none justify-between">
+        <div class="flex flex-col flex-nowrap justify-center h-full whitespace-nowrap" :class="['expand-height', loader === 'fabric' ? 'expanded' : '']">
+            <div class="flex gap-2 select-none justify-between pb-2">
                 <label for="allow-snapshots"> {{ $t("dependencies.version.snapshots") }} </label>
                 <input type="checkbox" v-model="allowSnapshots" id="allow-snapshots" aria-label="Enable Snapshots"/>
             </div>

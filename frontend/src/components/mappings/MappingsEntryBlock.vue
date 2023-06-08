@@ -10,7 +10,7 @@
                         <polyline points="7 7 12 12 7 17"></polyline>
                         <polyline points="13 7 18 12 13 17"></polyline>
                     </svg>
-                    <Copyable v-if="hasTranslation" :copy="getDisplayName(entry.translatedTo)">{{ getDisplayName(entry.translatedTo) }}</Copyable>
+                    <Copyable v-if="hasTranslation" :copy="getDisplayName(entry.translatedTo!!)">{{ getDisplayName(entry.translatedTo) }}</Copyable>
                     <div class="rounded-full text-[.75rem] px-[.438rem] inline-flex items-center justify-center h-4 ml-2 text-base-content"
                          :class="{
                             'bg-primary': entry.type === 'class',
@@ -53,36 +53,39 @@
 
         <div v-if="hasTranslation">
             <div class="divider mt-0 mb-0"/>
-            <EntryDetails v-if="entry.type === 'field' && translatedToNamespace.supportsFieldDescription" :title="$t('mappings.entry.type')" :code="false">
-                <Copyable :copy="fieldType(entry.translatedTo)" strokeWidth="1">{{ fieldType(entry.translatedTo) }}</Copyable>
+            <EntryDetails v-if="entry.type === 'field' && translatedToNamespace!!.supportsFieldDescription" :title="$t('mappings.entry.type')" :code="false">
+                <Copyable :copy="fieldType(entry.translatedTo!!)" strokeWidth="1">{{ fieldType(entry.translatedTo) }}</Copyable>
             </EntryDetails>
-            <EntryDetails v-if="entry.type !== 'class' && translatedToNamespace.supportsMixin" :title="$t('mappings.entry.mixin.target')">
-                <Copyable :copy="mixinTarget(entry.translatedTo)" strokeWidth="1">{{ mixinTarget(entry.translatedTo) }}</Copyable>
+            <EntryDetails v-if="entry.type !== 'class' && translatedToNamespace!!.supportsMixin" :title="$t('mappings.entry.mixin.target')">
+                <Copyable :copy="mixinTarget(entry.translatedTo!!)" strokeWidth="1">{{ mixinTarget(entry.translatedTo) }}</Copyable>
             </EntryDetails>
-            <EntryDetails v-if="translatedToNamespace.supportsAT" :title="$t('mappings.entry.at')">
-                <Copyable :copy="atText(entry.translatedTo)" strokeWidth="1">{{ atText(entry.translatedTo) }}</Copyable>
+            <EntryDetails v-if="translatedToNamespace!!.supportsAT" :title="$t('mappings.entry.at')">
+                <Copyable :copy="atText(entry.translatedTo!!)" strokeWidth="1">{{ atText(entry.translatedTo) }}</Copyable>
             </EntryDetails>
-            <EntryDetails v-if="translatedToNamespace.supportsAW" :title="$t('mappings.entry.aw')">
-                <Copyable :copy="awText(entry.translatedTo)" strokeWidth="1">{{ awText(entry.translatedTo) }}</Copyable>
+            <EntryDetails v-if="translatedToNamespace!!.supportsAW" :title="$t('mappings.entry.aw')">
+                <Copyable :copy="awText(entry.translatedTo!!)" strokeWidth="1">{{ awText(entry.translatedTo) }}</Copyable>
             </EntryDetails>
         </div>
 
-        <div class="rounded-lg bg-base-dark-300 p-3 text-sm mt-2 mb-1 h-[28rem] overflow-x-auto resize-y" v-if="expandSource === namespace?.id + ' ' + version + ' ' + query">
-            <div class="h-full items-center justify-center grid" v-if="source === ''">
-                <div class="flex gap-4 items-center justify-center animate-pulse animate-bounce text-base-dark-content" ref="source-loading">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="animate-spin" width="24" height="24" viewBox="0 0 24 24" stroke-width="2"
-                         stroke="currentColor"
-                         fill="none" stroke-linecap="round" stroke-linejoin="round">
-                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                        <path d="M10 17a3 3 0 1 1 -1.543 -2.623l2.087 -3.754a3 3 0 0 1 1.456 -5.623a3 3 0 0 1 1.457 5.623l2.087 3.754a3 3 0 1 1 -1.538 2.8l-.006 -.177h-4z"></path>
-                        <path d="M17 17v.01"></path>
-                        <path d="M7 17v.01"></path>
-                        <path d="M12 8v.01"></path>
-                    </svg>
-                    <p class="font-medium text-xl">Generating Sources... This is slow on the first run</p>
+        <div :class="[expandSource === namespace?.id + ' ' + version + ' ' + query ? 'expanded' : '', 'expand-height !ease-in']">
+            <div class="h-2"/>
+            <div class="rounded-lg bg-base-dark-200 p-3 text-sm h-[28rem] overflow-x-auto resize-y epic-scroller">
+                <div class="h-full items-center justify-center grid" v-if="source === ''">
+                    <div class="flex gap-4 items-center justify-center animate-pulse animate-bounce text-base-dark-content" ref="source-loading">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="animate-spin" width="24" height="24" viewBox="0 0 24 24" stroke-width="2"
+                             stroke="currentColor"
+                             fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                            <path d="M10 17a3 3 0 1 1 -1.543 -2.623l2.087 -3.754a3 3 0 0 1 1.456 -5.623a3 3 0 0 1 1.457 5.623l2.087 3.754a3 3 0 1 1 -1.538 2.8l-.006 -.177h-4z"></path>
+                            <path d="M17 17v.01"></path>
+                            <path d="M7 17v.01"></path>
+                            <path d="M12 8v.01"></path>
+                        </svg>
+                        <p class="font-medium text-xl">Generating Sources... This is slow on the first run</p>
+                    </div>
                 </div>
+                <code ref="source" class="whitespace-pre text-base-dark-content"></code>
             </div>
-            <code ref="source" class="whitespace-pre text-base-dark-content"></code>
         </div>
     </Block>
 </template>
@@ -294,13 +297,8 @@ export default defineComponent({
     watch: {
         source() {
             this.$nextTick(() => {
-                for (let entry of Object.entries(this.source.split("\n"))) {
-                    if (this.isSourceFocused(entry[1] + "")) {
-                        // (this.$refs["source-line-" + entry[0]] as HTMLFormElement)[0].scrollIntoView({behavior: "smooth", block: "center"})
-                        break
-                    }
-                }
-                
+                let sourceElement = this.$refs.source as HTMLFormElement
+                if (!sourceElement) return
                 let toFind = onlyClass(getOptimumName(this.entry)) ?? ""
                 if (toFind.includes("."))
                     toFind = toFind.substring(0, toFind.indexOf("."))
@@ -323,36 +321,89 @@ export default defineComponent({
                     }
                 }
 
+                let inner = ""
                 let code = ""
                 Prism.tokenize(this.source, Prism.languages.java).flatMap(extractToken).forEach((token: string) => {
-                    code += token
-                })
-                let sourceElement = this.$refs.source as HTMLFormElement
-                sourceElement.innerHTML = code
-                for (let i = 0; i < sourceElement.children.length; i++) {
-                    let child = sourceElement.children[i]
-                    let tokenType = "field"
-                    for (let key of child.className.split(" ")) {
-                        if (key !== "token") {
-                            tokenType = key
+                    if (token.startsWith("<") || token.endsWith(">")) {
+                        code += token
+                    } else {
+                        let split = token.split("\n")
+                        for (let j = 0; j < split.length; j++) {
+                            let lineToken = split[j]
+                            if (j !== 0) code += "\n"
+                            code += "<span class='token text'>"
+                            code += lineToken
+                            code += "</span>"
                         }
                     }
-                    if (this.entry.type === "class" && tokenType === "class-name" && child.textContent === toFind) {
-                        if (!sourceElement.children[i - 1]?.className?.includes("keyword")) continue
-                        if (sourceElement.children[i - 1]?.textContent !== "class") continue
-                    } else if (this.entry.type === "method" && tokenType === "function" && child.textContent === toFind) {
-                        if (!sourceElement.children[i + 1]?.className?.includes("punctuation")) continue
-                        if (sourceElement.children[i + 1]?.textContent !== "(") continue
-                        if (!(sourceElement.children[i - 1]?.className?.includes("keyword") && sourceElement.children[i - 1]?.textContent !== "return")
-                            && !sourceElement.children[i - 1]?.className?.includes("class-name")
-                            && !sourceElement.children[i - 1]?.className?.includes("generics")) continue
-                    } else if (this.entry.type === "field" && tokenType === "property" && child.textContent === " " + toFind) {
-                    } else continue
-                    child.className += " font-bold bg-base-dark-700"
-                    this.$nextTick(() => {
-                        child.scrollIntoView({behavior: "smooth", block: "center"})
-                    })
-                    break
+                })
+                let i = 0
+                for (let line of code.split("\n")) {
+                    inner += "<div class='flex gap-2 ml-[-.75rem] pl-3 inline-block' id='source-line-"
+                    inner += ++i
+                    inner += "'><span class='shrink-0 w-6 text-right font-semibold select-none'>"
+                    inner += i
+                    inner += "</span>"
+                    inner += "<span class='grow'>"
+                    inner += line
+                    inner += "</span></div>"
+                }
+
+                sourceElement.innerHTML = inner
+
+                for (let i = 0; i < sourceElement.children.length; i++) {
+                    let entireLine = sourceElement.children[i]
+                    let line = entireLine.children[1]
+                    for (let j = 0; j < line.children.length; j++) {
+                        let child = line.children[j]
+                        let tokenType = "field"
+                        for (let key of child.className.split(" ")) {
+                            if (key !== "token") {
+                                tokenType = key
+                            }
+                        }
+                        if (this.entry.type === "class" && tokenType === "class-name" && child.textContent === toFind) {
+                            if (!line.children[j - 2]?.className?.includes("keyword")) continue
+                            if (line.children[j - 2]?.textContent !== "class"
+                                    && line.children[j - 2]?.textContent !== "interface"
+                                    && line.children[j - 2]?.textContent !== "enum") continue
+                        } else if (this.entry.type === "method" && tokenType === "function" && child.textContent === toFind) {
+                            if (!line.children[j + 1]?.className?.includes("punctuation")) continue
+                            if (line.children[j + 1]?.textContent !== "(") continue
+                            if (!line.children[j - 1]?.className?.includes("text")) continue
+                            if (line.children[j - 1]?.textContent !== " ") continue
+                            if (!(line.children[j - 2]?.className?.includes("keyword") && line.children[j - 1]?.textContent !== "return")
+                                    && !line.children[j - 2]?.className?.includes("class-name")
+                                    && !line.children[j - 2]?.className?.includes("generics")) continue
+                        } else if (this.entry.type === "field" && tokenType === "text" && child.textContent === " " + toFind) {
+                            if (line.children[j + 1]?.textContent !== ";") continue
+                        } else if (this.entry.type === "field" && tokenType === "text" && child.textContent === " " + toFind + " ") {
+                            if (line.children[j + 1]?.textContent !== "=") continue
+                        } else if (this.entry.type === "field" && tokenType === "constant" && child.textContent === toFind) {
+                            if (line.children[j + 1]?.textContent !== " ") continue
+                            if (line.children[j + 2]?.textContent !== "=") continue
+                        } else continue
+                        if (this.entry.type === "field") {
+                            let type = this.entry.descNamed ?? this.entry.descIntermediary
+                            if (!type) continue
+                            type = beautifyFieldType(type)
+                            if (type.includes(".")) {
+                                // get the last
+                                type = type.substring(type.lastIndexOf(".") + 1)
+                            }
+                            let prev = tokenType === "constant" ? 2 : 1
+                            if (line.children[j - prev]?.className?.includes("generics")) {
+                                prev++
+                            }
+                            if (line.children[j - prev]?.textContent !== type) continue
+                        }
+                        entireLine.className += " font-bold bg-base-dark-400"
+                        line.className += " font-bold bg-base-dark-400"
+                        this.$nextTick(() => {
+                            entireLine.scrollIntoView({behavior: "smooth", block: "center"})
+                        })
+                        return
+                    }
                 }
             })
         },
@@ -402,13 +453,11 @@ export default defineComponent({
                 })
             }
         },
-        isSourceFocused(line: string) {
-            return line.includes((this.entry.type === "class" ? "class " : " ") + onlyClass(getOptimumName(this.entry)) + (this.entry.type === "method" ? "(" : ""))
-        },
     },
     props: {
         namespace: {
             type: Object as PropType<Namespace>,
+            required: true,
         },
         translatedToNamespace: {
             type: Object as PropType<Namespace>,
@@ -430,13 +479,7 @@ export default defineComponent({
 <style scoped>
 .breadcrumbs > ul > li + *:before {
     content: "";
-    @apply mx-2 block opacity-40;
-    height: 0.375rem;
-    width: 0.375rem;
-    --tw-rotate: 45deg;
-    transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skew(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
-    border-top: 1px solid;
-    border-right: 1px solid;
-    background-color: transparent;
+    @apply mx-2 block opacity-40 rotate-45 border-t border-r border-solid bg-transparent h-1.5 w-1.5;
+    border-color: initial;
 }
 </style>

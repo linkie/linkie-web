@@ -7,11 +7,11 @@
         </PageSidebar>
         <PageContent class="flex flex-col gap-y-5">
             <MappingsSearchBlock/>
-            <MappingsEntryBlock v-if="infoData.entries.length > 0" v-for="entry in infoData.entries"
-                                :namespace="mappingsData.namespaces.find(value => value.id === infoData.namespace)"
+            <MappingsEntryBlock v-for="entry in infoData.entries"
+                                :namespace="mappingsData.namespaces.find(value => value.id === infoData.namespace)!!"
                                 :translated-to-namespace="infoData.translateAs ? mappingsData.namespaces.find(value => value.id === infoData.translateAs) : undefined"
                                 :entry="entry" :version="version" :query="searchText"/>
-            <MappingsSearchPlaceholder v-else
+            <MappingsSearchPlaceholder v-if="infoData.entries.length == 0"
                                        :searching="!!searchController"
                                        :has-query="!!infoData.query"/>
         </PageContent>

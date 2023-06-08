@@ -62,3 +62,15 @@ input[type=checkbox] {
 .epic-scroller::-webkit-scrollbar-track {
     @apply bg-base-600/50 dark:bg-base-dark-500/90;
 }
+
+.expand-height {
+    @apply origin-top transition-[max-height,opacity,margin,padding] overflow-x-visible overflow-y-clip duration-300 ease-in-out;
+}
+
+.expand-height:not(.expanded) {
+    @apply max-h-0 opacity-0;
+}
+
+.expand-height.expanded {
+    @apply max-h-[100vh] opacity-100 mt-[-1rem] pt-[1rem];
+}

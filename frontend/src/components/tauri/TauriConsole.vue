@@ -4,7 +4,7 @@
         <span class="text-lg px-4 pt-3 pb-2.5 font-semibold">Console</span>
         <div class="overflow-auto mb-8 flex flex-col bg-base-dark-400">
             <div v-for="s in Object.keys(consoleMessages)" class="px-3 whitespace-pre text-sm flex gap-2">
-                <code class="shrink-0 w-8 text-right font-semibold">{{ (Number.parseInt(s) + 1) }}</code>
+                <code class="shrink-0 w-8 text-right font-semibold select-none">{{ (Number.parseInt(s) + 1) }}</code>
                 <code>
                     {{ consoleMessages[s as any as number] }}
                 </code>

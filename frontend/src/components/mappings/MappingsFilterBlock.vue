@@ -1,9 +1,22 @@
 <template>
     <div class="flex flex-col">
-        <SubHeader class="mt-[-.25rem] mb-1"> {{ $t("mappings.namespace") }} </SubHeader>
+        <SubHeader class="mt-[-.25rem] mb-1"> {{ $t("mappings.namespace") }}</SubHeader>
 
-        <div v-for="[group, nses] in Object.entries(namespacesGrouped)" class="pb-1">
-            <div v-if="group !== 'Others' || expandNamespaces">
+        <div v-for="[group, nses] in Object.entries(namespacesGrouped)">
+            <div v-if="group !== 'Others'" class="pb-1">
+                <p class="text-xs font-bold uppercase">{{ group }}</p>
+                <div v-for="ns in nses" :class="[
+                    namespace === ns.id ? 'font-medium' : 'font-normal opacity-80 decoration-base-400/50 hover:decoration-base-500/70 dark:decoration-base-dark-400/50 dark:hover:decoration-base-dark-400/70',
+                    'underline underline-offset-2 decoration-2 cursor-pointer mx-[-.5rem] px-2 py-1 rounded transition-all bg-base-500 dark:hover:bg-base-dark-400 bg-opacity-0 hover:bg-opacity-70']"
+                     @click="namespace = ns.id">
+                    {{ localizeNamespace(ns) ?? "" }}
+                </div>
+            </div>
+        </div>
+
+        <div v-for="[group, nses] in Object.entries(namespacesGrouped)"
+             :class="[expandNamespaces ? 'expanded' : '', 'expand-height']">
+            <div v-if="group === 'Others'" class="pb-1">
                 <p class="text-xs font-bold uppercase">{{ group }}</p>
                 <div v-for="ns in nses" :class="[
                     namespace === ns.id ? 'font-medium' : 'font-normal opacity-80 decoration-base-400/50 hover:decoration-base-500/70 dark:decoration-base-dark-400/50 dark:hover:decoration-base-dark-400/70',
@@ -16,7 +29,7 @@
 
         <div class="mx-[-.5rem] px-2 py-1 justify-center cursor-pointer flex gap-1 transition-all rounded bg-base-500 dark:hover:bg-base-dark-400 bg-opacity-0 hover:bg-opacity-70"
              @click="expandNamespaces=!expandNamespaces">
-            <svg xmlns="http://www.w3.org/2000/svg" :class="[expandNamespaces ? 'rotate-180' : '']" width="24" height="24" viewBox="0 0 24 24"
+            <svg xmlns="http://www.w3.org/2000/svg" :class="[expandNamespaces ? 'rotate-180' : '', 'transition-transform duration-200']" width="24" height="24" viewBox="0 0 24 24"
                  stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                 <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
                 <polyline points="6 9 12 15 18 9"></polyline>
@@ -30,7 +43,7 @@
         </div>
 
         <div class="divider mt-0 mb-0"/>
-        <SubHeader class="pb-1"> {{ $t("mappings.version") }} </SubHeader>
+        <SubHeader class="pb-1"> {{ $t("mappings.version") }}</SubHeader>
         <div class="flex flex-col flex-nowrap justify-center h-full whitespace-nowrap pb-2">
             <div class="flex gap-2 select-none justify-between">
                 <label for="allow-snapshots"> {{ $t("dependencies.version.snapshots") }} </label>
@@ -52,24 +65,40 @@
 
         <div class="divider mt-0 mb-0"/>
         <div class="mt-2">
-            <SubHeader class="pb-2"> {{ $t("mappings.translation") }} </SubHeader>
+            <SubHeader class="pb-2"> {{ $t("mappings.translation") }}</SubHeader>
             <p class="text-xs font-bold uppercase"> {{ $t("mappings.translation.none") }} </p>
             <div :class="[
                 translateAs === undefined ? 'font-medium' : 'font-normal opacity-80 decoration-base-400/50 hover:decoration-base-500/70 dark:decoration-base-dark-400/50 dark:hover:decoration-base-dark-400/70',
-                    'underline underline-offset-2 decoration-2 cursor-pointer mx-[-.5rem] px-2 py-1 rounded transition-all bg-base-500 dark:hover:bg-base-dark-400 bg-opacity-0 hover:bg-opacity-70 uppercase']" 
+                    'underline underline-offset-2 decoration-2 cursor-pointer mx-[-.5rem] px-2 py-1 rounded transition-all bg-base-500 dark:hover:bg-base-dark-400 bg-opacity-0 hover:bg-opacity-70 uppercase']"
                  @click="translateAs = undefined">
                 {{ $t("mappings.translation.n/a") }}
             </div>
-            <div v-for="[group, nses] in Object.entries(namespacesGrouped)" class="pb-1">
-                <p class="text-xs font-bold uppercase">{{ group }}</p>
-                <div v-for="ns in nses">
-                    <div v-if="ns?.id !== namespace" :class="[
+            <div :class="[expandTranslations ? 'expanded' : '', 'expand-height']">
+                <div v-for="[group, nses] in Object.entries(namespacesGrouped)" class="pb-1">
+                    <p class="text-xs font-bold uppercase">{{ group }}</p>
+                    <div v-for="ns in nses">
+                        <div v-if="ns?.id !== namespace" :class="[
                         translateAs === ns.id ? 'font-medium' : 'font-normal opacity-80 decoration-base-400/50 hover:decoration-base-500/70 dark:decoration-base-dark-400/50 dark:hover:decoration-base-dark-400/70',
                         'underline underline-offset-2 decoration-2 cursor-pointer mx-[-.5rem] px-2 py-1 rounded transition-all bg-base-500 dark:hover:bg-base-dark-400 bg-opacity-0 hover:bg-opacity-70']"
-                         @click="translateAs = ns.id">
-                        {{ localizeNamespace(ns) ?? "" }}
+                             @click="translateAs = ns.id">
+                            {{ localizeNamespace(ns) ?? "" }}
+                        </div>
                     </div>
                 </div>
+            </div>
+            <div class="mx-[-.5rem] px-2 py-1 justify-center cursor-pointer flex gap-1 transition-all rounded bg-base-500 dark:hover:bg-base-dark-400 bg-opacity-0 hover:bg-opacity-70"
+                 @click="expandTranslations=!expandTranslations">
+                <svg xmlns="http://www.w3.org/2000/svg" :class="[expandTranslations ? 'rotate-180' : '', 'transition-transform duration-200']" width="24" height="24" viewBox="0 0 24 24"
+                     stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+                <span v-if="!expandTranslations">
+                {{ $t("mappings.namespace.show.more") }} 
+            </span>
+                <span v-else>
+                {{ $t("mappings.namespace.show.less") }} 
+            </span>
             </div>
         </div>
     </div>
@@ -85,10 +114,11 @@ import {MappingsData, Namespace} from "../../app/mappings-data"
 
 export default defineComponent({
     name: "MappingsFilterBlock",
-    components: {SubHeader},
+    components: { SubHeader },
     data() {
         return {
             expandNamespaces: false,
+            expandTranslations: false,
         }
     },
     methods: {
