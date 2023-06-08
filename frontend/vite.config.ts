@@ -13,6 +13,7 @@ export default defineConfig({
     plugins: [
         vue(),
         VitePWA({
+            registerType: "autoUpdate",
             includeAssets: [
                 "favicon.ico",
                 "favicon-32x32.png",
@@ -43,8 +44,9 @@ export default defineConfig({
                 display: "standalone",
             },
             workbox: {
-                cleanupOutdatedCaches: false,
+                cleanupOutdatedCaches: true,
                 sourcemap: true,
+                skipWaiting: true,
             },
         }),
         prismjsPlugin({
