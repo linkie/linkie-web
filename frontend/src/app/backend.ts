@@ -51,6 +51,10 @@ export function reqOss<T = any>(): Promise<AxiosResponse<T>> {
     return HTTP.get(`/api/oss`)
 }
 
+export function reqStatusSource<T = any>(namespace: string): Promise<AxiosResponse<T>> {
+    return HTTP.get(`/api/status/sources/${namespace}`)
+}
+
 export let namespaceGroups: { [key: string]: string | string[] } = {
     "yarn": "Fabric",
     "mojang": "Fabric",
@@ -70,4 +74,6 @@ export let namespaceLocalizations: { [namespace: string]: string } = {
     "legacy-yarn": "Legacy Yarn",
     "yarrn": "Yarrn",
     "plasma": "Plasma",
+    "barn": "Barn",
+    "feather": "Feather",
 } 

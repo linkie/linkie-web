@@ -14,6 +14,7 @@ import Alerts from "./components/Alerts.vue"
 import {useI18nStore} from "./app/i18n-store"
 import {isTauri, tauriInit} from "./app/tauri/tauri"
 import Tauri from "./components/tauri/Tauri.vue"
+import SourcesStatus from "./routes/SourcesStatus.vue";
 
 const routes: { [route: string]: any; } = {
     "/": Home,
@@ -21,6 +22,7 @@ const routes: { [route: string]: any; } = {
     "/generator": Generator,
     "/mappings": Mappings,
     "/oss": OpenSourceLicenses,
+    "/status/sources": SourcesStatus,
 }
 
 export default defineComponent({

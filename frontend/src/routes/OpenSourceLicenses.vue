@@ -70,7 +70,7 @@ interface OssEntry {
 }
 
 export default defineComponent({
-    name: "Dependencies",
+    name: "OpenSourceLicenses",
     components: {Header, PageContent, PageSidebar, PageWidthLimiter, SubHeader, Block},
     data() {
         return {

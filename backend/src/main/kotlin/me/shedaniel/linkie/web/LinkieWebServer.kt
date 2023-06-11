@@ -12,9 +12,10 @@ import io.ktor.server.plugins.cors.routing.*
 import io.ktor.server.plugins.statuspages.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import io.ktor.util.pipeline.*
-import kotlinx.serialization.json.buildJsonObject
-import kotlinx.serialization.json.put
+import kotlinx.serialization.json.*
+import me.shedaniel.linkie.Namespaces
+import me.shedaniel.linkie.RemapperDaemon
+import me.shedaniel.linkie.utils.tryToVersion
 import me.shedaniel.linkie.web.deps.depsCycle
 import me.shedaniel.linkie.web.deps.startDepsCycle
 import me.shedaniel.linkie.web.deps.startLinkie
@@ -85,6 +86,55 @@ fun main() {
                     val className = call.parameters["class"]?.replace('.', '/') ?: throw IllegalArgumentException("No class specified")
                     val version = call.parameters["version"] ?: throw IllegalArgumentException("No version specified")
                     call.respondText(getSources(namespaceStr, version, className))
+                }
+                get("api/status/sources/{namespace}") {
+                    val namespaceStr = call.parameters["namespace"]?.lowercase() ?: throw IllegalArgumentException("No namespace specified")
+                    if (namespaceStr == "next") {
+                        val next = RemapperDaemon.nextInQueue
+                        val nextJson = buildJsonObject {
+                            put("namespace", next?.first?.id ?: "null")
+                            if (next != null) {
+                                put("version", next.second.version!!)
+                            }
+                        }
+                        call.respond(buildJsonObject {
+                            put("next", nextJson)
+                            putJsonArray("list") {
+                                RemapperDaemon.remapQueue.take(40).forEach { (ns, version, _) ->
+                                    addJsonObject {
+                                        put("namespace", ns.id)
+                                        put("version", version)
+                                    }
+                                }
+                            }
+                        })
+                        return@get
+                    } else if (namespaceStr == "current") {
+                        val current = RemapperDaemon.current
+                        if (current == null) {
+                            call.respond(buildJsonObject {
+                                put("namespace", "null")
+                            })
+                        } else {
+                            call.respond(buildJsonObject {
+                                put("namespace", current.first.id)
+                                put("version", current.second.version!!)
+                            })
+                        }
+                        return@get
+                    }
+                    val namespace = Namespaces.namespaces[namespaceStr] ?: throw IllegalArgumentException("No namespace found for $namespaceStr")
+                    call.respond(buildJsonObject {
+                        namespace.getAllSortedVersions().forEach { version ->
+                            val cache = RemapperDaemon.getCache(namespace, version)
+                            put(version, buildJsonObject {
+                                put("stable", version.tryToVersion()?.takeIf { it.snapshot == null } != null)
+                                put("curr", cache?.classes ?: 0)
+                                put("total", cache?.totalClasses ?: 0)
+                                put("everCached", cache != null)
+                            })
+                        }
+                    })
                 }
             }
         }

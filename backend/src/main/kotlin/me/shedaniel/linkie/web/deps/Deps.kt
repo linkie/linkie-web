@@ -1,5 +1,6 @@
 package me.shedaniel.linkie.web.deps
 
+import com.soywiz.klock.minutes
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
@@ -8,16 +9,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import me.shedaniel.linkie.LinkieConfig
 import me.shedaniel.linkie.Namespaces
-import me.shedaniel.linkie.namespaces.BarnNamespace
-import me.shedaniel.linkie.namespaces.LegacyYarnNamespace
-import me.shedaniel.linkie.namespaces.MCPNamespace
-import me.shedaniel.linkie.namespaces.MojangHashedNamespace
-import me.shedaniel.linkie.namespaces.MojangNamespace
-import me.shedaniel.linkie.namespaces.MojangSrgNamespace
-import me.shedaniel.linkie.namespaces.PlasmaNamespace
-import me.shedaniel.linkie.namespaces.QuiltMappingsNamespace
-import me.shedaniel.linkie.namespaces.YarnNamespace
-import me.shedaniel.linkie.namespaces.YarrnNamespace
+import me.shedaniel.linkie.namespaces.*
 import me.shedaniel.linkie.utils.info
 import me.shedaniel.linkie.utils.toVersion
 import me.shedaniel.linkie.utils.tryToVersion
@@ -168,7 +160,9 @@ fun startLinkie() {
                     YarrnNamespace,
                     PlasmaNamespace,
                     BarnNamespace,
-                )
+                    FeatherNamespace,
+                ),
+                remapSourceDaemonDuration = 10.minutes,
             )
         )
     }
