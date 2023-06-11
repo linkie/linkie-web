@@ -8,18 +8,18 @@
             </Block>
         </PageSidebar>
         <PageContent>
-            <div v-if="!!this.current" class="text-xl font-bold">{{ current }}</div>
-            <div v-if="!!this.next">
+            <div v-if="!!current" class="text-xl font-bold">{{ current }}</div>
+            <div v-if="!!next">
                 <div class="mb-4">{{ next }}</div>
                 Queue:
                 <ul class="list-inside list-disc">
-                    <li v-for="ni in this.nextList">
+                    <li v-for="ni in nextList">
                         {{ ni }}
                     </li>
                 </ul>
             </div>
-            <div v-if="!!this.data">
-                <div v-for="item in this.filteredData">
+            <div v-if="!!data">
+                <div v-for="item in filteredData">
                     <div class="mb-2">
                         <SubHeader>{{ item[0] }}</SubHeader>
                         Cached: {{ item[1].curr }} out of {{ item[1].total }}<br>
