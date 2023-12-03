@@ -14,6 +14,7 @@
     "dependencies.build.system": "Build System",
     "dependencies.build.system.architectury.loom": "Architectury Loom",
     "dependencies.build.system.forge.gradle": "ForgeGradle",
+    "dependencies.build.system.neo.gradle": "NeoGradle",
     "dependencies.version": "Version",
     "dependencies.version.snapshots": "Enable snapshots",
     "dependencies.maven.repo": "Maven Repository",
@@ -86,6 +87,7 @@
     "namespace.plasma": "Plasma",
     "loader.fabric": "Fabric",
     "loader.forge": "Forge",
+    "loader.neoforge": "NeoForge",
     "loader.quilt": "Quilt",
     "loader.legacy-fabric": "Legacy Fabric",
     "message.copy.clipboard": "Copied to clipboard"

@@ -14,7 +14,12 @@ export function formatMaven(url: string): string {
 
 function isFG(): boolean {
     let {loader, forgeGradle} = useDependencySearchStore()
-    return loader === "forge" && forgeGradle
+    return (loader === "forge") && forgeGradle
+}
+
+function isNG(): boolean {
+    let {loader, neoGradle} = useDependencySearchStore()
+    return (loader === "neoforge") && neoGradle
 }
 
 export function formatDepLine(configuration: string, notation: string, wrap?: string): string {
@@ -41,34 +46,43 @@ export function formatBlock(inner: string): string {
 }
 
 export function formatApi(notation: string, block: boolean = true): string {
-    if (!isFG()) {
-        return formatDep("modApi", notation, block)
-    } else {
+    if (isFG()) {
         return formatDep("api", notation, block, `fg.deobf("%%")`)
+    } else if (isNG()) {
+        return formatDep("api", notation, block)
+    } else {
+        return formatDep("modApi", notation, block)
     }
 }
 
 export function formatImpl(notation: string, block: boolean = true): string {
-    if (!isFG()) {
-        return formatDep("modImplementation", notation, block)
-    } else {
+    if (isFG()) {
         return formatDep("implementation", notation, block, `fg.deobf("%%")`)
+    } else if (isNG()) {
+        return formatDep("implementation", notation, block)
+    } else {
+        return formatDep("modImplementation", notation, block)
     }
 }
 
 export function formatCompileOnly(notation: string, block: boolean = true): string {
-    if (!isFG()) {
-        return formatDep("modCompileOnly", notation, block)
-    } else {
+    if (isFG()) {
         return formatDep("compileOnly", notation, block, `fg.deobf("%%")`)
+    } else if(isNG()) {
+        return formatDep("compileOnly", notation, block)
+    } else {
+        return formatDep("modCompileOnly", notation, block)
     }
 }
 
 export function formatRuntimeOnly(notation: string, block: boolean = true): string {
-    if (!isFG()) {
-        return formatDep("modRuntimeOnly", notation, block)
-    } else {
+    if (isFG()) {
         return formatDep("runtimeOnly", notation, block, `fg.deobf("%%")`)
+        
+    } else if (isNG()) {
+        return formatDep("runtimeOnly", notation, block)
+    } else {
+        return formatDep("modRuntimeOnly", notation, block)
     }
 }
 
@@ -88,6 +102,8 @@ export function formatDependency(type: DependencyType, notation: string, block: 
         return formatDep("mappings", notation, block)
     } else if (type === "Forge") {
         return formatDep("forge", notation, block)
+    } else if (type === "NeoForge") {
+        return formatDep("neoforge", notation, block)
     } else {
         return notation
     }

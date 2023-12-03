@@ -27,10 +27,11 @@ data class VersionIdentifier(
 val allDeps = listOf(
     FabricDeps,
     ForgeDeps,
+    NeoForgeDeps,
     LegacyFabricDeps,
     CFDeps(
         "Architectury API", 419699,
-        loaders = { _, _ -> listOf("fabric", "forge") },
+        loaders = { _, _ -> listOf("fabric", "forge", "neoforge") },
         notation = { loader, _, version -> "dev.architectury:architectury-${if (loader == "quilt") "fabric" else loader}:$version" },
         versionGrabber = { file -> file.displayName.substringAfterLast("v") },
         mavens = listOf(
@@ -50,6 +51,7 @@ val allDeps = listOf(
             loaders = { _, version ->
                 when {
                     version.tryToVersion() == null || version.toVersion().snapshot != null -> listOf("fabric")
+                    version.toVersion() >= "1.20.2".toVersion() -> listOf("fabric", "forge", "neoforge")
                     version.toVersion() >= "1.16.5".toVersion() -> listOf("fabric", "forge")
                     version.toVersion() > "1.13.2".toVersion() -> listOf("fabric")
                     else -> listOf()
@@ -68,12 +70,13 @@ val allDeps = listOf(
             loaders = { _, version ->
                 when {
                     version.tryToVersion() == null || version.toVersion().snapshot != null -> listOf("fabric")
+                    version.toVersion() >= "1.20.2".toVersion() -> listOf("fabric", "forge", "neoforge")
                     version.toVersion() >= "1.16.5".toVersion() -> listOf("fabric", "forge")
                     else -> listOf("fabric")
                 }
             },
             notation = { loader, _, version ->
-                if ((version.tryToVersion()?.major ?: 0) >= 4 || loader == "forge") {
+                if ((version.tryToVersion()?.major ?: 0) >= 4 || loader == "forge" || loader == "neoforge") {
                     "me.shedaniel.cloth:cloth-config-$loader:$version"
                 } else {
                     "me.shedaniel.cloth:config-2:$version"
@@ -225,5 +228,6 @@ abstract class Deps(val name: String) {
         RuntimeOnly,
         Mappings,
         Forge,
+        NeoForge,
     }
 }

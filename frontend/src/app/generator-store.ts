@@ -2,7 +2,7 @@ import {defineStore} from "pinia"
 
 export interface State {
     template: string | null
-    modLoaders: ("fabric" | "forge" | "quilt")[]
+    modLoaders: ("fabric" | "forge" | "neoforge" | "quilt")[]
     fabricLike: boolean
     splitEnv: boolean
     gradleSystem: "loom" | "fg"
@@ -72,7 +72,7 @@ interface Dependency {
     id: string
     name: string
     descriptions?: string[]
-    modLoaders?: ("fabric" | "forge" | "quilt")[]
+    modLoaders?: ("fabric" | "forge" | "neoforge" | "quilt")[]
 }
 
 export function isTemplateMultiPlatform() {
@@ -94,7 +94,7 @@ export function freeDependencies(): Dependency[] {
     dependencies.push({
         id: "cloth-config", name: "Cloth Config",
         descriptions: ["A client-sided configuration screen library, includes Auto Config."],
-        modLoaders: ["forge", "fabric", "quilt"],
+        modLoaders: ["forge", "neoforge", "fabric", "quilt"],
     })
     dependencies.push({
         id: "moonlight", name: "Moonlight",
@@ -114,7 +114,7 @@ export function freeDependencies(): Dependency[] {
     dependencies.push({
         id: "rei", name: "Roughly Enough Items",
         descriptions: ["Clean and Customizable. An easy way to browse recipes."],
-        modLoaders: ["forge", "fabric", "quilt"],
+        modLoaders: ["forge", "neoforge", "fabric", "quilt"],
     })
     if (has("fabric") || has("quilt")) {
         dependencies.push({

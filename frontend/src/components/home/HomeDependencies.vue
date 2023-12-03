@@ -24,7 +24,7 @@ export default defineComponent({
         versions() {
             let versions = useDependenciesDataStore().searchData.versions
             let list = Object.keys(versions).map(loader => versions[loader].filter(entry => entry.stable).map(entry => [loader, entry.version])).flat()
-            list = list.map(entry => [entry[0] == "fabric" ? "Fabric" : "Forge", entry[1]])
+            list = list.map(entry => [entry[0] == "fabric" ? "Fabric" : entry[0] == "neoforge" ? "NeoForge" : "Forge", entry[1]])
             list.sort((b, a) => {
                 let aVersion = a[1]
                 let bVersion = b[1]
