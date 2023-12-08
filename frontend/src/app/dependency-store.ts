@@ -6,12 +6,14 @@ interface State {
     version?: string,
     allowSnapshots: boolean,
     forgeGradle: boolean,
+    neoGradle: boolean,
 }
 
 function newState(): State {
     return {
         allowSnapshots: false,
         forgeGradle: false,
+        neoGradle: false
     }
 }
 
