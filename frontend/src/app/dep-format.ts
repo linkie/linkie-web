@@ -78,7 +78,6 @@ export function formatCompileOnly(notation: string, block: boolean = true): stri
 export function formatRuntimeOnly(notation: string, block: boolean = true): string {
     if (isFG()) {
         return formatDep("runtimeOnly", notation, block, `fg.deobf("%%")`)
-        
     } else if (isNG()) {
         return formatDep("runtimeOnly", notation, block)
     } else {
