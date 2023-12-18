@@ -14,6 +14,7 @@
     "dependencies.build.system": "构建系统",
     "dependencies.build.system.architectury.loom": "Architectury Loom",
     "dependencies.build.system.forge.gradle": "ForgeGradle",
+    "dependencies.build.system.neo.gradle": "NeoGradle",
     "dependencies.version": "版本",
     "dependencies.version.snapshots": "显示快照版本",
     "dependencies.maven.repo": "Maven 仓库",
@@ -86,6 +87,7 @@
     "namespace.plasma": "Plasma",
     "loader.fabric": "Fabric",
     "loader.forge": "Forge",
+    "loader.neoforge": "NeoForge",
     "loader.quilt": "Quilt",
     "loader.legacy-fabric": "Legacy Fabric",
     "message.copy.clipboard": "已复制到剪贴板"
