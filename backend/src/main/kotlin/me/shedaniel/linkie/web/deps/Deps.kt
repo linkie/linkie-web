@@ -154,6 +154,7 @@ fun startLinkie() {
             LinkieConfig.DEFAULT.copy(
                 namespaces = listOf(
                     YarnNamespace,
+                    MojangRawNamespace,
                     MojangNamespace,
                     MojangSrgNamespace,
                     MojangHashedNamespace,

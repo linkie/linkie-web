@@ -2,7 +2,7 @@
     <div class="flex flex-col">
         <SubHeader class="mt-[-.25rem] mb-1"> {{ $t("mappings.namespace") }}</SubHeader>
 
-        <div v-for="[group, nses] in Object.entries(namespacesGrouped)">
+        <div v-for="[group, nses] in namespacesGrouped">
             <div v-if="group !== 'Others'" class="pb-1">
                 <p class="text-xs font-bold uppercase">{{ group }}</p>
                 <div v-for="ns in nses" :class="[
@@ -14,7 +14,7 @@
             </div>
         </div>
 
-        <div v-for="[group, nses] in Object.entries(namespacesGrouped)"
+        <div v-for="[group, nses] in namespacesGrouped"
              :class="[expandNamespaces ? 'expanded' : '', 'expand-height']">
             <div v-if="group === 'Others'" class="pb-1">
                 <p class="text-xs font-bold uppercase">{{ group }}</p>
@@ -74,7 +74,7 @@
                 {{ $t("mappings.translation.n/a") }}
             </div>
             <div :class="[expandTranslations ? 'expanded' : '', 'expand-height']">
-                <div v-for="[group, nses] in Object.entries(namespacesGrouped)" class="pb-1">
+                <div v-for="[group, nses] in namespacesGrouped" class="pb-1">
                     <p class="text-xs font-bold uppercase">{{ group }}</p>
                     <div v-for="ns in nses">
                         <div v-if="ns?.id !== namespace" :class="[
@@ -109,7 +109,7 @@ import {defineComponent, PropType} from "vue"
 import {mapWritableState} from "pinia"
 import {applicableMappingsVersions, useMappingsStore, VersionPossible} from "../../app/mappings-store"
 import SubHeader from "../dependencies/SubHeader.vue"
-import {namespaceGroups, namespaceLocalizations} from "../../app/backend"
+import {allNamespaceGroups, namespaceGroups, namespaceLocalizations} from "../../app/backend"
 import {MappingsData, Namespace} from "../../app/mappings-data"
 
 export default defineComponent({
@@ -144,7 +144,7 @@ export default defineComponent({
         namespaces(): Namespace[] {
             return this.data.namespaces
         },
-        namespacesGrouped(): { [group: string]: Namespace[] } {
+        namespacesGrouped(): [string, Namespace[]][] {
             let groups = {} as { [group: string]: Namespace[] }
             for (let ns in this.namespaces) {
                 let groupsApplicable = namespaceGroups[this.namespaces[ns].id] ?? "Others"
@@ -162,7 +162,7 @@ export default defineComponent({
                 //sort
                 groups[groupsKey].sort((a, b) => (this.localizeNamespace(a) ?? "").localeCompare(this.localizeNamespace(b) ?? ""))
             }
-            return groups
+            return Object.entries(groups).sort((a, b) => allNamespaceGroups.indexOf(a[0]) - allNamespaceGroups.indexOf(b[0]))
         },
         firstNamespace(): Namespace | undefined {
             return this.namespaces[0]

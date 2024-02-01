@@ -41,7 +41,7 @@ export function reqSource<T = any>(namespace: string, version: string, className
     return HTTP.get(`/api/source`, {
         params: {
             namespace,
-            'class': className,
+            "class": className,
             version,
         },
     })
@@ -55,9 +55,17 @@ export function reqStatusSource<T = any>(namespace: string): Promise<AxiosRespon
     return HTTP.get(`/api/status/sources/${namespace}`)
 }
 
+export let allNamespaceGroups: string[] = [
+    "Official",
+    "Fabric",
+    "Forge",
+    "Quilt",
+]
+
 export let namespaceGroups: { [key: string]: string | string[] } = {
     "yarn": "Fabric",
     "mojang": "Fabric",
+    "mojang_raw": "Official",
     "mojang_srg": "Forge",
     "mojang_hashed": "Quilt",
     "mcp": "Forge",
@@ -66,9 +74,10 @@ export let namespaceGroups: { [key: string]: string | string[] } = {
 
 export let namespaceLocalizations: { [namespace: string]: string } = {
     "yarn": "Yarn",
-    "mojang": "Mojang (Intermediary)",
-    "mojang_srg": "Mojang (SRG)",
-    "mojang_hashed": "Mojang (Hashed)",
+    "mojang_raw": "Mojang",
+    "mojang": "Mojang (via Intermediary)",
+    "mojang_srg": "Mojang (via SRG)",
+    "mojang_hashed": "Mojang (via Hashed)",
     "mcp": "MCP",
     "quilt-mappings": "Quilt Mappings",
     "legacy-yarn": "Legacy Yarn",
