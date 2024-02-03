@@ -74,3 +74,7 @@ input[type=checkbox] {
 .expand-height.expanded {
     @apply max-h-[100vh] opacity-100 mt-[-1rem] pt-[1rem];
 }
+
+code {
+    @apply font-mono;
+}

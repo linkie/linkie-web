@@ -9,6 +9,7 @@ module.exports = {
         extend: {},
         fontFamily: {
             "sans": ["Inter"],
+            "mono": ["Jetbrains Mono"],
         },
         colors: {
             transparent: "transparent",

@@ -166,6 +166,7 @@ fun startLinkie() {
                     BarnNamespace,
                     FeatherNamespace,
                 ),
+                maximumLoadedVersions = 4,
                 remapSourceDaemonDuration = 10.minutes,
             )
         )

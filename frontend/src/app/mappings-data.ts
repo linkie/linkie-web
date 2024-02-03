@@ -39,6 +39,9 @@ export interface MappingEntry {
     ownerObfServer?: string,
     obfServer?: string,
     descObfServer?: string,
+    args?: { [index: number]: string },
+    argsGuessed?: boolean,
+    argsParchment?: boolean,
     type: MappingType,
     translatedTo?: MappingEntry,
 }
@@ -241,6 +244,9 @@ export function mapEntryToMappingEntry(obj: any): MappingEntry {
         ownerObfServer: obj.k,
         obfServer: obj.l,
         descObfServer: obj.m,
+        args: obj.p,
+        argsGuessed: obj.q,
+        argsParchment: obj.r,
         type,
         translatedTo,
     } as MappingEntry

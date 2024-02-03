@@ -1,10 +1,15 @@
 package me.shedaniel.linkie.web
 
+import com.soywiz.korio.async.launch
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.*
 import me.shedaniel.linkie.*
+import me.shedaniel.linkie.namespaces.YarnNamespace
 import me.shedaniel.linkie.utils.MemberEntry
 import me.shedaniel.linkie.utils.ResultHolder
 import me.shedaniel.linkie.utils.toVersion
@@ -17,6 +22,7 @@ import nl.adaptivity.xmlutil.serialization.XmlSerialName
 import java.io.File
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.properties.Delegates
 
 val xml = XML {
     autoPolymorphic = true
@@ -50,16 +56,39 @@ suspend fun search(
         ?: (translateNamespace?.defaultVersion?.takeIf { it in allVersions } ?: allVersions.first())
 
     val provider = version?.let { namespace.getProvider(it) } ?: namespace.getProvider(defaultVersion)
-    val mappings = provider.get()
+    var mappings by Delegates.notNull<MappingsContainer>()
+    var yarnMappings: MappingsContainer? = null
+    coroutineScope {
+        launch { withContext(Dispatchers.Default) { mappings = provider.get() } }
+        if (!namespace.hasMethodArgs(provider.version!!) && provider.version!!.tryToVersion()?.takeIf { it > "1.14.4".toVersion() } != null) {
+            val yarnProvider = YarnNamespace.getProvider(provider.version!!)
+            if (!yarnProvider.isEmpty()) {
+                launch { withContext(Dispatchers.Default) { yarnMappings = yarnProvider.get() } }
+            }
+        }
+    }
     val result = MappingsQueryUtils.query(mappings, query, *buildList {
         if (allowClasses) add(MappingsEntryType.CLASS)
         if (allowMethods) add(MappingsEntryType.METHOD)
         if (allowFields) add(MappingsEntryType.FIELD)
     }.toTypedArray(), limit = limit)
+    val argMappings: (Class, Method) -> List<MethodArg>? = if (yarnMappings != null) {
+        inner@{ clazz, method ->
+            val obfName = method.obfMergedName ?: return@inner null
+            val obfDesc = method.getObfMergedDesc(mappings)
+            val parentObfName = clazz.obfMergedName ?: return@inner null
+            val targetParent = yarnMappings!!.getClassByObfName(parentObfName) ?: return@inner null
+            val targetMethod =
+                targetParent.methods.firstOrNull { it.obfMergedName == obfName && it.getObfMergedDesc(yarnMappings!!) == obfDesc }
+                    ?: return@inner null
+
+            targetMethod.args
+        }
+    } else { _, _ -> null }
     if (translateNamespace == null) {
         return SearchResultEntries(
             entries = result.results.asSequence().take(limit).mapNotNull {
-                toJsonFromEntry(mappings, it.value, it.score)
+                toJsonFromEntry(namespace, mappings, it.value, it.score, argMappings)
             }.toList(),
             fuzzy = result.fuzzy,
         )
@@ -67,8 +96,8 @@ suspend fun search(
         val target = translateNamespace.getProvider(provider.version!!).get()
         val elements = mutableListOf<JsonElement>()
         translate(mappings, target, result.results.asSequence().take(limit)) { from, to, score ->
-            toJsonFromEntry(mappings, from, score)?.also { obj ->
-                val translated = toJsonFromEntry(target, to, score)
+            toJsonFromEntry(namespace, mappings, from, score, argMappings)?.also { obj ->
+                val translated = toJsonFromEntry(translateNamespace, target, to, score) { _, _ -> null }
                 if (translated == null) elements.add(obj)
                 else {
                     elements.add(buildJsonObject {
@@ -190,7 +219,7 @@ fun getLoaderVersions(loader: String): MutableMap<String, MutableMap<String, Dep
     return result
 }
 
-fun toJsonFromEntry(mappings: MappingsContainer, entry: Any?, score: Double): JsonObject? {
+fun toJsonFromEntry(namespace: Namespace, mappings: MappingsContainer, entry: Any?, score: Double, argMappings: (Class, Method) -> List<MethodArg>?): JsonObject? {
     return when (entry) {
         is Class -> json.encodeToJsonElement(
             SearchResultClassEntry.serializer(), SearchResultClassEntry(
@@ -204,7 +233,7 @@ fun toJsonFromEntry(mappings: MappingsContainer, entry: Any?, score: Double): Js
             )
         ) as JsonObject
 
-        is MemberEntry<*> -> json.encodeToJsonElement(
+        is MemberEntry<*> -> (json.encodeToJsonElement(
             SearchResultMemberEntry.serializer(), SearchResultMemberEntry(
                 obf = entry.member.obfMergedName,
                 intermediary = entry.member.intermediaryName,
@@ -224,7 +253,23 @@ fun toJsonFromEntry(mappings: MappingsContainer, entry: Any?, score: Double): Js
                 score = score,
                 memberType = if (entry.member is Field) "f" else "m"
             )
-        ) as JsonObject
+        ) as JsonObject).let {
+            if (entry.member is Method) {
+                var guessed = false
+                val args = (entry.member as Method).args ?: (argMappings(entry.owner, entry.member as Method)?.also {
+                    guessed = true
+                } ?: return@let it)
+                val map = it.toMutableMap()
+                map["p"] = buildJsonObject {
+                    args.forEach { arg ->
+                        put(arg.index.toString(), arg.name)
+                    }
+                }
+                map["q"] = JsonPrimitive(guessed)
+                map["r"] = JsonPrimitive(!guessed && namespace.id.contains("mojang"))
+                JsonObject(map)
+            } else it
+        }
 
         else -> null
     }

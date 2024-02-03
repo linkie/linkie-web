@@ -30,6 +30,53 @@
                 </div>
             </div>
         </SubHeader>
+        <div class="my-1 text-sm whitespace-nowrap flex items-center" v-if="entry.type === 'method'">
+            <div class="mr-2 relative" v-if="!!entry.argsGuessed || !!entry.argsParchment">
+                <svg v-if="!!entry.argsGuessed" xmlns="http://www.w3.org/2000/svg" class="peer" width="20" height="20" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                    <path d="M12 1.67c.955 0 1.845 .467 2.39 1.247l.105 .16l8.114 13.548a2.914 2.914 0 0 1 -2.307 4.363l-.195 .008h-16.225a2.914 2.914 0 0 1 -2.582 -4.2l.099 -.185l8.11 -13.538a2.914 2.914 0 0 1 2.491 -1.403zm.01 13.33l-.127 .007a1 1 0 0 0 0 1.986l.117 .007l.127 -.007a1 1 0 0 0 0 -1.986l-.117 -.007zm-.01 -7a1 1 0 0 0 -.993 .883l-.007 .117v4l.007 .117a1 1 0 0 0 1.986 0l.007 -.117v-4l-.007 -.117a1 1 0 0 0 -.993 -.883z" stroke-width="0" fill="currentColor"/>
+                </svg>
+                <svg v-else-if="!!entry.argsParchment" xmlns="http://www.w3.org/2000/svg" class="peer" width="20" height="20" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                    <path d="M19 2a3 3 0 0 1 2.995 2.824l.005 .176v14a3 3 0 0 1 -2.824 2.995l-.176 .005h-14a3 3 0 0 1 -2.995 -2.824l-.005 -.176v-14a3 3 0 0 1 2.824 -2.995l.176 -.005h14zm-7 9h-1l-.117 .007a1 1 0 0 0 0 1.986l.117 .007v3l.007 .117a1 1 0 0 0 .876 .876l.117 .007h1l.117 -.007a1 1 0 0 0 .876 -.876l.007 -.117l-.007 -.117a1 1 0 0 0 -.764 -.857l-.112 -.02l-.117 -.006v-3l-.007 -.117a1 1 0 0 0 -.876 -.876l-.117 -.007zm.01 -3l-.127 .007a1 1 0 0 0 0 1.986l.117 .007l.127 -.007a1 1 0 0 0 0 -1.986l-.117 -.007z" stroke-width="0" fill="currentColor"/>
+                </svg>
+                <Tooltip>
+                    <div v-if="!!entry.argsGuessed" class="flex flex-col gap-1">
+                        <div class="flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="mr-1.5" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                <path d="M12 9v4"/>
+                                <path d="M10.363 3.591l-8.106 13.534a1.914 1.914 0 0 0 1.636 2.871h16.214a1.914 1.914 0 0 0 1.636 -2.87l-8.106 -13.536a1.914 1.914 0 0 0 -3.274 0z"/>
+                                <path d="M12 16h.01"/>
+                            </svg>
+                            <span class="font-semibold">Warning</span>
+                        </div>
+                        The method argument mappings are aggregated from other mapping projects,<br>
+                        and may not be accurate or fit the current context.<br><br>
+                        This may be the result of the lack of a proper source for this mappings or this version.
+                    </div>
+                    <div v-else-if="!!entry.argsParchment" class="flex flex-col gap-1">
+                        <div class="flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="mr-1.5" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                <path d="M12 9h.01"/>
+                                <path d="M3 5a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v14a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-14z"/>
+                                <path d="M11 12h1v4h1"/>
+                            </svg>
+                            <span class="font-semibold">Info</span>
+                        </div>
+                        The method argument mappings are provided from a community project, ParchmentMC, <br>
+                        and may not be accurate, or may be subject to a different license.
+                    </div>
+                </Tooltip>
+            </div>
+            <div class="font-mono overflow-x-auto epic-scroller">
+                <span class="font-bold">{{ methodReturnType(entry) }}</span>
+                {{ onlyClass(getOptimumName(entry)) }}(<!---->
+                <AutoBold class="[&_.bold]:font-bold">{{ methodArgs(entry) }}</AutoBold><!--
+                -->)
+            </div>
+        </div>
         <div class="breadcrumbs text-sm max-w-full overflow-x-auto epic-scroller py-2" v-if="breadcrumbs.length > 1">
             <ul class="flex items-center whitespace-nowrap">
                 <li v-for="breadcrumb in breadcrumbs" class="flex items-center">
@@ -102,6 +149,9 @@ import {addAlert} from "../../app/alerts"
 import {MappingEntry, Namespace} from "../../app/mappings-data"
 import Copyable from "../Copyable.vue"
 import Prism, {TokenStream} from "prismjs"
+import GeneratorDescription from "../generator/GeneratorDescription.vue"
+import AutoBold from "./AutoBold.vue"
+import Tooltip from "../Tooltip.vue"
 
 function getOptimumName(entry: MappingEntry): string {
     return entry.named || entry.intermediary || ""
@@ -115,19 +165,19 @@ function getOptimumDesc(entry: MappingEntry): string {
     return entry.descNamed || entry.descIntermediary || ""
 }
 
-function formatName(str: string | undefined) {
+function formatName<T extends string | undefined>(str: T): T {
     if (str) {
-        return str.replaceAll("$", ".").replaceAll("/", ".")
+        return str.replaceAll("$", ".").replaceAll("/", ".") as T
     } else {
         return str
     }
 }
 
-function onlyClass(str: string | undefined) {
+function onlyClass<T extends string | undefined>(str: T): T {
     if (str) {
         let indexOf = str.lastIndexOf("/")
-        str = indexOf == -1 ? str : str.substring(indexOf + 1)
-        return formatName(str)
+        let substr = indexOf == -1 ? str : str.substring(indexOf + 1)
+        return formatName(substr) as T
     } else {
         return str
     }
@@ -263,6 +313,9 @@ function beautifyFieldType(type: string) {
                 case "D":
                     str += "double"
                     break
+                case "V":
+                    str += "void"
+                    break
             }
         }
     }
@@ -276,7 +329,7 @@ function beautifyFieldType(type: string) {
 
 export default defineComponent({
     name: "MappingsEntryBlock",
-    components: {Copyable, CodeBlock, EntryDetails, SubHeader, Header, Block},
+    components: {Tooltip, AutoBold, GeneratorDescription, Copyable, CodeBlock, EntryDetails, SubHeader, Header, Block},
     data() {
         return {
             getDisplayName,
@@ -365,16 +418,16 @@ export default defineComponent({
                         if (this.entry.type === "class" && tokenType === "class-name" && child.textContent === toFind) {
                             if (!line.children[j - 2]?.className?.includes("keyword")) continue
                             if (line.children[j - 2]?.textContent !== "class"
-                                    && line.children[j - 2]?.textContent !== "interface"
-                                    && line.children[j - 2]?.textContent !== "enum") continue
+                                && line.children[j - 2]?.textContent !== "interface"
+                                && line.children[j - 2]?.textContent !== "enum") continue
                         } else if (this.entry.type === "method" && tokenType === "function" && child.textContent === toFind) {
                             if (!line.children[j + 1]?.className?.includes("punctuation")) continue
                             if (line.children[j + 1]?.textContent !== "(") continue
                             if (!line.children[j - 1]?.className?.includes("text")) continue
                             if (line.children[j - 1]?.textContent !== " ") continue
                             if (!(line.children[j - 2]?.className?.includes("keyword") && line.children[j - 1]?.textContent !== "return")
-                                    && !line.children[j - 2]?.className?.includes("class-name")
-                                    && !line.children[j - 2]?.className?.includes("generics")) continue
+                                && !line.children[j - 2]?.className?.includes("class-name")
+                                && !line.children[j - 2]?.className?.includes("generics")) continue
                         } else if (this.entry.type === "field" && tokenType === "text" && child.textContent === " " + toFind) {
                             if (line.children[j + 1]?.textContent !== ";") continue
                         } else if (this.entry.type === "field" && tokenType === "text" && child.textContent === " " + toFind + " ") {
@@ -438,8 +491,54 @@ export default defineComponent({
             let desc = getOptimumDesc(entry)
             return beautifyFieldType(desc)
         },
+        methodReturnType(entry: MappingEntry) {
+            let desc = getOptimumDesc(entry)
+            desc = desc.substring(desc.lastIndexOf(")") + 1)
+            return onlyClass(beautifyFieldType(desc).replaceAll(".", "/"))
+        },
+        getMethodArgs(entry: MappingEntry): string[][] {
+            let desc = getOptimumDesc(entry)
+            let args = [] as string[][]
+            // Args can be single char or full class name wrapped with L and ;
+            let index = desc.indexOf("(") + 1
+            while (desc[index] !== ")") {
+                let start = desc[index]
+                if (start === "L") {
+                    let end = desc.indexOf(";", index)
+                    let arg = desc.substring(index, end + 1)
+                    args.push([arg, onlyClass(beautifyFieldType(arg).replaceAll(".", "/"))])
+                    index = end + 1
+                } else {
+                    args.push([desc[index], beautifyFieldType(desc[index])])
+                    index++
+                }
+            }
+            return args
+        },
+        methodArgs(entry: MappingEntry) {
+            let args = this.getMethodArgs(entry)
+            let min = 1000000, max = 0
+            if (entry.args) {
+                Object.keys(entry.args).filter(it => entry.args!!.hasOwnProperty(it)).map(it => +it).forEach(it => {
+                    if (it < min) min = it
+                    if (it > max) max = it
+                })
+            }
+            let apply = -1
+            if (max - min + 1 == args.length) apply = min
+            return args.map((arg, index) => {
+                let name = `var${index}`
+                if (entry.args && apply >= 0) {
+                    let argName = entry.args[index + apply]
+                    if (argName) {
+                        name = argName
+                    }
+                }
+                return `*${arg[1]}* ${name}`
+            }).join(", ")
+        },
         requestSource() {
-            this.expandSource = !this.expandSource ? this.namespace?.id + " " + this.version + " " + this.query : null
+            this.expandSource = !this.expandSource || this.expandSource !== this.namespace?.id + " " + this.version + " " + this.query ? this.namespace?.id + " " + this.version + " " + this.query : null
             this.source = ""
 
             if (this.expandSource === this.namespace?.id + " " + this.version + " " + this.query) {
