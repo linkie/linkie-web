@@ -534,7 +534,6 @@ export default defineComponent({
                         twoSpaces++
                     }
                 }
-                console.log(Object.values(entry.args), {...entry.args}, [...args], min, max, args.length, max - min + 1 - twoSpaces)
             }
             
             let apply = false
