@@ -501,15 +501,21 @@ export default defineComponent({
             let args = [] as string[][]
             // Args can be single char or full class name wrapped with L and ;
             let index = desc.indexOf("(") + 1
+            let array = 0
             while (desc[index] !== ")") {
                 let start = desc[index]
-                if (start === "L") {
+                if (start === "[") {
+                    array++
+                    index++
+                } else if (start === "L") {
                     let end = desc.indexOf(";", index)
                     let arg = desc.substring(index, end + 1)
-                    args.push([arg, onlyClass(beautifyFieldType(arg).replaceAll(".", "/"))])
+                    args.push(["[".repeat(array) + arg, onlyClass(beautifyFieldType(arg).replaceAll(".", "/")) + "[]".repeat(array)])
+                    array = 0
                     index = end + 1
                 } else {
-                    args.push([desc[index], beautifyFieldType(desc[index])])
+                    args.push(["[".repeat(array) + desc[index], beautifyFieldType(desc[index]) + "[]".repeat(array)])
+                    array = 0
                     index++
                 }
             }
@@ -517,19 +523,26 @@ export default defineComponent({
         },
         methodArgs(entry: MappingEntry) {
             let args = this.getMethodArgs(entry)
-            let min = 1000000, max = 0
+            let min = 1000000, max = 0, twoSpaces = 0
             if (entry.args) {
                 Object.keys(entry.args).filter(it => entry.args!!.hasOwnProperty(it)).map(it => +it).forEach(it => {
                     if (it < min) min = it
                     if (it > max) max = it
                 })
+                for (let i = 0; i < args.length - 1; i++) {
+                    if (args[i][0] == "J" || args[i][0] == "D") {
+                        twoSpaces++
+                    }
+                }
+                console.log(Object.values(entry.args), {...entry.args}, [...args], min, max, args.length, max - min + 1 - twoSpaces)
             }
-            let apply = -1
-            if (max - min + 1 == args.length) apply = min
+            
+            let apply = false
+            if (max - min + 1 - twoSpaces == args.length) apply = true
             return args.map((arg, index) => {
                 let name = `var${index}`
-                if (entry.args && apply >= 0) {
-                    let argName = entry.args[index + apply]
+                if (entry.args && apply) {
+                    let argName = Object.values(entry.args)[index]
                     if (argName) {
                         name = argName
                     }

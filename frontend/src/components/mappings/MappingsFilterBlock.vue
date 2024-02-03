@@ -3,7 +3,7 @@
         <SubHeader class="mt-[-.25rem] mb-1"> {{ $t("mappings.namespace") }}</SubHeader>
 
         <div v-for="[group, nses] in namespacesGrouped">
-            <div v-if="group !== 'Others'" class="pb-1">
+            <div v-if="!hiddenNamespaceGroups.includes(group)" class="pb-1">
                 <p class="text-xs font-bold uppercase">{{ group }}</p>
                 <div v-for="ns in nses" :class="[
                     namespace === ns.id ? 'font-medium' : 'font-normal opacity-80 decoration-base-400/50 hover:decoration-base-500/70 dark:decoration-base-dark-400/50 dark:hover:decoration-base-dark-400/70',
@@ -16,7 +16,7 @@
 
         <div v-for="[group, nses] in namespacesGrouped"
              :class="[expandNamespaces ? 'expanded' : '', 'expand-height']">
-            <div v-if="group === 'Others'" class="pb-1">
+            <div v-if="hiddenNamespaceGroups.includes(group)" class="pb-1">
                 <p class="text-xs font-bold uppercase">{{ group }}</p>
                 <div v-for="ns in nses" :class="[
                     namespace === ns.id ? 'font-medium' : 'font-normal opacity-80 decoration-base-400/50 hover:decoration-base-500/70 dark:decoration-base-dark-400/50 dark:hover:decoration-base-dark-400/70',
@@ -109,7 +109,7 @@ import {defineComponent, PropType} from "vue"
 import {mapWritableState} from "pinia"
 import {applicableMappingsVersions, useMappingsStore, VersionPossible} from "../../app/mappings-store"
 import SubHeader from "../dependencies/SubHeader.vue"
-import {allNamespaceGroups, namespaceGroups, namespaceLocalizations} from "../../app/backend"
+import {allNamespaceGroups, hiddenNamespaceGroups, namespaceGroups, namespaceLocalizations} from "../../app/backend"
 import {MappingsData, Namespace} from "../../app/mappings-data"
 
 export default defineComponent({
@@ -119,15 +119,16 @@ export default defineComponent({
         return {
             expandNamespaces: false,
             expandTranslations: false,
+            hiddenNamespaceGroups,
         }
     },
     methods: {
         localizeNamespace(namespace?: Namespace | string): string | undefined {
             if (typeof namespace === "string") {
-                return namespaceLocalizations[namespace.toLowerCase()] || namespace.toLowerCase()
+                return this.$t(`namespace.${namespace.toLowerCase()}`) || namespaceLocalizations[namespace.toLowerCase()] || namespace.toLowerCase()
             } else if (namespace) {
                 let id = namespace.id
-                return namespaceLocalizations[id.toLowerCase()] || id.toLowerCase()
+                return this.$t(`namespace.${id.toLowerCase()}`) || namespaceLocalizations[id.toLowerCase()] || id.toLowerCase()
             } else {
                 return undefined
             }

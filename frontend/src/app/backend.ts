@@ -60,6 +60,12 @@ export let allNamespaceGroups: string[] = [
     "Fabric",
     "Forge",
     "Quilt",
+    "Others",
+]
+
+export let hiddenNamespaceGroups: string[] = [
+    "Quilt",
+    "Others",
 ]
 
 export let namespaceGroups: { [key: string]: string | string[] } = {
@@ -78,7 +84,7 @@ export let namespaceLocalizations: { [namespace: string]: string } = {
     "mojang": "Mojang (via Intermediary)",
     "mojang_srg": "Mojang (via SRG)",
     "mojang_hashed": "Mojang (via Hashed)",
-    "mcp": "MCP",
+    "mcp": "Legacy MCP",
     "quilt-mappings": "Quilt Mappings",
     "legacy-yarn": "Legacy Yarn",
     "yarrn": "Yarrn",
