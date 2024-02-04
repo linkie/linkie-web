@@ -43,11 +43,15 @@ export default defineConfig({
                 background_color: "#333333",
                 display: "standalone",
             },
+            selfDestroying: true,
             workbox: {
                 cleanupOutdatedCaches: true,
                 sourcemap: true,
                 skipWaiting: true,
             },
+            devOptions: {
+                enabled: true,
+            }
         }),
         prismjsPlugin({
             languages: ["java", "groovy", "kotlin", "gradle", "json", "properties", "kt", "kts", "batch", "bash"],
