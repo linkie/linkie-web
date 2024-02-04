@@ -21,7 +21,7 @@ export function reqNamespaces<T = any>(): Promise<AxiosResponse<T>> {
 }
 
 export function reqSearch<T = any>(namespace: string, version: string, query: string, allowClasses: boolean, allowFields: boolean, allowMethods: boolean,
-                                   translate?: string, abortController?: AbortController, limit: number = 100): Promise<AxiosResponse<T>> {
+                                   translateMode?: string, translate?: string, abortController?: AbortController, limit: number = 100): Promise<AxiosResponse<T>> {
     return HTTP.get(`/api/search`, {
         signal: abortController?.signal,
         params: {
@@ -32,6 +32,7 @@ export function reqSearch<T = any>(namespace: string, version: string, query: st
             allowClasses,
             allowFields,
             allowMethods,
+            translateMode: translateMode || "ns",
             translate,
         },
     })

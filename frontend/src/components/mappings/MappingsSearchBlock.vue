@@ -10,15 +10,7 @@
             </div>
         </div>
         <div class="flex flex-nowrap items-center">
-            <div class="px-4">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                     stroke-width="2"
-                     stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                    <circle cx="10" cy="10" r="7"></circle>
-                    <line x1="21" y1="21" x2="15" y2="15"></line>
-                </svg>
-            </div>
+            <IconSearch class="mx-4 flex-shrink-0"/>
             <input type="text" placeholder="Search..." class="input h-12 bg-transparent rounded-lg flex-1 px-0 text-lg" :value="searchText"
                    @keyup="searchTimeOut($event)" @keydown.space.prevent autofocus/>
         </div>
@@ -30,6 +22,7 @@ import {defineComponent} from "vue"
 import {mapState, mapWritableState} from "pinia"
 import {useMappingsStore} from "../../app/mappings-store"
 import MappingsFilterPill from "./MappingsFilterPill.vue"
+import {IconSearch} from "@tabler/icons-vue"
 
 export default defineComponent({
     name: "MappingsSearchBlock",
@@ -40,6 +33,7 @@ export default defineComponent({
     },
     components: {
         MappingsFilterPill,
+        IconSearch,
     },
     computed: {
         ...mapWritableState(useMappingsStore, ["allowClasses", "allowFields", "allowMethods"]),

@@ -17,7 +17,7 @@
                     About the project
                 </span>
                 <span class="text-sm">
-                    Linkie Web is not a Free and Open Source software, and sadly there are no plans to move forward with that.
+                    Linkie Web is copyrighted © ARR.
                     <br><br>The source code of Linkie Web is visible <a href="https://github.com/linkie/linkie-web" class="underline underline-offset-2 decoration-2 font-bold">here</a>, you are free to tinker with it,
                     compile from source, but redistribution (including network redistribution) is not allowed.
                     <br><br>The website backend is a simple wrapper based on Linkie Core, an FOSS component, used by Linkie the discord bot, and many others.

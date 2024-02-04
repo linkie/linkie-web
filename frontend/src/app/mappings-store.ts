@@ -9,7 +9,9 @@ interface State {
     allowFields: boolean,
     allowMethods: boolean,
     searchText: string,
+    translateMode?: string,
     translateAs?: string,
+    translateAsVersion?: string,
 }
 
 export interface VersionPossible {
@@ -26,6 +28,7 @@ function newState(): State {
         allowFields: true,
         allowMethods: true,
         searchText: "",
+        translateMode: undefined,
         translateAs: undefined,
     }
 }

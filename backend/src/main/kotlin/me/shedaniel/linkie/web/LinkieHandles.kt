@@ -36,11 +36,13 @@ val json = Json {
 }
 
 suspend fun search(
-    namespaceStr: String, translateNsStr: String?,
+    namespaceStr: String, translateNsStr: String?, translateVersion: String?,
     version: String?, query: String, allowClasses: Boolean,
     allowMethods: Boolean, allowFields: Boolean, limit: Int,
 ): SearchResultEntries {
     require(limit in 1..1000) { "Limit must be between 1 and 1000" }
+    if (translateNsStr != null) require(translateVersion == null) { "Cannot specify both translateNs and translateVersion" }
+    if (translateVersion != null) require(translateNsStr == null) { "Cannot specify both translateNs and translateVersion" }
     val namespace =
         Namespaces.namespaces[namespaceStr] ?: throw IllegalArgumentException("No namespace found for $namespaceStr")
     val translateNamespace = translateNsStr?.let {
@@ -58,6 +60,7 @@ suspend fun search(
     val provider = version?.let { namespace.getProvider(it) } ?: namespace.getProvider(defaultVersion)
     var mappings by Delegates.notNull<MappingsContainer>()
     var yarnMappings: MappingsContainer? = null
+    var translateMappings: MappingsContainer? = null
     coroutineScope {
         launch { withContext(Dispatchers.Default) { mappings = provider.get() } }
         if (!namespace.hasMethodArgs(provider.version!!) && provider.version!!.tryToVersion()?.takeIf { it > "1.14.4".toVersion() } != null) {
@@ -66,14 +69,20 @@ suspend fun search(
                 launch { withContext(Dispatchers.Default) { yarnMappings = yarnProvider.get() } }
             }
         }
+        if (translateNamespace != null) {
+            launch { withContext(Dispatchers.Default) { translateMappings = translateNamespace.getProvider(provider.version!!).get() } }
+        } else if (translateVersion != null) {
+            launch { withContext(Dispatchers.Default) { translateMappings = namespace.getProvider(translateVersion).get() } }
+        }
+        Unit
     }
     val result = MappingsQueryUtils.query(mappings, query, *buildList {
         if (allowClasses) add(MappingsEntryType.CLASS)
         if (allowMethods) add(MappingsEntryType.METHOD)
         if (allowFields) add(MappingsEntryType.FIELD)
     }.toTypedArray(), limit = limit)
-    val argMappings: (Class, Method) -> List<MethodArg>? = if (yarnMappings != null) {
-        inner@{ clazz, method ->
+    val argsMetadata: MethodArgMetadata = if (yarnMappings != null) {
+        MethodArgMetadata(namespace.id.contains("mojang")) inner@{ clazz, method ->
             val obfName = method.obfMergedName ?: return@inner null
             val obfDesc = method.getObfMergedDesc(mappings)
             val parentObfName = clazz.obfMergedName ?: return@inner null
@@ -84,20 +93,19 @@ suspend fun search(
 
             targetMethod.args
         }
-    } else { _, _ -> null }
-    if (translateNamespace == null) {
+    } else MethodArgMetadata(namespace)
+    if (translateMappings == null) {
         return SearchResultEntries(
             entries = result.results.asSequence().take(limit).mapNotNull {
-                toJsonFromEntry(namespace, mappings, it.value, it.score, argMappings)
+                toJsonFromEntry(mappings, it.value, it.score, argsMetadata)
             }.toList(),
             fuzzy = result.fuzzy,
         )
     } else {
-        val target = translateNamespace.getProvider(provider.version!!).get()
         val elements = mutableListOf<JsonElement>()
-        translate(mappings, target, result.results.asSequence().take(limit)) { from, to, score ->
-            toJsonFromEntry(namespace, mappings, from, score, argMappings)?.also { obj ->
-                val translated = toJsonFromEntry(translateNamespace, target, to, score) { _, _ -> null }
+        translate(mappings, translateMappings!!, translateNamespace != null, result.results.asSequence().take(limit)) { from, to, score ->
+            toJsonFromEntry(mappings, from, score, argsMetadata)?.also { obj ->
+                val translated = toJsonFromEntry(translateMappings!!, to, score, null)
                 if (translated == null) elements.add(obj)
                 else {
                     elements.add(buildJsonObject {
@@ -219,7 +227,7 @@ fun getLoaderVersions(loader: String): MutableMap<String, MutableMap<String, Dep
     return result
 }
 
-fun toJsonFromEntry(namespace: Namespace, mappings: MappingsContainer, entry: Any?, score: Double, argMappings: (Class, Method) -> List<MethodArg>?): JsonObject? {
+fun toJsonFromEntry(mappings: MappingsContainer, entry: Any?, score: Double, argsMetadata: MethodArgMetadata?): JsonObject? {
     return when (entry) {
         is Class -> json.encodeToJsonElement(
             SearchResultClassEntry.serializer(), SearchResultClassEntry(
@@ -254,9 +262,9 @@ fun toJsonFromEntry(namespace: Namespace, mappings: MappingsContainer, entry: An
                 memberType = if (entry.member is Field) "f" else "m"
             )
         ) as JsonObject).let {
-            if (entry.member is Method) {
+            if (entry.member is Method && argsMetadata != null) {
                 var guessed = false
-                val args = (entry.member as Method).args ?: (argMappings(entry.owner, entry.member as Method)?.also {
+                val args = (entry.member as Method).args ?: (argsMetadata.guesser(entry.owner, entry.member as Method)?.also {
                     guessed = true
                 } ?: return@let it)
                 val map = it.toMutableMap()
@@ -266,7 +274,7 @@ fun toJsonFromEntry(namespace: Namespace, mappings: MappingsContainer, entry: An
                     }
                 }
                 map["q"] = JsonPrimitive(guessed)
-                map["r"] = JsonPrimitive(!guessed && namespace.id.contains("mojang"))
+                map["r"] = JsonPrimitive(!guessed && argsMetadata.isMojang)
                 JsonObject(map)
             } else it
         }
@@ -276,6 +284,15 @@ fun toJsonFromEntry(namespace: Namespace, mappings: MappingsContainer, entry: An
 }
 
 fun translate(
+    source: MappingsContainer,
+    target: MappingsContainer,
+    matchObf: Boolean,
+    results: Sequence<ResultHolder<*>>,
+    callback: (Any, Any, Double) -> Unit,
+) = if (matchObf) translateViaObf(source, target, results, callback)
+else translateViaIntermediary(source, target, results, callback)
+
+fun translateViaObf(
     source: MappingsContainer,
     target: MappingsContainer,
     results: Sequence<ResultHolder<*>>,
@@ -296,7 +313,7 @@ fun translate(
                 val obfName = field.obfMergedName ?: return@forEach
                 val parentObfName = parent.obfMergedName ?: return@forEach
                 val targetParent = target.getClassByObfName(parentObfName) ?: return@forEach
-                val targetField = targetParent.fields.firstOrNull { it.obfMergedName == obfName } ?: return@forEach
+                val targetField = targetParent.getFieldByObfName(obfName) ?: return@forEach
 
                 callback(value, MemberEntry(targetParent, targetField), score)
             }
@@ -311,6 +328,50 @@ fun translate(
                 val targetParent = target.getClassByObfName(parentObfName) ?: return@forEach
                 val targetMethod =
                     targetParent.methods.firstOrNull { it.obfMergedName == obfName && it.getObfMergedDesc(target) == obfDesc }
+                        ?: return@forEach
+
+                callback(value, MemberEntry(targetParent, targetMethod), score)
+            }
+        }
+    }
+}
+
+fun translateViaIntermediary(
+    source: MappingsContainer,
+    target: MappingsContainer,
+    results: Sequence<ResultHolder<*>>,
+    callback: (Any, Any, Double) -> Unit,
+) {
+    results.forEach { (value, score) ->
+        when {
+            value is Class -> {
+                val intermediaryName = value.intermediaryName
+                val targetClass = target.getClass(intermediaryName) ?: return@forEach
+                callback(value, targetClass, score)
+            }
+
+            value is MemberEntry<*> && value.member is Field -> {
+                val parent = value.owner
+                val field = value.member as Field
+
+                val intermediaryName = field.intermediaryName
+                val parentIntermediaryName = parent.intermediaryName
+                val targetParent = target.getClass(parentIntermediaryName) ?: return@forEach
+                val targetField = targetParent.getField(intermediaryName) ?: return@forEach
+
+                callback(value, MemberEntry(targetParent, targetField), score)
+            }
+
+            value is MemberEntry<*> && value.member is Method -> {
+                val parent = value.owner
+                val method = value.member as Method
+
+                val intermediaryName = method.intermediaryName
+                val intermediaryDesc = method.intermediaryDesc
+                val parentIntermediaryName = parent.intermediaryName
+                val targetParent = target.getClass(parentIntermediaryName) ?: return@forEach
+                val targetMethod =
+                    targetParent.methods.firstOrNull { it.intermediaryName == intermediaryName && it.intermediaryDesc == intermediaryDesc }
                         ?: return@forEach
 
                 callback(value, MemberEntry(targetParent, targetMethod), score)
@@ -424,3 +485,10 @@ data class NamespaceEntry(
     val supportsFieldDescription: Boolean,
     val supportsSource: Boolean,
 )
+
+data class MethodArgMetadata(
+    val isMojang: Boolean,
+    val guesser: (Class, Method) -> List<MethodArg>?,
+) {
+    constructor(namespace: Namespace) : this(namespace.id.contains("mojang"), { _, _ -> null })
+}

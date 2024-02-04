@@ -12,7 +12,10 @@ import io.ktor.server.plugins.cors.routing.*
 import io.ktor.server.plugins.statuspages.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import kotlinx.serialization.json.*
+import kotlinx.serialization.json.addJsonObject
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
+import kotlinx.serialization.json.putJsonArray
 import me.shedaniel.linkie.Namespaces
 import me.shedaniel.linkie.RemapperDaemon
 import me.shedaniel.linkie.utils.tryToVersion
@@ -71,9 +74,10 @@ fun main() {
                     val allowClasses = call.parameters["allowClasses"]?.toBoolean() ?: true
                     val allowMethods = call.parameters["allowMethods"]?.toBoolean() ?: true
                     val allowFields = call.parameters["allowFields"]?.toBoolean() ?: true
-                    val translateNsStr = call.parameters["translate"]?.lowercase()
+                    val translateMode = call.parameters["translateMode"]?.lowercase()?.takeIf { it == "ns" || it == "ver" } ?: "ns"
+                    val translateStr = call.parameters["translate"]?.lowercase()
                     try {
-                        call.respond(search(namespaceStr, translateNsStr, version, query, allowClasses, allowMethods, allowFields, limit))
+                        call.respond(search(namespaceStr, translateStr?.takeIf { translateMode == "ns" }, translateStr?.takeIf { translateMode == "ver" }, version, query, allowClasses, allowMethods, allowFields, limit))
                     } catch (error: NullPointerException) {
                         call.respond(buildJsonObject {
                             put("error", error.message ?: error.toString())

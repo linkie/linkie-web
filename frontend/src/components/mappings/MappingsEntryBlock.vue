@@ -1,17 +1,20 @@
 <template>
     <Block>
         <SubHeader>
-            <div class="flex">
-                <div class="flex-1 overflow-x-auto flex flex-nowrap items-center">
-                    <Copyable :copy="getDisplayName(entry)">{{ getDisplayName(entry) }}</Copyable>
-                    <svg v-if="hasTranslation" xmlns="http://www.w3.org/2000/svg" class="mx-1 min-w-[22px]" width="24" height="24" viewBox="0 0 24 24"
-                         stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                        <polyline points="7 7 12 12 7 17"></polyline>
-                        <polyline points="13 7 18 12 13 17"></polyline>
-                    </svg>
-                    <Copyable v-if="hasTranslation" :copy="getDisplayName(entry.translatedTo!!)">{{ getDisplayName(entry.translatedTo) }}</Copyable>
-                    <div class="rounded-full text-[.75rem] px-[.438rem] inline-flex items-center justify-center h-4 ml-2 text-base-content"
+            <div class="flex gap-x-2">
+                <div class="flex-1 overflow-x-auto overflow-y-clip epic-scroller flex flex-nowrap items-center">
+                    <div class="whitespace-nowrap [&_>span]:cursor-pointer">
+                        <span v-if="entry.type !== 'class'" class="hover:underline peer" @click="copyAs($i18n, getDisplayName(entry))">{{ onlyClass(getOptimumOwnerName(entry)) }}.</span>
+                        <span class="hover:underline peer-hover:underline" @click="copyAs($i18n, onlyClass(getOptimumName(entry)))">{{ onlyClass(getOptimumName(entry)) }}</span>
+                        <CopyableIcon class="inline-block pl-0.5"/>
+                    </div>
+                    <IconChevronsRight class="ml-1.5 mr-1 min-w-[22px]" v-if="hasTranslation"/>
+                    <div class="whitespace-nowrap [&_>span]:cursor-pointer" v-if="hasTranslation">
+                        <span v-if="entry.translatedTo!!.type !== 'class'" class="hover:underline peer" @click="copyAs($i18n, getDisplayName(entry.translatedTo!!))">{{ onlyClass(getOptimumOwnerName(entry.translatedTo!!)) }}.</span>
+                        <span class="hover:underline peer-hover:underline" @click="copyAs($i18n, onlyClass(getOptimumName(entry.translatedTo!!)))">{{ onlyClass(getOptimumName(entry.translatedTo!!)) }}</span>
+                        <CopyableIcon class="inline-block pl-0.5"/>
+                    </div>
+                    <div class="rounded-full text-[.75rem] px-[.438rem] inline-flex items-center justify-center h-4 ml-2 text-base-content whitespace-nowrap"
                          :class="{
                             'bg-primary': entry.type === 'class',
                             'bg-secondary': entry.type === 'field',
@@ -19,68 +22,22 @@
                         }">{{ $t(`mappings.entry.type.${entry.type}`) }}
                     </div>
                 </div>
-                <div class="cursor-pointer" v-if="namespace?.supportsSource" @click="requestSource()">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-code" width="24" height="24" viewBox="0 0 24 24"
-                         stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                        <polyline points="7 8 3 12 7 16"></polyline>
-                        <polyline points="17 8 21 12 17 16"></polyline>
-                        <line x1="14" y1="4" x2="10" y2="20"></line>
-                    </svg>
+                <div class="cursor-pointer relative" v-if="namespace?.supportsSource" @click="requestSource()">
+                    <IconCode class="peer"/>
+                    <Tooltip class="font-medium">View Sources</Tooltip>
                 </div>
             </div>
         </SubHeader>
-        <div class="my-1 text-sm whitespace-nowrap flex items-center" v-if="entry.type === 'method'">
-            <div class="mr-2 relative" v-if="!!entry.argsGuessed || !!entry.argsParchment">
-                <svg v-if="!!entry.argsGuessed" xmlns="http://www.w3.org/2000/svg" class="peer" width="20" height="20" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                    <path d="M12 1.67c.955 0 1.845 .467 2.39 1.247l.105 .16l8.114 13.548a2.914 2.914 0 0 1 -2.307 4.363l-.195 .008h-16.225a2.914 2.914 0 0 1 -2.582 -4.2l.099 -.185l8.11 -13.538a2.914 2.914 0 0 1 2.491 -1.403zm.01 13.33l-.127 .007a1 1 0 0 0 0 1.986l.117 .007l.127 -.007a1 1 0 0 0 0 -1.986l-.117 -.007zm-.01 -7a1 1 0 0 0 -.993 .883l-.007 .117v4l.007 .117a1 1 0 0 0 1.986 0l.007 -.117v-4l-.007 -.117a1 1 0 0 0 -.993 -.883z" stroke-width="0" fill="currentColor"/>
-                </svg>
-                <svg v-else-if="!!entry.argsParchment" xmlns="http://www.w3.org/2000/svg" class="peer" width="20" height="20" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                    <path d="M19 2a3 3 0 0 1 2.995 2.824l.005 .176v14a3 3 0 0 1 -2.824 2.995l-.176 .005h-14a3 3 0 0 1 -2.995 -2.824l-.005 -.176v-14a3 3 0 0 1 2.824 -2.995l.176 -.005h14zm-7 9h-1l-.117 .007a1 1 0 0 0 0 1.986l.117 .007v3l.007 .117a1 1 0 0 0 .876 .876l.117 .007h1l.117 -.007a1 1 0 0 0 .876 -.876l.007 -.117l-.007 -.117a1 1 0 0 0 -.764 -.857l-.112 -.02l-.117 -.006v-3l-.007 -.117a1 1 0 0 0 -.876 -.876l-.117 -.007zm.01 -3l-.127 .007a1 1 0 0 0 0 1.986l.117 .007l.127 -.007a1 1 0 0 0 0 -1.986l-.117 -.007z" stroke-width="0" fill="currentColor"/>
-                </svg>
-                <Tooltip>
-                    <div v-if="!!entry.argsGuessed" class="flex flex-col gap-1">
-                        <div class="flex items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="mr-1.5" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                                <path d="M12 9v4"/>
-                                <path d="M10.363 3.591l-8.106 13.534a1.914 1.914 0 0 0 1.636 2.871h16.214a1.914 1.914 0 0 0 1.636 -2.87l-8.106 -13.536a1.914 1.914 0 0 0 -3.274 0z"/>
-                                <path d="M12 16h.01"/>
-                            </svg>
-                            <span class="font-semibold">Warning</span>
-                        </div>
-                        The method argument mappings are aggregated from other mapping projects,<br>
-                        and may not be accurate or fit the current context.<br><br>
-                        This may be the result of the lack of a proper source for this mappings or this version.
-                    </div>
-                    <div v-else-if="!!entry.argsParchment" class="flex flex-col gap-1">
-                        <div class="flex items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="mr-1.5" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                                <path d="M12 9h.01"/>
-                                <path d="M3 5a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v14a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-14z"/>
-                                <path d="M11 12h1v4h1"/>
-                            </svg>
-                            <span class="font-semibold">Info</span>
-                        </div>
-                        The method argument mappings are provided from a community project, ParchmentMC, <br>
-                        and may not be accurate, or may be subject to a different license.
-                    </div>
-                </Tooltip>
-            </div>
-            <div class="font-mono overflow-x-auto epic-scroller">
-                <span class="font-bold">{{ methodReturnType(entry) }}</span>
-                {{ onlyClass(getOptimumName(entry)) }}(<!---->
-                <AutoBold class="[&_.bold]:font-bold">{{ methodArgs(entry) }}</AutoBold><!--
-                -->)
-            </div>
-        </div>
-        <div class="breadcrumbs text-sm max-w-full overflow-x-auto epic-scroller py-2" v-if="breadcrumbs.length > 1">
+        <MappingsMethodLine v-if="entry.type === 'method'"
+                            :only-class="onlyClass" :get-optimum-name="getOptimumName" :method-args="methodArgs" :method-return-type="methodReturnType" :entry="entry"/>
+        <div class="breadcrumbs text-sm max-w-full overflow-x-auto overflow-y-clip epic-scroller py-2" v-if="breadcrumbs.length > 1">
             <ul class="flex items-center whitespace-nowrap">
                 <li v-for="breadcrumb in breadcrumbs" class="flex items-center">
-                    <Copyable :copy="breadcrumb" strokeWidth="1">{{ breadcrumb }}</Copyable>
+                    <div class="whitespace-nowrap [&_>span]:cursor-pointer">
+                        <span v-if="breadcrumb.includes('.')" class="hover:underline peer" @click="copyAs($i18n, breadcrumb)">{{ breadcrumb.substring(0, breadcrumb.lastIndexOf(".")) }}.</span>
+                        <span class="hover:underline peer-hover:underline" @click="copyAs($i18n, breadcrumb.substring(breadcrumb.lastIndexOf('.') + 1))">{{ breadcrumb.substring(breadcrumb.lastIndexOf(".") + 1) }}</span>
+                        <CopyableIcon class="inline-block pl-0.5" stroke-width="1"/>
+                    </div>
                 </li>
             </ul>
         </div>
@@ -152,6 +109,10 @@ import Prism, {TokenStream} from "prismjs"
 import GeneratorDescription from "../generator/GeneratorDescription.vue"
 import AutoBold from "./AutoBold.vue"
 import Tooltip from "../Tooltip.vue"
+import CopyableIcon from "../CopyableIcon.vue"
+import {copyAs} from "../../app/copy"
+import MappingsMethodLine from "./MappingsMethodLine.vue"
+import {IconChevronsRight, IconCode, IconFileText} from "@tabler/icons-vue"
 
 function getOptimumName(entry: MappingEntry): string {
     return entry.named || entry.intermediary || ""
@@ -329,13 +290,14 @@ function beautifyFieldType(type: string) {
 
 export default defineComponent({
     name: "MappingsEntryBlock",
-    components: {Tooltip, AutoBold, GeneratorDescription, Copyable, CodeBlock, EntryDetails, SubHeader, Header, Block},
+    components: {MappingsMethodLine, CopyableIcon, Tooltip, AutoBold, GeneratorDescription, Copyable, CodeBlock, EntryDetails, SubHeader, Header, Block, IconChevronsRight, IconCode, IconFileText},
     data() {
         return {
             getDisplayName,
             expandSource: null as string | null,
             source: "",
             getOptimumName,
+            getOptimumOwnerName,
             onlyClass,
         }
     },
@@ -469,6 +431,7 @@ export default defineComponent({
         },
     },
     methods: {
+        copyAs,
         mixinTarget(entry: MappingEntry) {
             return `L${getOptimumOwnerName(entry)};${getOptimumName(entry)}${entry.type === "field" ? ":" : ""}${getOptimumDesc(entry)}`
         },
@@ -535,7 +498,7 @@ export default defineComponent({
                     }
                 }
             }
-            
+
             let apply = false
             if (max - min + 1 - twoSpaces == args.length) apply = true
             return args.map((arg, index) => {

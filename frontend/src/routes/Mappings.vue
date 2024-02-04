@@ -8,8 +8,8 @@
         <PageContent class="flex flex-col gap-y-5">
             <MappingsSearchBlock/>
             <MappingsEntryBlock v-for="entry in infoData.entries"
-                                :namespace="mappingsData.namespaces.find(value => value.id === infoData.namespace)!!"
-                                :translated-to-namespace="infoData.translateAs ? mappingsData.namespaces.find(value => value.id === infoData.translateAs) : undefined"
+                                :namespace="namespaceObj"
+                                :translated-to-namespace="infoData.translateAs ? mappingsData.namespaces.find(value => value.id === infoData.translateAs) : (infoData.translateAsVersion ? namespaceObj : undefined)"
                                 :entry="entry" :version="version" :query="searchText"/>
             <MappingsSearchPlaceholder v-if="infoData.entries.length == 0"
                                        :searching="!!searchController"
@@ -27,7 +27,7 @@ import {mapState} from "pinia"
 import MappingsSearchBlock from "../components/mappings/MappingsSearchBlock.vue"
 import MappingsEntryBlock from "../components/mappings/MappingsEntryBlock.vue"
 import MappingsFilterBlock from "../components/mappings/MappingsFilterBlock.vue"
-import {ensureMappingsData, updateMappingsData, updateMappingsInfo, useMappingsDataStore} from "../app/mappings-data"
+import {ensureMappingsData, Namespace, updateMappingsData, updateMappingsInfo, useMappingsDataStore} from "../app/mappings-data"
 import MappingsSearchPlaceholder from "../components/mappings/MappingsSearchPlaceholder.vue"
 import PageWidthLimiter from "../components/PageWidthLimiter.vue"
 import PageSidebar from "../components/PageSidebar.vue"
@@ -43,8 +43,11 @@ export default defineComponent({
         PageContent, PageSidebar, PageWidthLimiter, MappingsSearchPlaceholder, MappingsFilterBlock, MappingsSearchBlock, MappingsEntryBlock,
     },
     computed: {
+        namespaceObj(): Namespace {
+            return this.mappingsData.namespaces.find(value => value.id === this.infoData.namespace)!!
+        },
         ...mapState(useMappingsDataStore, ["mappingsData", "infoData", "searchController"]),
-        ...mapState(useMappingsStore, ["namespace", "version", "allowSnapshots", "searchText", "allowClasses", "allowMethods", "allowFields", "translateAs"]),
+        ...mapState(useMappingsStore, ["namespace", "version", "allowSnapshots", "searchText", "allowClasses", "allowMethods", "allowFields", "translateAs", "translateAsVersion"]),
     },
     watch: {
         namespace: {
@@ -94,6 +97,13 @@ export default defineComponent({
             immediate: true,
         },
         translateAs: {
+            handler() {
+                ensureMappingsData()
+                updateMappingsInfo()
+            },
+            immediate: true,
+        },
+        translateAsVersion: {
             handler() {
                 ensureMappingsData()
                 updateMappingsInfo()
