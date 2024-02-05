@@ -24,7 +24,7 @@
                 </div>
                 <div class="cursor-pointer relative" v-if="namespace?.supportsSource" @click="requestSource()">
                     <IconCode class="peer"/>
-                    <Tooltip class="font-medium">View Sources</Tooltip>
+                    <Tooltip class="font-medium" placement="left">{{ $t("mappings.entry.view.sources") }}</Tooltip>
                 </div>
             </div>
         </SubHeader>

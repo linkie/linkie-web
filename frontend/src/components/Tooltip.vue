@@ -12,13 +12,13 @@
 </template>
 
 <script lang="ts">
-import {defineComponent} from "vue"
+import {defineComponent, PropType} from "vue"
 
 export default defineComponent({
     name: "Tooltip",
     props: {
         placement: {
-            type: String,
+            type: Object as PropType<"left" | "right">,
             default: "right",
         },
     }

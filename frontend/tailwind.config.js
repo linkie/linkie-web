@@ -8,7 +8,7 @@ module.exports = {
     theme: {
         extend: {},
         fontFamily: {
-            "sans": ["Inter"],
+            "sans": ["Inter", "Noto Sans TC", "Noto Sans SC"],
             "mono": ["Jetbrains Mono"],
         },
         colors: {

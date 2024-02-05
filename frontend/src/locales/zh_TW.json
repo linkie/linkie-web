@@ -49,6 +49,8 @@
     "mappings.version.snapshots": "啟用快照版:",
     "mappings.translation": "翻譯",
     "mappings.translation.none": "禁用翻譯",
+    "mappings.translation.another.namespace": "翻譯至另一方案",
+    "mappings.translation.another.version": "翻譯至另一版本",
     "mappings.translation.n/a": "N/a",
     "mappings.search.type": "搜尋類型:",
     "mappings.search.type.classes": "類型",

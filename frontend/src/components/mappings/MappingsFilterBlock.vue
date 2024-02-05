@@ -64,7 +64,10 @@
                     v.hasTranslation ? 'transition-all bg-base-700 dark:hover:bg-base-dark-600 bg-opacity-0 hover:bg-opacity-60 rounded-md cursor-pointer' : 'cursor-not-allowed line-through decoration-base-content hover:decoration-base-content dark:decoration-base-dark-content dark:hover:decoration-base-dark-content',
                     'px-2 py-1 underline underline-offset-2 decoration-2']"
                    @click="version = v.hasTranslation ? v.version : version">
-                    {{ !v.hasTranslation ? $t("mappings.version.no.translation", {version: v.version}) : v.version }}
+                    {{
+                        // noinspection TypeScriptValidateTypes
+                        !v.hasTranslation ? $t("mappings.version.no.translation", {version: v.version}) : v.version
+                    }}
                 </p>
             </div>
         </div>
@@ -80,19 +83,19 @@
                         class="selection-button py-2 px-3 flex-1 flex items-center gap-3 text-left rounded-lg bg-base-500 dark:bg-base-dark-200 bg-opacity-60 hover:bg-opacity-100
                 dark:hover:bg-base-dark-400 dark:focus:bg-base-dark-400 transition-all duration-150 border-none select-none">
                     <IconArrowBarToRight class="flex-shrink-0" :size="20"/>
-                    No Translation
+                    {{ $t("mappings.translation.none") }}
                 </button>
                 <button :aria-selected="(translateMode ?? 'none') === 'ns'" @click="translateMode = 'ns'; translateAs = undefined; translateAsVersion = undefined"
                         class="selection-button py-2 px-3 flex-1 flex items-center gap-3 text-left rounded-lg bg-base-500 dark:bg-base-dark-200 bg-opacity-60 hover:bg-opacity-100
                 dark:hover:bg-base-dark-400 dark:focus:bg-base-dark-400 transition-all duration-150 border-none select-none">
                     <IconArrowBounce class="flex-shrink-0" :size="20"/>
-                    Translate to another Namespace
+                    {{ $t("mappings.translation.another.namespace") }}
                 </button>
                 <button :aria-selected="(translateMode ?? 'none') === 'ver'" @click="translateMode = 'ver'; translateAs = undefined; translateAsVersion = undefined"
                         class="selection-button py-2 px-3 flex-1 flex items-center gap-3 text-left rounded-lg bg-base-500 dark:bg-base-dark-200 bg-opacity-60 hover:bg-opacity-100
                 dark:hover:bg-base-dark-400 dark:focus:bg-base-dark-400 transition-all duration-150 border-none select-none">
                     <IconArrowIteration class="flex-shrink-0" :size="20"/>
-                    Translate to another Version
+                    {{ $t("mappings.translation.another.version") }}
                 </button>
             </div>
             <div v-if="(translateMode ?? 'none') === 'ns'" class="pt-4">

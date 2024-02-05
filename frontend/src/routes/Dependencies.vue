@@ -18,7 +18,7 @@
         <PageContent class="flex flex-col gap-y-5">
             <Block v-for="[blockName, block] in dependencyBlocks"
                    :id="'dep-' + dependencyBlocks.findIndex(entry => entry[0] === blockName)">
-                <div class="text-2xl font-extrabold mb-2">{{ blockName }}</div>
+                <div class="text-2xl font-bold mb-2">{{ blockName }}</div>
                 <div v-if="block.mavens.length > 0" class="flex flex-col gap-1">
                     <div v-for="maven in block.mavens">
                         <div class="font-bold" v-if="block.mavens.indexOf(maven) === 0 && !maven.subtitle"> {{ $t("dependencies.maven.repo") }}</div>

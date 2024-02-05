@@ -14,7 +14,7 @@ import Alerts from "./components/Alerts.vue"
 import {useI18nStore} from "./app/i18n-store"
 import {isTauri, tauriInit} from "./app/tauri/tauri"
 import Tauri from "./components/tauri/Tauri.vue"
-import SourcesStatus from "./routes/SourcesStatus.vue";
+import SourcesStatus from "./routes/SourcesStatus.vue"
 
 const routes: { [route: string]: any; } = {
     "/": Home,
@@ -43,6 +43,16 @@ export default defineComponent({
         locale(): string {
             return this.$i18n.locale
         },
+        fontLink(): string | undefined {
+            switch (this.locale) {
+                case "zh_TW":
+                    return "https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@100..900"
+                case "zh_CN":
+                    return "https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@100..900"
+                default:
+                    return undefined
+            }
+        }
     },
     mounted() {
         this.$i18n.locale = this.$i18n.availableLocales.find((locale: string) => locale === useI18nStore().locale) ?? "en_US"
@@ -64,7 +74,7 @@ export default defineComponent({
             document.documentElement.classList.remove("dark")
             document.documentElement.style.setProperty("--color-scheme", "light")
         }
-        
+
         if (isTauri()) {
             tauriInit()
         }
@@ -74,6 +84,7 @@ export default defineComponent({
 </script>
 
 <template>
+    <link rel="stylesheet" :href="fontLink" v-if="!!fontLink">
     <meta name="theme-color" :key="theme" :content="theme === 'cupcake' ? '#efeae6' : '#242933'">
     <div class="overflow-x-hidden text-base-content dark:text-base-dark-content" :key="locale">
         <Navbar class="top-0 fixed z-10" :class="`navbar-${current}`"/>
@@ -93,7 +104,7 @@ export default defineComponent({
 </template>
 
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900');
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap');
 
 body {

@@ -57,6 +57,8 @@
     "mappings.version.no.translation": "{version}（无映射转换）",
     "mappings.translation": "映射转换",
     "mappings.translation.none": "不转换",
+    "mappings.translation.another.namespace": "转换至另一命名空间",
+    "mappings.translation.another.version": "转换至另一版本",
     "mappings.translation.n/a": "N/a",
     "mappings.search.type": "搜索类型：",
     "mappings.search.type.classes": "类",

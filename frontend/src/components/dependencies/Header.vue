@@ -1,5 +1,5 @@
 <template>
-    <div class="pb-2 text-base-content dark:text-base-dark-content font-extrabold text-3xl">
+    <div class="pb-2 text-base-content dark:text-base-dark-content font-bold text-3xl">
         <slot/>
     </div>
     <div class="divider mt-0 mb-0"/>
