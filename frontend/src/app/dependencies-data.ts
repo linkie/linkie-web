@@ -1,8 +1,9 @@
-import {reqVersions} from "./backend"
+import {getQuery, reqVersions} from "./backend"
 import {addAlert} from "./alerts"
 import {applicableDependencyVersions, useDependencySearchStore} from "./dependency-store"
 import {DependencyType} from "./dep-format"
 import {defineStore} from "pinia"
+import {LocationQuery} from "vue-router"
 
 export interface VersionEntry {
     version: string,
@@ -54,12 +55,12 @@ export const useDependenciesDataStore = defineStore({
     state: newState,
 })
 
-export function updateDependencyData(applyURL: boolean = false) {
+export function updateDependencyData(fullPath?: string, query: LocationQuery | null = null) {
     let store = useDependenciesDataStore()
-    if (applyURL || (Object.keys(store.searchData.versions).length == 0 && !store.reqVersionsPromise)) {
+    if (query || (Object.keys(store.searchData.versions).length == 0 && !store.reqVersionsPromise)) {
         store.reqVersionsPromise = reqVersions().then(value => {
             store.searchData.versions = value.data
-            ensureDependencyData(applyURL)
+            ensureDependencyData(fullPath, query)
         }).catch(reason => {
             addAlert({
                 type: "error",
@@ -71,21 +72,20 @@ export function updateDependencyData(applyURL: boolean = false) {
     }
 }
 
-export function ensureDependencyData(applyURL: boolean = false) {
+export function ensureDependencyData(fullPath?: string, query: LocationQuery | null = null) {
     let store = useDependenciesDataStore()
 
-    if (applyURL) {
-        const urlParams = new URLSearchParams(window.location.search)
+    if (query) {
         let {searchData} = useDependenciesDataStore()
         let loaders = Object.keys(searchData.versions)
 
-        if (loaders.includes(urlParams.get("loader") ?? "")) {
-            useDependencySearchStore().loader = (urlParams.get("loader") ?? "") as string
+        if (loaders.includes(getQuery(query, "loader") ?? "")) {
+            useDependencySearchStore().loader = (getQuery(query, "loader") ?? "") as string
             useDependencySearchStore().version = undefined
         }
 
-        if (applicableDependencyVersions().includes(urlParams.get("version") ?? "")) {
-            useDependencySearchStore().version = (urlParams.get("version") ?? "") as string
+        if (applicableDependencyVersions().includes(getQuery(query, "version") ?? "")) {
+            useDependencySearchStore().version = (getQuery(query, "version") ?? "") as string
         }
 
         useDependenciesDataStore().hasFirstLoaded = true
@@ -107,14 +107,14 @@ export function ensureDependencyData(applyURL: boolean = false) {
         }
     }
 
-    if (useDependenciesDataStore().hasFirstLoaded) {
-        updateDependenciesWindowUrl()
+    if (useDependenciesDataStore().hasFirstLoaded && fullPath) {
+        updateDependenciesWindowUrl(fullPath)
     }
 }
 
-export function updateDependenciesWindowUrl() {
+export function updateDependenciesWindowUrl(fullPath: string) {
     let {loader, version} = useDependencySearchStore()
-    let url = new URL(window.location.href)
+    let url = new URL(fullPath)
     url.searchParams.set("loader", loader ?? "")
     url.searchParams.set("version", version ?? "")
     window.history.replaceState({}, "", url.toString())

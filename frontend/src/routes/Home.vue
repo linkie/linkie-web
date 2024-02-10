@@ -1,6 +1,6 @@
 <template>
     <div class="flex flex-col">
-        <h1 class="pt-40 pb-28 text-center text-6xl font-bold title-home text-white"> {{ $t("home.welcome") }} </h1>
+        <h1 id="welcome-banner" class="pt-40 pb-28 text-center text-6xl font-bold title-home text-white"> {{ $t("home.welcome") }} </h1>
 
         <PageWidthLimiter class="pt-8">
             <PageContent>
@@ -19,7 +19,7 @@
                 </div>
 
                 <Header> {{ $t("home.quick.access") }}</Header>
-                <a class="flex flex-nowrap gap-2 pb-2" href="/dependencies">
+                <router-link class="flex flex-nowrap gap-2 pb-2" to="/dependencies">
                     <SubHeader class="text-2xl">{{ $t("home.dependencies") }}</SubHeader>
                     <div class="flex flex-col">
                         <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler flex-1" width="20" height="20" viewBox="0 0 24 24"
@@ -30,10 +30,10 @@
                             <polyline points="15 4 20 4 20 9"></polyline>
                         </svg>
                     </div>
-                </a>
+                </router-link>
                 <HomeDependencies/>
 
-                <a class="flex flex-nowrap gap-2 pt-6 pb-2" href="/mappings">
+                <router-link class="flex flex-nowrap gap-2 pt-6 pb-2" to="/mappings">
                     <SubHeader class="text-2xl">{{ $t("home.mappings") }}</SubHeader>
                     <div class="flex flex-col">
                         <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler flex-1" width="20" height="20" viewBox="0 0 24 24"
@@ -44,7 +44,7 @@
                             <polyline points="15 4 20 4 20 9"></polyline>
                         </svg>
                     </div>
-                </a>
+                </router-link>
                 <HomeMappings/>
             </PageContent>
         </PageWidthLimiter>
@@ -78,7 +78,7 @@ export default defineComponent({
 </style>
 <style>
 .navbar-\/ {
-    color: white !important;
+    color: white;
 }
 
 .locale-dropdown {

@@ -27,9 +27,11 @@ export default defineComponent({
     props: {
         consoleEnabled: {
             type: Boolean,
+            required: true,
         },
         setConsoleEnabled: {
             type: Object as PropType<(enabled: boolean) => {}>,
+            required: true,
         },
     },
 })

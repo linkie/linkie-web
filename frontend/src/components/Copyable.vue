@@ -6,7 +6,7 @@
 </template>
 
 <script lang="ts">
-import {defineComponent, PropType} from "vue"
+import {defineComponent} from "vue"
 import {copyAs} from "../app/copy"
 import CopyableIcon from "./CopyableIcon.vue"
 

@@ -2,16 +2,16 @@ import {defineStore} from "pinia"
 import {useMappingsDataStore} from "./mappings-data"
 
 interface State {
-    namespace?: string,
-    version?: string,
+    namespace: string | undefined,
+    version: string | undefined,
     allowSnapshots: boolean,
     allowClasses: boolean,
     allowFields: boolean,
     allowMethods: boolean,
     searchText: string,
-    translateMode?: string,
-    translateAs?: string,
-    translateAsVersion?: string,
+    translateMode: string | undefined,
+    translateAs: string | undefined,
+    translateAsVersion: string | undefined,
 }
 
 export interface VersionPossible {
@@ -30,6 +30,7 @@ function newState(): State {
         searchText: "",
         translateMode: undefined,
         translateAs: undefined,
+        translateAsVersion: undefined,
     }
 }
 

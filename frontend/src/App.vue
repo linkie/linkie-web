@@ -1,41 +1,24 @@
 <script lang="ts">
 import {defineComponent} from "vue"
 
-import Home from "./routes/Home.vue"
-import Dependencies from "./routes/Dependencies.vue"
-import Generator from "./routes/Generator.vue"
-import Mappings from "./routes/Mappings.vue"
-import OpenSourceLicenses from "./routes/OpenSourceLicenses.vue"
-
-import NotFound from "./routes/NotFound.vue"
 import Footer from "./components/Footer.vue"
 import Navbar from "./components/Navbar.vue"
 import Alerts from "./components/Alerts.vue"
 import {useI18nStore} from "./app/i18n-store"
 import {isTauri, tauriInit} from "./app/tauri/tauri"
 import Tauri from "./components/tauri/Tauri.vue"
-import SourcesStatus from "./routes/SourcesStatus.vue"
-
-const routes: { [route: string]: any; } = {
-    "/": Home,
-    "/dependencies": Dependencies,
-    "/generator": Generator,
-    "/mappings": Mappings,
-    "/oss": OpenSourceLicenses,
-    "/status/sources": SourcesStatus,
-}
 
 export default defineComponent({
     data() {
         return {
-            current: window.location.pathname as string,
             isTauri,
+            allowTransition: false,
         }
     },
     components: {Tauri, Alerts, Footer, Navbar},
     computed: {
-        currentView() {
-            return routes[this.current || "/"] || NotFound
+        current(): string {
+            return this.$route.path
         },
         theme(): string {
             return localStorage.getItem("theme") ?? ""
@@ -52,7 +35,7 @@ export default defineComponent({
                 default:
                     return undefined
             }
-        }
+        },
     },
     mounted() {
         this.$i18n.locale = this.$i18n.availableLocales.find((locale: string) => locale === useI18nStore().locale) ?? "en_US"
@@ -78,6 +61,10 @@ export default defineComponent({
         if (isTauri()) {
             tauriInit()
         }
+
+        setTimeout(() => {
+            this.allowTransition = true
+        }, 1000)
     },
 })
 
@@ -90,9 +77,23 @@ export default defineComponent({
         <Navbar class="top-0 fixed z-10" :class="`navbar-${current}`"/>
 
         <div class="min-h-[100vh] flex flex-col justify-between bg-base-floor">
-            <div v-if="current !== '/'" class="pt-[4.5rem]"/>
+            <transition :enter-active-class="`duration-500 ${allowTransition ? 'transition-all' : 'transition-none'}`"
+                        enter-from-class="!mt-0"
+                        :leave-active-class="`duration-500 ${allowTransition ? 'transition-all' : 'transition-none'}`"
+                        leave-to-class="!mt-0">
+                <div v-if="current !== '/'" class="mt-[4.5rem]"/>
+            </transition>
             <div class="grow shrink-0">
-                <component :is="currentView"/>
+                <router-view v-slot="{ Component, route }">
+                    <transition enter-active-class="transition-opacity duration-250 delay-250 ease-linear"
+                                enter-from-class="opacity-50"
+                                enter-to-class="opacity-100"
+                                leave-active-class="transition-opacity duration-250 ease-linear"
+                                leave-from-class="opacity-100"
+                                leave-to-class="opacity-50">
+                        <component :is="Component"/>
+                    </transition>
+                </router-view>
             </div>
             <Footer v-if="!isTauri()"/>
             <div v-else class="h-10"/>

@@ -124,7 +124,7 @@ export default defineComponent({
     name: "GeneratorBuildSystem",
     components: {TransitionFadeIn, GeneratorDescription, GeneratorOptionEntry, GeneratorOptions},
     computed: {
-        ...mapWritableState(useGeneratorStore, ["template", "gradleSystem", "mappings", "modLoaders", "gradleLanguage", "splitEnv"]),
+        ...mapWritableState(useGeneratorStore, ["template", "gradleSystem", "mappings", "parchment", "modLoaders", "gradleLanguage", "splitEnv"]),
     },
     methods: {
         canChoosePlugin() {

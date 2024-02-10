@@ -1,5 +1,6 @@
 import {createApp} from "vue"
 import {createI18n} from "vue-i18n"
+import {createRouter, createWebHistory} from "vue-router"
 import axios from "axios"
 import VueAxios from "vue-axios"
 import App from "./App.vue"
@@ -18,10 +19,11 @@ import enGB from "./locales/en_GB.json"
 import zhCN from "./locales/zh_CN.json"
 // @ts-ignore
 import zhTW from "./locales/zh_TW.json"
-import {isTauri} from "./app/tauri/tauri";
+import {isTauri} from "./app/tauri/tauri"
+import {routes} from "./app/routes"
 // @ts-ignore
 
-Prism.manual = true;
+Prism.manual = true
 
 NProgress.configure({
     showSpinner: false,
@@ -62,11 +64,19 @@ const i18n = createI18n({
     },
 })
 
-let pinia = createPinia()
+const router = createRouter({
+    history: createWebHistory(),
+    routes,
+    scrollBehavior(to, from, savedPosition) {
+        return {top: 0}
+    },
+})
 
+const pinia = createPinia()
 pinia.use(persistedState)
 
 app.use(pinia)
+app.use(router)
 app.use(VueAxios, axios)
 app.provide("axios", app.config.globalProperties.axios)
 

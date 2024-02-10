@@ -1,12 +1,11 @@
 <template>
-    <a :class="[
-            'px-4 py-3 rounded-lg transition-all normal-case flex items-center',
+    <router-link :class="[
+            'px-4 py-3 rounded-lg transition-all duration-100 normal-case flex items-center',
             bold ? 'text-xl font-bold' : 'font-medium',
             hoverDim ? 'hover:opacity-70' : '',
-    ]" :href="href">
+    ]" :to="{path: (href ?? ''), query: {}}">
         <slot/>
-    </a>
-
+    </router-link>
 </template>
 
 <script lang="ts">

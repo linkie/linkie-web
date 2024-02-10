@@ -34,6 +34,7 @@ import PageSidebar from "../components/PageSidebar.vue"
 import PageContent from "../components/PageContent.vue"
 import LoadingSection from "../components/LoadingSection.vue"
 import Block from "../components/Block.vue"
+import {fullPath} from "../app/backend"
 
 export default defineComponent({
     name: "Mappings",
@@ -52,67 +53,67 @@ export default defineComponent({
     watch: {
         namespace: {
             handler() {
-                updateMappingsData()
-                ensureMappingsData()
-                updateMappingsInfo()
+                updateMappingsData(fullPath())
+                ensureMappingsData(fullPath())
+                updateMappingsInfo(fullPath())
             },
             immediate: true,
         },
         version: {
             handler() {
-                updateMappingsData()
-                ensureMappingsData()
-                updateMappingsInfo()
+                updateMappingsData(fullPath())
+                ensureMappingsData(fullPath())
+                updateMappingsInfo(fullPath())
             },
             immediate: true,
         },
         allowSnapshots: {
             handler() {
-                ensureMappingsData()
+                ensureMappingsData(fullPath())
             },
             immediate: true,
         },
         searchText: {
             handler() {
-                updateMappingsInfo()
+                updateMappingsInfo(fullPath())
             },
             immediate: true,
         },
         allowClasses: {
             handler() {
-                updateMappingsInfo()
+                updateMappingsInfo(fullPath())
             },
             immediate: true,
         },
         allowMethods: {
             handler() {
-                updateMappingsInfo()
+                updateMappingsInfo(fullPath())
             },
             immediate: true,
         },
         allowFields: {
             handler() {
-                updateMappingsInfo()
+                updateMappingsInfo(fullPath())
             },
             immediate: true,
         },
         translateAs: {
             handler() {
-                ensureMappingsData()
-                updateMappingsInfo()
+                ensureMappingsData(fullPath())
+                updateMappingsInfo(fullPath())
             },
             immediate: true,
         },
         translateAsVersion: {
             handler() {
-                ensureMappingsData()
-                updateMappingsInfo()
+                ensureMappingsData(fullPath())
+                updateMappingsInfo(fullPath())
             },
             immediate: true,
         },
     },
     mounted() {
-        updateMappingsData(true)
+        updateMappingsData(fullPath(), this.$route.query)
     },
 })
 </script>

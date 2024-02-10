@@ -58,7 +58,7 @@ import Header from "../components/dependencies/Header.vue"
 import {ensureMappingsData, updateMappingsData, useMappingsDataStore} from "../app/mappings-data"
 import {mapState} from "pinia"
 import NamespaceFilterBlock from "../components/statuses/NamespaceFilterBlock.vue"
-import {namespaceLocalizations, reqStatusSource} from "../app/backend"
+import {fullPath, namespaceLocalizations, reqStatusSource} from "../app/backend"
 
 interface Cache {
     stable: boolean,
@@ -120,8 +120,8 @@ export default defineComponent({
         },
     },
     mounted() {
-        updateMappingsData()
-        ensureMappingsData()
+        updateMappingsData(fullPath())
+        ensureMappingsData(fullPath())
     },
 })
 </script>

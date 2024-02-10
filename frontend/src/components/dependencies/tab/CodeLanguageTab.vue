@@ -7,9 +7,9 @@
 </template>
 
 <script lang="ts">
-import {defineComponent} from "vue"
+import {defineComponent, PropType} from "vue"
 import {mapWritableState} from "pinia"
-import {usePreferenceStore} from "../../../app/preference-store"
+import {CodeLanguage, usePreferenceStore} from "../../../app/preference-store"
 
 export default defineComponent({
     name: "CodeLanguageTab",
@@ -18,7 +18,8 @@ export default defineComponent({
     },
     props: {
         language: {
-            type: String,
+            type: String as PropType<CodeLanguage>,
+            required: true,
         },
     },
 })

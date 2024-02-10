@@ -10,7 +10,7 @@
             <br/><br/>You can create projects with *Fabric*, *Forge*, or *Architectury*, at the moment, with more options coming soon.
             <br/>You also get options for *Build Language* (Kotlin or Groovy), *Mixins*, *Build Plugins* (Loom or ForgeGradle), *Mappings* (Yarn or Official),
             Parchment, and more!
-            <br/><br/>Try it out now! ⊂◉‿◉つ {{ (current === "/" ? "It is accessible on the navigation bar at the top of the page." : "") }}
+            <br/><br/>Try it out now! ⊂◉‿◉つ {{ ($route.path === "/" ? "It is accessible on the navigation bar at the top of the page." : "") }}
         </generator-description>
     </div>
 </template>
@@ -22,11 +22,6 @@ import GeneratorDescription from "./generator/GeneratorDescription.vue"
 export default defineComponent({
     name: "NewsProjectGenerator",
     components: {GeneratorDescription},
-    data() {
-        return {
-            current: window.location.pathname as string,
-        }
-    },
 })
 </script>
 

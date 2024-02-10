@@ -51,7 +51,7 @@ suspend fun search(
 
     val allVersions = namespace.getAllSortedVersions().toMutableList()
     if (translateNamespace != null) {
-        allVersions.retainAll(translateNamespace.getAllSortedVersions())
+        allVersions.retainAll(translateNamespace.getAllSortedVersions().toSet())
     }
 
     val defaultVersion = namespace.defaultVersion.takeIf { it in allVersions }
@@ -451,7 +451,7 @@ data class SearchResultMemberEntry(
     val descObfClient: String?,
     @SerialName("k")
     val ownerObfServer: String?,
-    @SerialName("l")
+    @SerialName("s")
     val obfServer: String?,
     @SerialName("m")
     val descObfServer: String?,

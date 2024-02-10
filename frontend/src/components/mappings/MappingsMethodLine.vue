@@ -1,8 +1,8 @@
 <template>
     <div class="my-1 text-sm whitespace-nowrap flex items-center">
         <div class="mr-2 relative" v-if="!!entry.argsGuessed || !!entry.argsParchment">
-            <IconAlertTriangleFilled v-if="!!entry.argsGuessed" class="peer" size="20"/>
-            <IconAlertCircleFilled v-else-if="!!entry.argsParchment" class="peer" size="20"/>
+            <IconAlertTriangleFilled v-if="!!entry.argsGuessed" class="peer" :size="20"/>
+            <IconAlertCircleFilled v-else-if="!!entry.argsParchment" class="peer" :size="20"/>
             <Tooltip>
                 <div v-if="!!entry.argsGuessed" class="flex flex-col gap-1">
                     <div class="flex items-center">
@@ -48,19 +48,19 @@ export default defineComponent({
             required: true,
         },
         methodReturnType: {
-            type: Object as PropType<(entry: MappingEntry) => string>,
+            type: Function as PropType<(entry: MappingEntry) => string>,
             required: true,
         },
         methodArgs: {
-            type: Object as PropType<(entry: MappingEntry) => string>,
+            type: Function as PropType<(entry: MappingEntry) => string>,
             required: true,
         },
         getOptimumName: {
-            type: Object as PropType<(entry: MappingEntry) => string>,
+            type: Function as PropType<(entry: MappingEntry) => string>,
             required: true,
         },
         onlyClass: {
-            type: Object as PropType<(name: string) => string>,
+            type: Function as PropType<(name: string) => string>,
             required: true,
         },
     },

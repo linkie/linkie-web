@@ -1,7 +1,7 @@
 <template>
     <NavbarButton :hover-dim="false">
         <div class="relative">
-            <div @click="dropdownVisible = !dropdownVisible" class="hover:opacity-70 transition-all">
+            <div @click="dropdownVisible = !dropdownVisible" class="hover:opacity-70">
                 <slot/>
             </div>
 

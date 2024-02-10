@@ -58,16 +58,16 @@
         <div v-if="hasTranslation">
             <div class="divider mt-0 mb-0"/>
             <EntryDetails v-if="entry.type === 'field' && translatedToNamespace!!.supportsFieldDescription" :title="$t('mappings.entry.type')" :code="false">
-                <Copyable :copy="fieldType(entry.translatedTo!!)" strokeWidth="1">{{ fieldType(entry.translatedTo) }}</Copyable>
+                <Copyable :copy="fieldType(entry.translatedTo!!)" strokeWidth="1">{{ fieldType(entry.translatedTo!!) }}</Copyable>
             </EntryDetails>
             <EntryDetails v-if="entry.type !== 'class' && translatedToNamespace!!.supportsMixin" :title="$t('mappings.entry.mixin.target')">
-                <Copyable :copy="mixinTarget(entry.translatedTo!!)" strokeWidth="1">{{ mixinTarget(entry.translatedTo) }}</Copyable>
+                <Copyable :copy="mixinTarget(entry.translatedTo!!)" strokeWidth="1">{{ mixinTarget(entry.translatedTo!!) }}</Copyable>
             </EntryDetails>
             <EntryDetails v-if="translatedToNamespace!!.supportsAT" :title="$t('mappings.entry.at')">
-                <Copyable :copy="atText(entry.translatedTo!!)" strokeWidth="1">{{ atText(entry.translatedTo) }}</Copyable>
+                <Copyable :copy="atText(entry.translatedTo!!)" strokeWidth="1">{{ atText(entry.translatedTo!!) }}</Copyable>
             </EntryDetails>
             <EntryDetails v-if="translatedToNamespace!!.supportsAW" :title="$t('mappings.entry.aw')">
-                <Copyable :copy="awText(entry.translatedTo!!)" strokeWidth="1">{{ awText(entry.translatedTo) }}</Copyable>
+                <Copyable :copy="awText(entry.translatedTo!!)" strokeWidth="1">{{ awText(entry.translatedTo!!) }}</Copyable>
             </EntryDetails>
         </div>
 

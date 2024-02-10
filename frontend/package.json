@@ -15,30 +15,30 @@
     "copy-to-clipboard": "^3.3.2",
     "nprogress": "^0.2.0",
     "pinia": "^2.0.20",
-    "pinia-plugin-persistedstate": "^1.6.3",
+    "pinia-plugin-persistedstate": "^3.2.1",
     "prismjs": "^1.29.0",
     "tailwind-gradient-mask-image": "^1.0.0",
-    "vite-plugin-prismjs": "^0.0.8",
+    "vite-plugin-prismjs": "^0.0.11",
     "vue": "^3.2.25",
     "vue-axios": "^3.4.1",
-    "vue-i18n": "^9.2.2"
+    "vue-i18n": "^9.2.2",
+    "vue-router": "^4.2.5"
   },
   "devDependencies": {
     "@tailwindcss/forms": "^0.5.3",
     "@tauri-apps/cli": "^1.2.3",
-    "@types/node": "^17.0.45",
+    "@types/node": "^20.11.17",
     "@types/prismjs": "^1.26.0",
-    "@vitejs/plugin-vue": "^3.0.3",
+    "@vitejs/plugin-vue": "^5.0.4",
     "autoprefixer": "^10.4.8",
     "cssnano": "^6.0.0",
     "postcss": "^8.4.16",
-    "rollup-obfuscator": "^3.0.2",
     "tailwindcss": "^3.1.8",
-    "typescript": "^4.7.4",
+    "typescript": "^5.3.3",
     "typescript-tslint-plugin": "^1.0.2",
-    "vite": "^3.0.9",
+    "vite": "^5.1.1",
     "vite-plugin-mkcert": "^1.9.0",
-    "vite-plugin-pwa": "^0.12.3",
-    "vue-tsc": "^0.34.17"
+    "vite-plugin-pwa": "^0.17.5",
+    "vue-tsc": "^1.8.27"
   }
 }

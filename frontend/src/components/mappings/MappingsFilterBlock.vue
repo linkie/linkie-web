@@ -2,7 +2,7 @@
     <div class="flex flex-col">
         <SubHeader class="mt-[-.25rem] mb-1 flex items-center gap-1.5">
             {{ $t("mappings.namespace") }}
-            <IconDatabase size="20"/>
+            <IconDatabase :size="20"/>
         </SubHeader>
 
         <div v-for="[group, nses] in namespacesGrouped">
@@ -48,7 +48,7 @@
         <div class="divider mt-0 mb-0"/>
         <SubHeader class="pb-1 flex items-center gap-1.5">
             {{ $t("mappings.version") }}
-            <IconGitCherryPick class="-scale-100" size="20"/>
+            <IconGitCherryPick class="-scale-100" :size="20"/>
         </SubHeader>
         <div class="flex flex-col flex-nowrap justify-center h-full whitespace-nowrap pb-2">
             <div class="flex gap-2 select-none justify-between">
@@ -76,7 +76,7 @@
         <div class="mt-2">
             <SubHeader class="flex items-center gap-1.5">
                 {{ $t("mappings.translation") }}
-                <IconWorld size="20"/>
+                <IconWorld :size="20"/>
             </SubHeader>
             <div class="pt-2 flex flex-col gap-3">
                 <button :aria-selected="(translateMode ?? 'none') === 'none'" @click="translateMode = 'none'; translateAs = undefined; translateAsVersion = undefined"
@@ -193,7 +193,7 @@ export default defineComponent({
             let id = Object.entries(namespaceLocalizations)
             .find(([id, name]) => name === string)
                 ?.[0] ?? this.namespace
-            return this.namespaces.find(ns => ns.id === id) ?? (this.namespace ?? this.namespaces[0])
+            return this.namespaces.find(ns => ns.id === id) ?? (this.namespaces.find(ns => ns.id === this.namespace) ?? this.namespaces[0])
         },
     },
     computed: {

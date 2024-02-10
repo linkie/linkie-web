@@ -1,9 +1,10 @@
 import {defineStore} from "pinia"
-import {reqNamespaces, reqSearch} from "./backend"
+import {getQuery, hasQuery, reqNamespaces, reqSearch} from "./backend"
 import {addAlert} from "./alerts"
 import {applicableMappingsVersions, useMappingsStore} from "./mappings-store"
 import axios from "axios"
 import {VersionEntry} from "./dependencies-data"
+import {LocationQuery} from "vue-router"
 
 export interface Namespace {
     id: string,
@@ -88,38 +89,36 @@ export const useMappingsDataStore = defineStore({
     state: newState,
 })
 
-export function updateMappingsData(applyURL: boolean = false) {
+export function updateMappingsData(fullPath?: string, query: LocationQuery | null = null) {
     let store = useMappingsDataStore()
-    if (applyURL || (Object.keys(store.mappingsData.namespaces).length == 0 && !store.reqNamespacesPromise)) {
+    if (query || (Object.keys(store.mappingsData.namespaces).length == 0 && !store.reqNamespacesPromise)) {
         store.reqNamespacesPromise = reqNamespaces().then(value => {
-            store.mappingsData.namespaces = value.data
-            ensureMappingsData(applyURL)
+            useMappingsDataStore().mappingsData.namespaces = value.data
+            ensureMappingsData(fullPath, query)
         }).catch(reason => {
             addAlert({
                 type: "error",
                 message: `Failed to fetch namespaces: ${reason.message}`,
             })
         }).finally(() => {
-            store.reqNamespacesPromise = undefined
+            useMappingsDataStore().reqNamespacesPromise = undefined
         })
     }
 }
 
-export function ensureMappingsData(applyURL: boolean = false) {
+export function ensureMappingsData(fullPath?: string, query: LocationQuery | null = null) {
     let store = useMappingsDataStore()
-    if (applyURL) {
-        const urlParams = new URLSearchParams(window.location.search)
-
-        if (store.mappingsData.namespaces.map(namespace => namespace.id).includes(urlParams.get("namespace") ?? "")) {
-            useMappingsStore().namespace = (urlParams.get("namespace") ?? "") as string
+    if (query) {
+        if (store.mappingsData.namespaces.map(namespace => namespace.id).includes(getQuery(query, "namespace") ?? "")) {
+            useMappingsStore().namespace = (getQuery(query, "namespace") ?? "") as string
             useMappingsStore().translateMode = undefined
             useMappingsStore().translateAs = undefined
             useMappingsStore().translateAsVersion = undefined
             useMappingsStore().version = undefined
         }
 
-        if (urlParams.has("translateMode")) {
-            useMappingsStore().translateMode = urlParams.get("translateMode") ?? ""
+        if (getQuery(query, "translateMode")) {
+            useMappingsStore().translateMode = getQuery(query, "translateMode") ?? ""
             
             if (useMappingsStore().translateMode !== undefined && useMappingsStore().translateMode !in ["ns", "ver"]) {
                 useMappingsStore().translateMode = undefined
@@ -128,22 +127,22 @@ export function ensureMappingsData(applyURL: boolean = false) {
             }
         }
 
-        if (useMappingsStore().translateMode === "ns" && store.mappingsData.namespaces.map(namespace => namespace.id).includes(urlParams.get("translateAs") ?? "")
-            && useMappingsStore().namespace && useMappingsStore().namespace !== urlParams.get("translateAs")) {
-            useMappingsStore().translateAs = (urlParams.get("translateAs") ?? "") as string
+        if (useMappingsStore().translateMode === "ns" && store.mappingsData.namespaces.map(namespace => namespace.id).includes(getQuery(query, "translateAs") ?? "")
+            && useMappingsStore().namespace && useMappingsStore().namespace !== getQuery(query, "translateAs")) {
+            useMappingsStore().translateAs = (getQuery(query, "translateAs") ?? "") as string
         }
 
-        if (applicableMappingsVersions().map(version => version.version).includes(urlParams.get("version") ?? "")) {
-            useMappingsStore().version = (urlParams.get("version") ?? "") as string
+        if (applicableMappingsVersions().map(version => version.version).includes(getQuery(query, "version") ?? "")) {
+            useMappingsStore().version = (getQuery(query, "version") ?? "") as string
         }
-        if (useMappingsStore().translateMode === "ver" && applicableMappingsVersions().map(version => version.version).includes(urlParams.get("translateAsVersion") ?? "")) {
-            useMappingsStore().translateAsVersion = (urlParams.get("translateAsVersion") ?? "") as string
+        if (useMappingsStore().translateMode === "ver" && applicableMappingsVersions().map(version => version.version).includes(getQuery(query, "translateAsVersion") ?? "")) {
+            useMappingsStore().translateAsVersion = (getQuery(query, "translateAsVersion") ?? "") as string
         }
 
-        if (urlParams.has("search")) useMappingsStore().searchText = urlParams.get("search") ?? ""
-        if (urlParams.has("allowClasses")) useMappingsStore().allowClasses = urlParams.get("allowClasses") === "true"
-        if (urlParams.has("allowMethods")) useMappingsStore().allowMethods = urlParams.get("allowMethods") === "true"
-        if (urlParams.has("allowFields")) useMappingsStore().allowFields = urlParams.get("allowFields") === "true"
+        if (hasQuery(query, "search")) useMappingsStore().searchText = getQuery(query, "search") ?? ""
+        if (hasQuery(query, "allowClasses")) useMappingsStore().allowClasses = getQuery(query, "allowClasses") === "true"
+        if (hasQuery(query, "allowMethods")) useMappingsStore().allowMethods = getQuery(query, "allowMethods") === "true"
+        if (hasQuery(query, "allowFields")) useMappingsStore().allowFields = getQuery(query, "allowFields") === "true"
         
         useMappingsDataStore().hasFirstLoaded = true
     }
@@ -173,12 +172,12 @@ export function ensureMappingsData(applyURL: boolean = false) {
         }
     }
 
-    if (useMappingsDataStore().hasFirstLoaded) {
-        updateMappingsWindowUrl()
+    if (useMappingsDataStore().hasFirstLoaded && fullPath) {
+        updateMappingsWindowUrl(fullPath)
     }
 }
 
-export function updateMappingsInfo() {
+export function updateMappingsInfo(fullPath: string | undefined) {
     let store = useMappingsDataStore()
     let {namespace, version, searchText, allowClasses, allowFields, allowMethods, translateMode, translateAs, translateAsVersion} = useMappingsStore()
     if (namespace && version && searchText && (allowClasses || allowMethods || allowFields)) {
@@ -203,8 +202,8 @@ export function updateMappingsInfo() {
                 }
                 store.infoData.fuzzy = value.data.fuzzy
                 store.infoData.entries = (value.data.entries as any[]).map(mapEntryToMappingEntry)
-                if (useMappingsDataStore().hasFirstLoaded) {
-                    updateMappingsWindowUrl()
+                if (useMappingsDataStore().hasFirstLoaded && fullPath) {
+                    updateMappingsWindowUrl(fullPath)
                 }
             }).catch(reason => {
                 if (!axios.isCancel(reason)) {
@@ -262,7 +261,7 @@ export function mapEntryToMappingEntry(obj: any): MappingEntry {
         obfClient: obj.h,
         descObfClient: obj.j,
         ownerObfServer: obj.k,
-        obfServer: obj.l,
+        obfServer: obj.s,
         descObfServer: obj.m,
         args: obj.p,
         argsGuessed: obj.q,
@@ -272,9 +271,9 @@ export function mapEntryToMappingEntry(obj: any): MappingEntry {
     } as MappingEntry
 }
 
-export function updateMappingsWindowUrl() {
+export function updateMappingsWindowUrl(fullPath: string) {
     let {namespace, version, searchText, allowClasses, allowFields, allowMethods, translateMode, translateAs, translateAsVersion} = useMappingsStore()
-    let url = new URL(window.location.href)
+    let url = new URL(fullPath)
     url.searchParams.set("namespace", namespace ?? "")
     url.searchParams.set("version", version ?? "")
     url.searchParams.set("search", searchText ?? "")

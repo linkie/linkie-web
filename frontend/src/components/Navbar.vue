@@ -1,5 +1,6 @@
 <template>
-    <div class="flex justify-center px-2 py-1 min-h-16 w-full backdrop-blur-md">
+    <div id="nav-bar" :class="[`flex justify-center px-2 py-1 min-h-16 w-full backdrop-blur-md [transition:box-shadow_0.3s,backdrop-filter_.1s,color_.1s,background-color_.1s]`,
+        addDropShadow && `bg-base-200/80 dark:bg-base-dark-200/80 backdrop-blur-lg !text-base-content dark:!text-base-dark-content ${$route.path === '/' ? 'shadow-[0_35px_60px_-15px_rgba(0,0,0,0.3)]' : 'shadow-[0_25px_30px_-15px_rgba(0,0,0,0.1)]'}`]">
         <div class="max-w-[78rem] mx-auto w-full flex justify-between min-h-16">
             <div class="flex overflow-x-auto overflow-y-hidden epic-scroller">
                 <NavbarButton href="/" :bold="true"> {{ $t("navbar./") }} </NavbarButton>
@@ -16,15 +17,7 @@
 
             <div class="flex">
                 <NavbarDropdown :options="localeOptions($i18n)">
-                    <svg tabindex="0" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" stroke-width="2"
-                         stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                        <path d="M4 5h7"></path>
-                        <path d="M7 4c0 4.846 0 7 .5 8"></path>
-                        <path d="M10 8.5c0 2.286 -2 4.5 -3.5 4.5s-2.5 -1.135 -2.5 -2c0 -2 1 -3 3 -3s5 .57 5 2.857c0 1.524 -.667 2.571 -2 3.143"></path>
-                        <path d="M12 20l4 -9l4 9"></path>
-                        <path d="M19.1 18h-6.2"></path>
-                    </svg>
+                    <IconLanguageHiragana/>
                     <template v-slot:option-en_US>
                         <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" preserveAspectRatio="xMidYMid meet"
                              viewBox="0 0 36 36">
@@ -70,35 +63,19 @@
                     </template>
                     <template v-slot:option-new-group>
                         <a href="https://github.com/linkie/linkie-web/tree/master/frontend/src/locales"
-                           class="cursor-pointer block px-4 py-2 hover:bg-base-300 dark:hover:bg-base-dark-400 transition-colors flex gap-2 items-center">
+                           class="cursor-pointer px-4 py-2 hover:bg-base-300 dark:hover:bg-base-dark-400 transition-colors flex gap-2 items-center">
                             <div class="flex-1 pr-2">
                                 <p class="whitespace-nowrap"> {{ $t("navbar.locale.help.0") }} </p>
                                 <p class="whitespace-nowrap"> {{ $t("navbar.locale.help.1") }} </p>
                             </div>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" stroke-width="2"
-                                 stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                                <path d="M11 7h-5a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-5"></path>
-                                <line x1="10" y1="14" x2="20" y2="4"></line>
-                                <polyline points="15 4 20 4 20 9"></polyline>
-                            </svg>
+                            <IconExternalLink/>
                         </a>
                     </template>
                 </NavbarDropdown>
 
                 <NavbarButton @click="setDarkMode(!(($event.target as any)?.checked ?? darkMode()))" :key="componentKey">
-                    <svg v-if="darkMode()" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                         stroke-width="2"
-                         stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                        <path d="M7.962 3.949a8.97 8.97 0 0 1 4.038 -.957v.008h.393a7.478 7.478 0 0 0 -2.07 3.308m-.141 3.84c.186 .823 .514 1.626 .989 2.373a7.49 7.49 0 0 0 4.586 3.268m3.893 -.11c.223 -.067 .444 -.144 .663 -.233a9.088 9.088 0 0 1 -.274 .597m-1.695 2.337a9 9 0 0 1 -12.71 -12.749"></path>
-                        <path d="M3 3l18 18"></path>
-                    </svg>
-                    <svg v-else xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler" width="24" height="24" viewBox="0 0 24 24" stroke-width="2"
-                         stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                        <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z"></path>
-                    </svg>
+                    <IconMoonOff v-if="darkMode()"/>
+                    <IconMoon v-else/>
                 </NavbarButton>
             </div>
         </div>
@@ -111,21 +88,23 @@ import NavbarButton from "./navbar/NavbarButton.vue"
 import {mapWritableState} from "pinia"
 import {useI18nStore} from "../app/i18n-store"
 import NavbarDropdown, {DropdownOption} from "./navbar/NavbarDropdown.vue"
-import {VueI18n} from "vue-i18n"
+import {ExportedGlobalComposer, VueI18n} from "vue-i18n"
+import {IconExternalLink, IconLanguageHiragana, IconMoon, IconMoonOff} from "@tabler/icons-vue"
 
 export default defineComponent({
     name: "Navbar",
-    components: {NavbarDropdown, NavbarButton},
+    components: {NavbarDropdown, NavbarButton, IconLanguageHiragana, IconMoon, IconMoonOff, IconExternalLink},
     data() {
         return {
             componentKey: 0,
+            addDropShadow: false,
         }
     },
     computed: {
         ...mapWritableState(useI18nStore, ["locale"]),
     },
     methods: {
-        localeOptions(i18n: VueI18n): DropdownOption[] {
+        localeOptions(i18n: VueI18n | ExportedGlobalComposer): DropdownOption[] {
             function createLocale(id: string, name: string): DropdownOption {
                 return {
                     id, name, onClick() {
@@ -158,6 +137,17 @@ export default defineComponent({
             }
             this.componentKey++
         },
+    },
+    mounted() {
+        document.addEventListener("scroll", () => {
+            let element = document.getElementById("welcome-banner")
+            if (element) {
+                let navbar = document.getElementById("nav-bar")
+                this.addDropShadow = window.scrollY > element.clientHeight - (navbar?.clientHeight ?? 0)
+            } else {
+                this.addDropShadow = window.scrollY > 0
+            }
+        })
     },
 })
 </script>

@@ -2,8 +2,8 @@ import {defineStore} from "pinia"
 import {useDependenciesDataStore} from "./dependencies-data"
 
 interface State {
-    loader?: string,
-    version?: string,
+    loader: string | undefined,
+    version: string | undefined,
     allowSnapshots: boolean,
     forgeGradle: boolean,
     neoGradle: boolean,
@@ -11,6 +11,8 @@ interface State {
 
 function newState(): State {
     return {
+        loader: undefined,
+        version: undefined,
         allowSnapshots: false,
         forgeGradle: false,
         neoGradle: false

@@ -3,10 +3,10 @@
         <div v-for="vers in versions">
             <div class="font-bold text-xl mb-2">{{ namespaceLocalizations[vers[0][0]] ?? vers[0][0] }}</div>
             <div class="flex gap-x-4 gap-y-3 flex-wrap">
-                <a class="px-4 py-2 cursor-pointer border-2 border-base-content dark:border-base-dark-content
+                <router-link class="px-4 py-2 cursor-pointer border-2 border-base-content dark:border-base-dark-content
                  font-medium rounded-xl whitespace-nowrap hover:scale-110 transition-all"
-                     v-for="version in vers.slice(0, 16)" :href="select(version[0], version[1])">{{ version[1] }}
-                </a>
+                     v-for="version in vers.slice(0, 16)" :to="select(version[0], version[1])">{{ version[1] }}
+                </router-link>
             </div>
         </div>
     </div>
@@ -17,7 +17,7 @@ import {defineComponent} from "vue"
 import Block from "../Block.vue"
 import {ensureMappingsData, updateMappingsData, useMappingsDataStore} from "../../app/mappings-data"
 import {mapState} from "pinia"
-import {namespaceLocalizations} from "../../app/backend"
+import {fullPath, namespaceLocalizations} from "../../app/backend"
 
 export default defineComponent({
     name: "HomeMappings",
@@ -59,8 +59,8 @@ export default defineComponent({
         ...mapState(useMappingsDataStore, ["mappingsData"]),
     },
     mounted() {
-        updateMappingsData()
-        ensureMappingsData()
+        updateMappingsData(fullPath())
+        ensureMappingsData(fullPath())
     },
 })
 </script>

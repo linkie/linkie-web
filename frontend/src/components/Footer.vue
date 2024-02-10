@@ -9,7 +9,7 @@
                     </p>
                     <p>
                         <span class="whitespace-nowrap">
-                            Made with <IconHeartFilled class="text-red-400 inline-block" size="18"/> in Hong Kong.
+                            Made with <IconHeartFilled class="text-red-400 inline-block" :size="18"/> in Hong Kong.
                         </span>
                     </p>
                 </div>

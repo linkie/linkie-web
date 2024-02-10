@@ -43,10 +43,10 @@ export default defineComponent({
     name: "GeneratorMixinConfiguration",
     components: {GeneratorDescription, GeneratorOptionEntry, GeneratorOptions},
     computed: {
-        ...mapWritableState(useGeneratorStore, ["template", "mixin"]),
+        ...mapWritableState(useGeneratorStore, ["template", "mixin", "modLoaders"]),
     },
     methods: {
-        hasFabric() {
+        hasFabric(): boolean {
             return this.template === "fabric" || (this.template === "architectury" || this.template === "multiloader" && this.modLoaders.includes("fabric"))
         },
         selectMixin(mixin: boolean) {

@@ -70,7 +70,7 @@ export default defineComponent({
         },
     },
     computed: {
-        ...mapWritableState(useGeneratorStore, ["template", "modLoaders", "mappings", "gradleLanguage", "gradleSystem", "mixin"]),
+        ...mapWritableState(useGeneratorStore, ["template", "modLoaders", "mappings", "gradleLanguage", "gradleSystem", "mixin", "minecraftVersion"]),
         step() {
             let step = 1
             if (this.template === null) return step

@@ -68,6 +68,7 @@ import PageWidthLimiter from "../components/PageWidthLimiter.vue"
 import PageSidebar from "../components/PageSidebar.vue"
 import PageContent from "../components/PageContent.vue"
 import LoadingSection from "../components/LoadingSection.vue"
+import {fullPath} from "../app/backend"
 
 export default defineComponent({
     name: "Dependencies",
@@ -92,26 +93,26 @@ export default defineComponent({
     watch: {
         loader: {
             handler() {
-                updateDependencyData()
-                ensureDependencyData()
+                updateDependencyData(fullPath())
+                ensureDependencyData(fullPath())
             },
             immediate: true,
         },
         version: {
             handler() {
-                ensureDependencyData()
+                ensureDependencyData(fullPath())
             },
             immediate: true,
         },
         allowSnapshots: {
             handler() {
-                ensureDependencyData()
+                ensureDependencyData(fullPath())
             },
             immediate: true,
         },
     },
     mounted() {
-        updateDependencyData(true)
+        updateDependencyData(fullPath(), this.$route.query)
     },
 })
 </script>

@@ -1,8 +1,8 @@
 <template>
     <div class="flex gap-x-4 gap-y-3 flex-wrap">
-        <a class="px-4 py-2 cursor-pointer border-2 border-base-content dark:border-base-dark-content
+        <router-link class="px-4 py-2 cursor-pointer border-2 border-base-content dark:border-base-dark-content
         font-medium rounded-xl whitespace-nowrap hover:scale-110 transition-all" 
-               v-for="version in versions.slice(0, 16)" :href="select(version[0], version[1])">{{ version[0] }} {{ version[1] }}</a>
+               v-for="version in versions.slice(0, 16)" :to="select(version[0], version[1])">{{ version[0] }} {{ version[1] }}</router-link>
     </div>
 </template>
 
@@ -11,6 +11,7 @@ import {defineComponent} from "vue"
 import Block from "../Block.vue"
 import {ensureDependencyData, updateDependencyData, useDependenciesDataStore} from "../../app/dependencies-data"
 import {mapState} from "pinia"
+import {fullPath} from "../../app/backend"
 
 export default defineComponent({
     name: "HomeDependencies",
@@ -45,8 +46,8 @@ export default defineComponent({
         ...mapState(useDependenciesDataStore, ["searchData"]),
     },
     mounted() {
-        updateDependencyData()
-        ensureDependencyData()
+        updateDependencyData(fullPath())
+        ensureDependencyData(fullPath())
     },
 })
 </script>
