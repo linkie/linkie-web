@@ -16,7 +16,9 @@ import io.ktor.server.routing.*
 import kotlinx.serialization.json.*
 import me.shedaniel.linkie.Namespaces
 import me.shedaniel.linkie.RemapperDaemon
+import me.shedaniel.linkie.namespaces.MojangRawNamespace
 import me.shedaniel.linkie.namespaces.MojangSrgNamespace
+import me.shedaniel.linkie.obfMergedName
 import me.shedaniel.linkie.utils.tryToVersion
 import me.shedaniel.linkie.web.deps.depsCycle
 import me.shedaniel.linkie.web.deps.startDepsCycle
@@ -150,12 +152,16 @@ fun main() {
                     val namespace = Namespaces.namespaces[namespaceStr] ?: throw IllegalArgumentException("No namespace found for $namespaceStr")
                     val defaultVersion = namespace.defaultVersion.takeIf { it in namespace.getAllSortedVersions() } ?: namespace.getAllSortedVersions().first()
                     val provider = version.let { namespace.getProvider(it) }.takeUnless { it.isEmpty() } ?: namespace.getProvider(defaultVersion)
+                    val useObj = namespace == MojangRawNamespace
                     val noIntermediary = namespace == MojangSrgNamespace
                     call.respond(buildJsonObject {
                         provider.get().allClasses.forEach { clazz ->
                             var intermediaryName = clazz.intermediaryName
                             var mappedName = clazz.mappedName
-                            if (noIntermediary) {
+                            if (useObj) {
+                                mappedName = intermediaryName
+                                intermediaryName = clazz.obfMergedName ?: intermediaryName
+                            } else if (noIntermediary) {
                                 intermediaryName = mappedName ?: intermediaryName
                                 mappedName = null
                             }
