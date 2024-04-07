@@ -16,6 +16,7 @@
     "nprogress": "^0.2.0",
     "pinia": "^2.0.20",
     "pinia-plugin-persistedstate": "^3.2.1",
+    "prism-code-editor": "^3.2.1",
     "prismjs": "^1.29.0",
     "tailwind-gradient-mask-image": "^1.0.0",
     "vite-plugin-prismjs": "^0.0.11",

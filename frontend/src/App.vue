@@ -7,6 +7,7 @@ import Alerts from "./components/Alerts.vue"
 import {useI18nStore} from "./app/i18n-store"
 import {isTauri, tauriInit} from "./app/tauri/tauri"
 import Tauri from "./components/tauri/Tauri.vue"
+import {useI18n} from "vue-i18n"
 
 export default defineComponent({
     data() {
@@ -66,6 +67,10 @@ export default defineComponent({
             this.allowTransition = true
         }, 1000)
     },
+    setup() {
+        const { t } = useI18n()
+        return { t }
+    }
 })
 
 </script>

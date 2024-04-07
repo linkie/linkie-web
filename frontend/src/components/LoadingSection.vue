@@ -14,17 +14,11 @@
     </div>
 </template>
 
-<script lang="ts">
-import {defineComponent} from "vue"
-
-export default defineComponent({
-    name: "LoadingSection",
-    props: {
-        text: {
-            type: String,
-            default: "Loading...",
-        },
-    }
+<script setup lang="ts">
+withDefaults(defineProps<{
+    text?: string,
+}>(), {
+    text: "Loading...",
 })
 </script>
 

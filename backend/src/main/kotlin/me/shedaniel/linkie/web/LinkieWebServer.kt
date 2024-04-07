@@ -7,17 +7,16 @@ import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
+import io.ktor.server.plugins.compression.*
 import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.plugins.cors.routing.*
 import io.ktor.server.plugins.statuspages.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import kotlinx.serialization.json.addJsonObject
-import kotlinx.serialization.json.buildJsonObject
-import kotlinx.serialization.json.put
-import kotlinx.serialization.json.putJsonArray
+import kotlinx.serialization.json.*
 import me.shedaniel.linkie.Namespaces
 import me.shedaniel.linkie.RemapperDaemon
+import me.shedaniel.linkie.namespaces.MojangSrgNamespace
 import me.shedaniel.linkie.utils.tryToVersion
 import me.shedaniel.linkie.web.deps.depsCycle
 import me.shedaniel.linkie.web.deps.startDepsCycle
@@ -30,6 +29,11 @@ fun main() {
     startLinkie()
     embeddedServer(Netty, port = 6969) {
         install(CORS) { anyHost() }
+        install(Compression) {
+            gzip {
+                matchContentType(ContentType.Application.Json)
+            }
+        }
         install(IgnoreTrailingSlash)
         install(ContentNegotiation) {
             json(json)
@@ -137,6 +141,39 @@ fun main() {
                                 put("total", cache?.totalClasses ?: 0)
                                 put("everCached", cache != null)
                             })
+                        }
+                    })
+                }
+                get("api/mappings") {
+                    val namespaceStr = call.parameters["namespace"]?.lowercase() ?: throw IllegalArgumentException("No namespace specified")
+                    val version = call.parameters["version"] ?: throw IllegalArgumentException("No version specified")
+                    val namespace = Namespaces.namespaces[namespaceStr] ?: throw IllegalArgumentException("No namespace found for $namespaceStr")
+                    val defaultVersion = namespace.defaultVersion.takeIf { it in namespace.getAllSortedVersions() } ?: namespace.getAllSortedVersions().first()
+                    val provider = version.let { namespace.getProvider(it) }.takeUnless { it.isEmpty() } ?: namespace.getProvider(defaultVersion)
+                    val noIntermediary = namespace == MojangSrgNamespace
+                    call.respond(buildJsonObject {
+                        provider.get().allClasses.forEach { clazz ->
+                            var intermediaryName = clazz.intermediaryName
+                            var mappedName = clazz.mappedName
+                            if (noIntermediary) {
+                                intermediaryName = mappedName ?: intermediaryName
+                                mappedName = null
+                            }
+                            val obj = buildJsonObject {
+                                clazz.members.filter { it.mappedName != null && it.mappedName != it.intermediaryName }.forEach { member ->
+                                    put(member.intermediaryName, member.mappedName)
+                                }
+                            }
+                            if (obj.isNotEmpty() || (mappedName != null && mappedName != intermediaryName)) {
+                                putJsonObject(intermediaryName) {
+                                    obj.entries.forEach { (key, value) ->
+                                        put(key, value)
+                                    }
+                                    if (mappedName != null && mappedName != intermediaryName) {
+                                        put("mappedName", mappedName)
+                                    }
+                                }
+                            }
                         }
                     })
                 }

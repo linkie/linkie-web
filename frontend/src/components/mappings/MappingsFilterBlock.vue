@@ -1,6 +1,26 @@
 <template>
     <div class="flex flex-col">
         <SubHeader class="mt-[-.25rem] mb-1 flex items-center gap-1.5">
+            {{ $t("mappings.mode") }}
+            <IconBrandCodepen :size="20"/>
+        </SubHeader>
+
+        <div class="pt-2 pb-2.5 flex gap-3">
+            <button v-for="item in ['mappings', 'stacktrace']"
+                    :aria-selected="(mode ?? 'mappings') === item" @click="selectMode(item)" @mouseenter="modeHover = true" @mouseleave="modeHover = false"
+                    class="selection-button py-2 px-3 flex items-center text-left rounded-lg bg-base-500 dark:bg-base-dark-200 bg-opacity-60 hover:bg-opacity-100
+                dark:hover:bg-base-dark-400 dark:focus:bg-base-dark-400 transition-all duration-150 border-none select-none group overflow-clip flex-shrink-0">
+                <IconTriangles class="flex-shrink-0" :size="20" v-if="item === 'mappings'"/>
+                <IconFileSad class="flex-shrink-0" :size="20" v-else/>
+                <span :aria-expanded="!modeHover && (mode ?? 'mappings') === item"
+                      class="group-hover:opacity-100 group-hover:w-fit group-hover:pl-2 aria-expanded:opacity-100 aria-expanded:w-fit aria-expanded:pl-2 w-0 pl-0 transition-all duration-150 opacity-[-100]">
+                    {{ $t(`mappings.mode.${item}`) }}</span>
+            </button>
+        </div>
+
+        <div class="divider mt-0 mb-0 pb-0.5"/>
+
+        <SubHeader class="mt-[-.25rem] mb-1 flex items-center gap-1.5">
             {{ $t("mappings.namespace") }}
             <IconDatabase :size="20"/>
         </SubHeader>
@@ -72,8 +92,8 @@
             </div>
         </div>
 
-        <div class="divider mt-0 mb-0"/>
-        <div class="mt-2">
+        <div class="divider mt-0 mb-0" v-if="mode === 'mappings'"/>
+        <div class="mt-2" v-if="mode === 'mappings'">
             <SubHeader class="flex items-center gap-1.5">
                 {{ $t("mappings.translation") }}
                 <IconWorld :size="20"/>
@@ -159,82 +179,70 @@
     </div>
 </template>
 
-<script lang="ts">
-import {defineComponent, PropType} from "vue"
-import {mapWritableState} from "pinia"
-import {applicableMappingsVersions, useMappingsStore, VersionPossible} from "../../app/mappings-store"
+<script setup lang="ts">
+import {computed, ref} from "vue"
+import {storeToRefs} from "pinia"
+import {applicableMappingsVersions, useMappingsStore} from "../../app/mappings-store"
 import SubHeader from "../dependencies/SubHeader.vue"
 import {allNamespaceGroups, hiddenNamespaceGroups, namespaceGroups, namespaceLocalizations} from "../../app/backend"
 import {MappingsData, Namespace} from "../../app/mappings-data"
-import {IconArrowBarToRight, IconArrowBounce, IconArrowIteration, IconDatabase, IconGitCherryPick, IconWorld} from "@tabler/icons-vue"
+import {IconArrowBarToRight, IconArrowBounce, IconArrowIteration, IconBrandCodepen, IconDatabase, IconFileSad, IconGitCherryPick, IconTriangles, IconWorld} from "@tabler/icons-vue"
+import {useI18n} from "vue-i18n"
 
-export default defineComponent({
-    name: "MappingsFilterBlock",
-    components: {SubHeader, IconArrowBarToRight, IconArrowBounce, IconArrowIteration, IconDatabase, IconGitCherryPick, IconWorld},
-    data() {
-        return {
-            expandNamespaces: false,
-            expandTranslations: false,
-            hiddenNamespaceGroups,
+const {data} = defineProps<{
+    data: MappingsData
+}>()
+
+const expandNamespaces = ref(false)
+const expandTranslations = ref(false)
+const modeHover = ref(false)
+
+const { t } = useI18n();
+
+const {namespace, version, allowSnapshots, mode, translateMode, translateAs, translateAsVersion} = storeToRefs(useMappingsStore())
+
+const namespaces = computed<Namespace[]>(() => data.namespaces)
+const namespacesGrouped = computed<[string, Namespace[]][]>(() => {
+    let groups = {} as { [group: string]: Namespace[] }
+    for (let ns in namespaces.value) {
+        let groupsApplicable = namespaceGroups[namespaces.value[ns].id] ?? "Others"
+        if (typeof groupsApplicable === "string") {
+            groupsApplicable = [groupsApplicable]
         }
-    },
-    methods: {
-        localizeNamespace(namespace?: Namespace | string): string | undefined {
-            if (typeof namespace === "string") {
-                return this.$t(`namespace.${namespace.toLowerCase()}`) || namespaceLocalizations[namespace.toLowerCase()] || namespace.toLowerCase()
-            } else if (namespace) {
-                let id = namespace.id
-                return this.$t(`namespace.${id.toLowerCase()}`) || namespaceLocalizations[id.toLowerCase()] || id.toLowerCase()
-            } else {
-                return undefined
+        for (let group of groupsApplicable) {
+            if (!groups[group]) {
+                groups[group] = []
             }
-        },
-        delocalizeNamespace(string: string): Namespace {
-            let id = Object.entries(namespaceLocalizations)
-            .find(([id, name]) => name === string)
-                ?.[0] ?? this.namespace
-            return this.namespaces.find(ns => ns.id === id) ?? (this.namespaces.find(ns => ns.id === this.namespace) ?? this.namespaces[0])
-        },
-    },
-    computed: {
-        ...mapWritableState(useMappingsStore, ["namespace", "version", "allowSnapshots", "translateMode", "translateAs", "translateAsVersion"]),
-        namespaces(): Namespace[] {
-            return this.data.namespaces
-        },
-        namespacesGrouped(): [string, Namespace[]][] {
-            let groups = {} as { [group: string]: Namespace[] }
-            for (let ns in this.namespaces) {
-                let groupsApplicable = namespaceGroups[this.namespaces[ns].id] ?? "Others"
-                if (typeof groupsApplicable === "string") {
-                    groupsApplicable = [groupsApplicable]
-                }
-                for (let group of groupsApplicable) {
-                    if (!groups[group]) {
-                        groups[group] = []
-                    }
-                    groups[group].push(this.namespaces[ns])
-                }
-            }
-            for (let groupsKey in groups) {
-                //sort
-                groups[groupsKey].sort((a, b) => (this.localizeNamespace(a) ?? "").localeCompare(this.localizeNamespace(b) ?? ""))
-            }
-            return Object.entries(groups).sort((a, b) => allNamespaceGroups.indexOf(a[0]) - allNamespaceGroups.indexOf(b[0]))
-        },
-        firstNamespace(): Namespace | undefined {
-            return this.namespaces[0]
-        },
-        applicableVersions(): VersionPossible[] {
-            return applicableMappingsVersions()
-        },
-    },
-    props: {
-        data: {
-            type: Object as PropType<MappingsData>,
-            required: true,
-        },
-    },
+            groups[group].push(namespaces.value[ns])
+        }
+    }
+    for (let groupsKey in groups) {
+        //sort
+        groups[groupsKey].sort((a, b) => (localizeNamespace(a) ?? "").localeCompare(localizeNamespace(b) ?? ""))
+    }
+    return Object.entries(groups).sort((a, b) => allNamespaceGroups.indexOf(a[0]) - allNamespaceGroups.indexOf(b[0]))
 })
+const applicableVersions = computed(() => applicableMappingsVersions())
+
+function localizeNamespace(namespace?: Namespace | string): string | undefined {
+    if (typeof namespace === "string") {
+        return t(`namespace.${namespace.toLowerCase()}`) || namespaceLocalizations[namespace.toLowerCase()] || namespace.toLowerCase()
+    } else if (namespace) {
+        let id = namespace.id
+        return t(`namespace.${id.toLowerCase()}`) || namespaceLocalizations[id.toLowerCase()] || id.toLowerCase()
+    } else {
+        return undefined
+    }
+}
+
+function selectMode(_mode: string) {
+    mode.value = _mode
+    if (mode.value === "stacktrace") {
+        translateMode.value = "none"
+        translateAs.value = undefined
+        translateAsVersion.value = undefined
+    }
+}
 </script>
 
 <style scoped>

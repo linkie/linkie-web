@@ -2,9 +2,9 @@
     <PageWidthLimiter v-if="mappingsData.namespaces.length !== 0">
         <PageSidebar>
             <Block>
-                <NamespaceFilterBlock :ns="namespace" :set-ns="(ns) => namespace = ns"
+                <NamespaceFilterBlock :ns="namespace ?? undefined" :set-ns="(ns: string | null) => namespace = ns"
                                       :snapshots="snapshots"
-                                      :set-snapshots="(ss) => snapshots = ss"/>
+                                      :set-snapshots="(ss: boolean) => snapshots = ss"/>
             </Block>
         </PageSidebar>
         <PageContent>
@@ -47,18 +47,18 @@
     </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import Block from "../components/Block.vue"
 import SubHeader from "../components/dependencies/SubHeader.vue"
-import {defineComponent} from "vue"
+import {computed, onMounted, ref, watch} from "vue"
 import PageWidthLimiter from "../components/PageWidthLimiter.vue"
 import PageSidebar from "../components/PageSidebar.vue"
 import PageContent from "../components/PageContent.vue"
-import Header from "../components/dependencies/Header.vue"
 import {ensureMappingsData, updateMappingsData, useMappingsDataStore} from "../app/mappings-data"
-import {mapState} from "pinia"
+import {storeToRefs} from "pinia"
 import NamespaceFilterBlock from "../components/statuses/NamespaceFilterBlock.vue"
-import {fullPath, namespaceLocalizations, reqStatusSource} from "../app/backend"
+import {fullPath, reqStatusSource} from "../app/backend"
+import {useRoute} from "vue-router"
 
 interface Cache {
     stable: boolean,
@@ -67,62 +67,55 @@ interface Cache {
     everCached: boolean,
 }
 
-export default defineComponent({
-    name: "SourcesStatus",
-    components: {NamespaceFilterBlock, Header, PageContent, PageSidebar, PageWidthLimiter, SubHeader, Block},
-    data() {
-        return {
-            namespaceLocalizations,
-            namespace: null as string | null,
-            snapshots: false,
-            data: {} as { [version: string]: Cache },
-            current: null as string | null,
-            next: null as string | null,
-            nextList: [] as string[],
+const namespace = ref<string | null>(null)
+const snapshots = ref(false)
+const data = ref<{ [version: string]: Cache }>({})
+const current = ref<string | null>(null)
+const next = ref<string | null>(null)
+const nextList = ref<string[]>([])
+
+const { mappingsData } = storeToRefs(useMappingsDataStore())
+
+const filteredData = computed(() => {
+    return Object.entries(data.value).filter(([version, cache]) => snapshots.value || cache.stable)
+})
+
+const route = useRoute()
+
+watch(namespace, (newValue) => {
+    reqStatusSource("current").then(value => {
+        if (value.data.namespace !== "null") {
+            current.value = `Currently remapping ${value.data.namespace} ${value.data.version}`
+        } else {
+            current.value = null
         }
-    },
-    computed: {
-        filteredData() {
-            return Object.entries(this.data).filter(([version, cache]) => this.snapshots || cache.stable)
-        },
-        ...mapState(useMappingsDataStore, ["mappingsData"]),
-    },
-    watch: {
-        namespace(newValue, oldValue) {
-            reqStatusSource("current").then(value => {
-                if (value.data.namespace !== "null") {
-                    this.current = `Currently remapping ${value.data.namespace} ${value.data.version}`
+    })
+    reqStatusSource(newValue ?? "next").then(value => {
+        if (namespace.value === newValue) {
+            next.value = null
+            nextList.value = []
+            if (!newValue) {
+                data.value = {}
+                let nextJson = value.data.next
+                if (nextJson.namespace !== "null") {
+                    next.value = `Next in line for remapper daemon is ${nextJson.namespace} ${nextJson.version}`
                 } else {
-                    this.current = null
+                    next.value = "No namespaces in queue"
                 }
-            })
-            reqStatusSource(newValue ?? "next").then(value => {
-                if (this.namespace === newValue) {
-                    this.next = null
-                    this.nextList = []
-                    if (!newValue) {
-                        this.data = {}
-                        let nextJson = value.data.next
-                        if (nextJson.namespace !== "null") {
-                            this.next = `Next in line for remapper daemon is ${nextJson.namespace} ${nextJson.version}`
-                        } else {
-                            this.next = "No namespaces in queue"
-                        }
-                        this.nextList = value.data.list.map((obj: {
-                            namespace: string,
-                            version: string
-                        }) => `${obj.namespace} ${obj.version}`)
-                    } else {
-                        this.data = value.data as unknown as { [version: string]: Cache }
-                    }
-                }
-            })
-        },
-    },
-    mounted() {
-        updateMappingsData(fullPath())
-        ensureMappingsData(fullPath())
-    },
+                nextList.value = value.data.list.map((obj: {
+                    namespace: string,
+                    version: string
+                }) => `${obj.namespace} ${obj.version}`)
+            } else {
+                data.value = value.data as unknown as { [version: string]: Cache }
+            }
+        }
+    })
+})
+
+onMounted(() => {
+    updateMappingsData(fullPath(route))
+    ensureMappingsData(fullPath(route))
 })
 </script>
 

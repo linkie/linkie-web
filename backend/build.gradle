@@ -31,6 +31,7 @@ dependencies {
     implementation("me.shedaniel:linkie-core:1.0.121")
     implementation("io.ktor:ktor-server-cors:2.2.3")
     implementation("io.ktor:ktor-server-content-negotiation:2.2.3")
+    implementation("io.ktor:ktor-server-compression:2.2.3")
     implementation("io.ktor:ktor-server-status-pages:2.2.3")
     implementation("io.ktor:ktor-client-content-negotiation:2.2.3")
     implementation("io.ktor:ktor-serialization-kotlinx-json:2.2.3")

@@ -11,17 +11,11 @@
     </div>
 </template>
 
-<script lang="ts">
-import {defineComponent} from "vue"
-
-export default defineComponent({
-    name: "Tooltip",
-    props: {
-        placement: {
-            type: String,
-            default: "right",
-        },
-    }
+<script setup lang="ts">
+withDefaults(defineProps<{
+    placement?: string
+}>(), {
+    placement: "right",
 })
 </script>
 

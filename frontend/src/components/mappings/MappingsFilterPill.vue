@@ -9,25 +9,13 @@
     </a>
 </template>
 
-<script lang="ts">
-import {defineComponent} from "vue"
+<script setup lang="ts">
 import {IconFilter, IconFilterOff} from "@tabler/icons-vue"
 
-export default defineComponent({
-    name: "MappingsFilterPill",
-    components: {
-        IconFilter,
-        IconFilterOff,
-    },
-    props: {
-        enabled: {
-            type: Boolean,
-        },
-        text: {
-            type: String,
-        },
-    },
-})
+defineProps<{
+    enabled: boolean,
+    text: string,
+}>()
 </script>
 
 <style scoped>

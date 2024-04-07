@@ -52,68 +52,58 @@
     <LoadingSection v-else class="h-[calc(100vh-56px-24px-5rem)]"/>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import DependencyFilterBlock from "../components/dependencies/DependencyFilterBlock.vue"
 import CodeBlock from "../components/dependencies/CodeBlock.vue"
 import SubHeader from "../components/dependencies/SubHeader.vue"
 import {formatDependency, formatMaven} from "../app/dep-format"
 import Block from "../components/Block.vue"
-import {defineComponent} from "vue"
+import {computed, onMounted, watch} from "vue"
 import {useDependencySearchStore} from "../app/dependency-store"
-import {mapState} from "pinia"
-import {DependencyBlockData, ensureDependencyData, updateDependencyData, useDependenciesDataStore} from "../app/dependencies-data"
+import {storeToRefs} from "pinia"
+import {ensureDependencyData, updateDependencyData, useDependenciesDataStore} from "../app/dependencies-data"
 import Copyable from "../components/Copyable.vue"
-import Header from "../components/dependencies/Header.vue"
 import PageWidthLimiter from "../components/PageWidthLimiter.vue"
 import PageSidebar from "../components/PageSidebar.vue"
 import PageContent from "../components/PageContent.vue"
 import LoadingSection from "../components/LoadingSection.vue"
 import {fullPath} from "../app/backend"
+import {useRoute} from "vue-router"
 
-export default defineComponent({
-    name: "Dependencies",
-    components: {LoadingSection, PageContent, PageSidebar, PageWidthLimiter, Header, Copyable, Block, CodeBlock, DependencyFilterBlock, SubHeader},
-    data() {
-        return {
-            formatMaven,
-            formatDependency,
-        }
-    },
-    computed: {
-        dependencyBlocks(): [string, DependencyBlockData][] {
-            let {loader, version} = useDependencySearchStore()
-            let {searchData} = useDependenciesDataStore()
-            return Object.entries(searchData.versions[loader ?? ""]
-                    ?.find(entry => entry.version === version)
-                    ?.blocks ?? {})
-        },
-        ...mapState(useDependenciesDataStore, ["searchData"]),
-        ...mapState(useDependencySearchStore, ["loader", "version", "allowSnapshots"]),
-    },
-    watch: {
-        loader: {
-            handler() {
-                updateDependencyData(fullPath())
-                ensureDependencyData(fullPath())
-            },
-            immediate: true,
-        },
-        version: {
-            handler() {
-                ensureDependencyData(fullPath())
-            },
-            immediate: true,
-        },
-        allowSnapshots: {
-            handler() {
-                ensureDependencyData(fullPath())
-            },
-            immediate: true,
-        },
-    },
-    mounted() {
-        updateDependencyData(fullPath(), this.$route.query)
-    },
+const { searchData } = storeToRefs(useDependenciesDataStore())
+const { loader, version, allowSnapshots } = storeToRefs(useDependencySearchStore())
+
+const route = useRoute()
+
+const dependencyBlocks = computed(() => {
+    let {loader, version} = useDependencySearchStore()
+    let {searchData} = useDependenciesDataStore()
+    return Object.entries(searchData.versions[loader ?? ""]
+    ?.find(entry => entry.version === version)
+        ?.blocks ?? {})
+})
+
+watch(loader, () => {
+    updateDependencyData(fullPath(route))
+    ensureDependencyData(fullPath(route))
+}, {
+    immediate: true,
+})
+
+watch(version, () => {
+    ensureDependencyData(fullPath(route))
+}, {
+    immediate: true,
+})
+
+watch(allowSnapshots, () => {
+    ensureDependencyData(fullPath(route))
+}, {
+    immediate: true,
+})
+
+onMounted(() => {
+    updateDependencyData(fullPath(route), useRoute().query)
 })
 </script>
 

@@ -51,22 +51,14 @@
     </div>
 </template>
 
-<script lang="ts">
-import {defineComponent} from "vue"
-import Block from "../components/Block.vue"
+<script setup lang="ts">
 import HomeDependencies from "../components/home/HomeDependencies.vue"
 import HomeMappings from "../components/home/HomeMappings.vue"
 import Header from "../components/dependencies/Header.vue"
 import SubHeader from "../components/dependencies/SubHeader.vue"
-import Navbar from "../components/Navbar.vue"
 import PageContent from "../components/PageContent.vue"
 import PageWidthLimiter from "../components/PageWidthLimiter.vue"
 import NewsProjectGenerator from "../components/NewsProjectGenerator.vue"
-
-export default defineComponent({
-    name: "NotFound",
-    components: {NewsProjectGenerator, PageWidthLimiter, PageContent, Navbar, SubHeader, Header, Block, HomeDependencies, HomeMappings},
-})
 </script>
 
 <style scoped>

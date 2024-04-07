@@ -28,8 +28,8 @@
     </NavbarButton>
 </template>
 
-<script lang="ts">
-import {defineComponent} from "vue"
+<script setup lang="ts">
+import {ref} from "vue"
 import NavbarButton from "./NavbarButton.vue"
 
 export interface DropdownOption {
@@ -38,21 +38,11 @@ export interface DropdownOption {
     onClick: () => void,
 }
 
-export default defineComponent({
-    name: "NavbarDropdown",
-    components: {NavbarButton},
-    data() {
-        return {
-            dropdownVisible: false,
-        }
-    },
-    props: {
-        options: {
-            type: Array as () => DropdownOption[],
-            required: true,
-        },
-    },
-})
+defineProps<{
+    options: DropdownOption[],
+}>()
+
+const dropdownVisible = ref(false)
 </script>
 
 <style scoped>

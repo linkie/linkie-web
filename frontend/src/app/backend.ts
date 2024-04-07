@@ -1,6 +1,6 @@
 import axios, {AxiosResponse} from "axios"
 import {isTauri} from "./tauri/tauri"
-import {LocationQuery, useRoute} from "vue-router"
+import {LocationQuery, RouteLocationNormalizedLoaded, useRoute} from "vue-router"
 
 export const backendServer = "https://linkieapi.shedaniel.me"
 export const localBackendServer = "http://localhost:6969"
@@ -57,8 +57,8 @@ export function reqStatusSource<T = any>(namespace: string): Promise<AxiosRespon
     return HTTP.get(`/api/status/sources/${namespace}`)
 }
 
-export function fullPath() {
-    let route = useRoute()
+export function fullPath(route: RouteLocationNormalizedLoaded | undefined = undefined) {
+    if (!route) route = useRoute()
     if (!route) return undefined
     return new URL(route.fullPath, window.location.origin).href
 }

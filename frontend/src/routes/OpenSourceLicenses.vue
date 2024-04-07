@@ -52,16 +52,15 @@
     </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import {reqOss} from "../app/backend"
 import Block from "../components/Block.vue"
 import SubHeader from "../components/dependencies/SubHeader.vue"
-import {defineComponent} from "vue"
+import {onMounted, ref} from "vue"
 import {addAlert} from "../app/alerts"
 import PageWidthLimiter from "../components/PageWidthLimiter.vue"
 import PageSidebar from "../components/PageSidebar.vue"
 import PageContent from "../components/PageContent.vue"
-import Header from "../components/dependencies/Header.vue"
 
 interface OssEntry {
     name: string,
@@ -69,24 +68,17 @@ interface OssEntry {
     license: string,
 }
 
-export default defineComponent({
-    name: "OpenSourceLicenses",
-    components: {Header, PageContent, PageSidebar, PageWidthLimiter, SubHeader, Block},
-    data() {
-        return {
-            entries: [] as OssEntry[],
-        }
-    },
-    mounted() {
-        reqOss().then(value => {
-            this.entries = value.data
-        }).catch(reason => {
-            addAlert({
-                type: "error",
-                message: `Failed to fetch entries: ${reason.message}`,
-            })
+const entries = ref<OssEntry[]>([])
+
+onMounted(() => {
+    reqOss().then(value => {
+        entries.value = value.data
+    }).catch(reason => {
+        addAlert({
+            type: "error",
+            message: `Failed to fetch entries: ${reason.message}`,
         })
-    },
+    })
 })
 </script>
 

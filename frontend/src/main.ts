@@ -54,8 +54,10 @@ HTTP.interceptors.response.use(response => {
 })
 
 const i18n = createI18n({
+    legacy: false,
     locale: "en_US",
     fallbackLocale: "en_US",
+    allowComposition: true,
     messages: {
         "en_US": enUS,
         "en_GB": enGB,

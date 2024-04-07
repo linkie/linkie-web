@@ -45,31 +45,16 @@
     </div>
 </template>
 
-<script lang="ts">
-import {defineComponent} from "vue"
-import {Alert, useAlertsStore} from "../app/alerts-store"
-import {mapActions, mapState} from "pinia"
+<script setup lang="ts">
+import {useAlertsStore} from "../app/alerts-store"
+import {storeToRefs} from "pinia"
 import {useNotificationStore} from "../app/notification-store"
 
-export default defineComponent({
-    name: "Alerts",
-    data() {
-        return {
-            timer: undefined as any,
-        }
-    },
-    computed: {
-        ...mapState(useAlertsStore, ["alerts"]),
-        ...mapState(useNotificationStore, ["notifications"]),
-    },
-    methods: {
-        getAlertFor(type: string): Alert[] {
-            return this.alerts.filter((alert: Alert) => alert.type === type)
-        },
-        ...mapActions(useAlertsStore, ["removeAlert"]),
-        ...mapActions(useNotificationStore, ["removeNotification"]),
-    },
-})
+const { alerts } = storeToRefs(useAlertsStore())
+const { notifications } = storeToRefs(useNotificationStore())
+
+const { removeAlert } = useAlertsStore()
+const { removeNotification } = useNotificationStore()
 </script>
 
 <style>

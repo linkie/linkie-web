@@ -27,17 +27,11 @@
     </div>
 </template>
 
-<script lang="ts">
-
-import {defineComponent} from "vue"
-
-export default defineComponent({
-    name: "MappingsSearchPlaceholder",
-    props: {
-        searching: Boolean,
-        hasQuery: Boolean,
-    },
-})
+<script setup lang="ts">
+defineProps<{
+    searching: boolean,
+    hasQuery: boolean,
+}>()
 </script>
 
 <style scoped>

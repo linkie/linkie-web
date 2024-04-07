@@ -5,28 +5,14 @@
     </div>
 </template>
 
-<script lang="ts">
-import {defineComponent} from "vue"
+<script setup lang="ts">
 import {copyAs} from "../app/copy"
 import CopyableIcon from "./CopyableIcon.vue"
 
-export default defineComponent({
-    name: "Copyable",
-    components: {CopyableIcon},
-    data() {
-        return {
-            copyAs,
-        }
-    },
-    props: {
-        copy: {
-            type: String,
-        },
-        strokeWidth: {
-            type: String,
-        },
-    },
-})
+defineProps<{
+    copy?: string,
+    strokeWidth?: string,
+}>()
 </script>
 
 <style scoped>

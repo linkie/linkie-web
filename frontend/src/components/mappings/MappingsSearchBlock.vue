@@ -17,38 +17,24 @@
     </div>
 </template>
 
-<script lang="ts">
-import {defineComponent} from "vue"
-import {mapState, mapWritableState} from "pinia"
+<script setup lang="ts">
+import {ref} from "vue"
+import {storeToRefs} from "pinia"
 import {useMappingsStore} from "../../app/mappings-store"
 import MappingsFilterPill from "./MappingsFilterPill.vue"
 import {IconSearch} from "@tabler/icons-vue"
 
-export default defineComponent({
-    name: "MappingsSearchBlock",
-    data() {
-        return {
-            timer: undefined as any,
-        }
-    },
-    components: {
-        MappingsFilterPill,
-        IconSearch,
-    },
-    computed: {
-        ...mapWritableState(useMappingsStore, ["allowClasses", "allowFields", "allowMethods"]),
-        ...mapState(useMappingsStore, ["searchText"]),
-    },
-    methods: {
-        searchTimeOut(event: any) {
-            clearTimeout(this.timer)
+const timer = ref<ReturnType<typeof setTimeout> | undefined>(undefined)
 
-            this.timer = setTimeout(() => {
-                useMappingsStore().searchText = (event.target as any)?.value?.replaceAll(" ", "")
-            }, 100)
-        },
-    },
-})
+const { searchText, allowClasses, allowFields, allowMethods } = storeToRefs(useMappingsStore())
+
+function searchTimeOut(event: KeyboardEvent) {
+    clearTimeout(timer.value)
+
+    timer.value = setTimeout(() => {
+        useMappingsStore().searchText = (event.target as any)?.value?.replaceAll(" ", "")
+    }, 100)
+}
 </script>
 
 <style scoped>

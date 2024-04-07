@@ -32,39 +32,19 @@
     </div>
 </template>
 
-<script lang="ts">
-import {defineComponent, PropType} from "vue"
+<script setup lang="ts">
 import Tooltip from "../Tooltip.vue"
 import AutoBold from "./AutoBold.vue"
 import {MappingEntry} from "../../app/mappings-data"
 import {IconAlertCircle, IconAlertCircleFilled, IconAlertTriangle, IconAlertTriangleFilled} from "@tabler/icons-vue"
 
-export default defineComponent({
-    name: "MappingsMethodLine",
-    components: {AutoBold, Tooltip, IconAlertTriangle, IconAlertTriangleFilled, IconAlertCircle, IconAlertCircleFilled},
-    props: {
-        entry: {
-            type: Object as PropType<MappingEntry>,
-            required: true,
-        },
-        methodReturnType: {
-            type: Function as PropType<(entry: MappingEntry) => string>,
-            required: true,
-        },
-        methodArgs: {
-            type: Function as PropType<(entry: MappingEntry) => string>,
-            required: true,
-        },
-        getOptimumName: {
-            type: Function as PropType<(entry: MappingEntry) => string>,
-            required: true,
-        },
-        onlyClass: {
-            type: Function as PropType<(name: string) => string>,
-            required: true,
-        },
-    },
-})
+defineProps<{
+    entry: MappingEntry,
+    methodReturnType: (entry: MappingEntry) => string,
+    methodArgs: (entry: MappingEntry) => string,
+    getOptimumName: (entry: MappingEntry) => string,
+    onlyClass: (name: string) => string,
+}>()
 </script>
 
 <style scoped>

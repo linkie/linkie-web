@@ -82,74 +82,65 @@
     </div>
 </template>
 
-<script lang="ts">
-import {defineComponent} from "vue"
-import NavbarButton from "./navbar/NavbarButton.vue"
-import {mapWritableState} from "pinia"
-import {useI18nStore} from "../app/i18n-store"
-import NavbarDropdown, {DropdownOption} from "./navbar/NavbarDropdown.vue"
+<script setup lang="ts">
+import {computed, onMounted, ref} from "vue"
 import {ExportedGlobalComposer, VueI18n} from "vue-i18n"
+import {useI18nStore} from "../app/i18n-store"
+import {storeToRefs} from "pinia"
+import NavbarDropdown, {DropdownOption} from "./navbar/NavbarDropdown.vue"
 import {IconExternalLink, IconLanguageHiragana, IconMoon, IconMoonOff} from "@tabler/icons-vue"
+import NavbarButton from "./navbar/NavbarButton.vue"
 
-export default defineComponent({
-    name: "Navbar",
-    components: {NavbarDropdown, NavbarButton, IconLanguageHiragana, IconMoon, IconMoonOff, IconExternalLink},
-    data() {
-        return {
-            componentKey: 0,
-            addDropShadow: false,
+const componentKey = ref(0)
+const addDropShadow = ref(false)
+
+onMounted(() => {
+    document.addEventListener("scroll", () => {
+        let element = document.getElementById("welcome-banner")
+        if (element) {
+            let navbar = document.getElementById("nav-bar")
+            addDropShadow.value = window.scrollY > element.clientHeight - (navbar?.clientHeight ?? 0)
+        } else {
+            addDropShadow.value = window.scrollY > 0
         }
-    },
-    computed: {
-        ...mapWritableState(useI18nStore, ["locale"]),
-    },
-    methods: {
-        localeOptions(i18n: VueI18n | ExportedGlobalComposer): DropdownOption[] {
-            function createLocale(id: string, name: string): DropdownOption {
-                return {
-                    id, name, onClick() {
-                        useI18nStore().locale = id
-                        i18n.locale = id
-                    },
-                }
-            }
-
-            return [
-                createLocale("en_US", "English (US)"),
-                createLocale("en_GB", "English (UK)"),
-                createLocale("zh_CN", "中文 (中国)"),
-                createLocale("zh_TW", "中文 (台灣)"),
-            ]
-        },
-        darkMode(): boolean {
-            return localStorage.getItem("theme") === "dark"
-        },
-        setDarkMode(darkMode: boolean) {
-            localStorage.setItem("theme", darkMode ? "dark" : "cupcake")
-            if (localStorage.getItem("theme") === "dark") {
-                document.documentElement.setAttribute("data-theme", "dark")
-                document.documentElement.classList.add("dark")
-                document.documentElement.style.setProperty("--color-scheme", "dark")
-            } else {
-                document.documentElement.removeAttribute("data-theme")
-                document.documentElement.classList.remove("dark")
-                document.documentElement.style.setProperty("--color-scheme", "light")
-            }
-            this.componentKey++
-        },
-    },
-    mounted() {
-        document.addEventListener("scroll", () => {
-            let element = document.getElementById("welcome-banner")
-            if (element) {
-                let navbar = document.getElementById("nav-bar")
-                this.addDropShadow = window.scrollY > element.clientHeight - (navbar?.clientHeight ?? 0)
-            } else {
-                this.addDropShadow = window.scrollY > 0
-            }
-        })
-    },
+    })
 })
+
+function darkMode(): boolean {
+    return localStorage.getItem("theme") === "dark"
+}
+
+function localeOptions(i18n: VueI18n | ExportedGlobalComposer): DropdownOption[] {
+    function createLocale(id: string, name: string): DropdownOption {
+        return {
+            id, name, onClick() {
+                useI18nStore().locale = id
+                i18n.locale = id
+            },
+        }
+    }
+
+    return [
+        createLocale("en_US", "English (US)"),
+        createLocale("en_GB", "English (UK)"),
+        createLocale("zh_CN", "中文 (中国)"),
+        createLocale("zh_TW", "中文 (台灣)"),
+    ]
+}
+
+function setDarkMode(darkMode: boolean) {
+    localStorage.setItem("theme", darkMode ? "dark" : "cupcake")
+    if (localStorage.getItem("theme") === "dark") {
+        document.documentElement.setAttribute("data-theme", "dark")
+        document.documentElement.classList.add("dark")
+        document.documentElement.style.setProperty("--color-scheme", "dark")
+    } else {
+        document.documentElement.removeAttribute("data-theme")
+        document.documentElement.classList.remove("dark")
+        document.documentElement.style.setProperty("--color-scheme", "light")
+    }
+    componentKey.value++
+}
 </script>
 
 <style scoped>

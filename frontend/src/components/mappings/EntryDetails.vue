@@ -8,19 +8,12 @@
     </div>
 </template>
 
-<script lang="ts">
-
-import {defineComponent} from "vue"
-
-export default defineComponent({
-    name: "EntryDetails",
-    props: {
-        title: String,
-        code: {
-            type: Boolean,
-            default: () => true,
-        },
-    },
+<script setup lang="ts">
+withDefaults(defineProps<{
+    title?: string,
+    code: boolean
+}>(), {
+    code: true,
 })
 </script>
 
