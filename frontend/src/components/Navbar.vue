@@ -132,7 +132,7 @@ function localeOptions(i18n: VueI18n | ExportedGlobalComposer): DropdownOption[]
         createLocale("en_GB", "English (UK)"),
         createLocale("zh_CN", "中文 (中国)"),
         createLocale("zh_TW", "中文 (台灣)"),
-        createLocale("ru_RU", "Russian (RU)"),
+        createLocale("ru_RU", "Русский")
     ]
 }
 
