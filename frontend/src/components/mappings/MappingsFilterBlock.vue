@@ -5,20 +5,19 @@
             <IconBrandCodepen :size="20"/>
         </SubHeader>
 
-        <div class="pt-2 pb-2.5 flex gap-3">
-            <button v-for="item in ['mappings', 'stacktrace']"
-                    :aria-selected="(mode ?? 'mappings') === item" @click="selectMode(item)" @mouseenter="modeHover = true" @mouseleave="modeHover = false"
-                    class="selection-button py-2 px-3 flex items-center text-left rounded-lg bg-base-500 dark:bg-base-dark-200 bg-opacity-60 hover:bg-opacity-100
-                dark:hover:bg-base-dark-400 dark:focus:bg-base-dark-400 transition-all duration-150 border-none select-none group overflow-clip flex-shrink-0">
-                <IconTriangles class="flex-shrink-0" :size="20" v-if="item === 'mappings'"/>
-                <IconFileSad class="flex-shrink-0" :size="20" v-else/>
-                <span :aria-expanded="!modeHover && (mode ?? 'mappings') === item"
-                      class="group-hover:opacity-100 group-hover:w-fit group-hover:pl-2 aria-expanded:opacity-100 aria-expanded:w-fit aria-expanded:pl-2 w-0 pl-0 transition-all duration-150 opacity-[-100]">
+      <div class="pt-2 pb-2.5 flex gap-3">
+        <button v-for="item in ['mappings', 'stacktrace']"
+                :aria-selected="(mode ?? 'mappings') === item" @click="selectMode(item)" @mouseenter="modeHover = true" @mouseleave="modeHover = false"
+                class="selection-button py-2 px-3 flex items-center text-left rounded-lg bg-base-500 dark:bg-base-dark-200 bg-opacity-60 hover:bg-opacity-100 dark:hover:bg-base-dark-400 dark:focus:bg-base-dark-400 transition-all duration-150 border-none select-none group overflow-clip flex-shrink-0">
+          <IconTriangles class="flex-shrink-0" :size="20" v-if="item === 'mappings'"/>
+          <IconFileSad class="flex-shrink-0" :size="20" v-else/>
+          <span :aria-expanded="!modeHover && (mode ?? 'mappings') === item"
+                class="group-hover:opacity-100 group-hover:w-fit group-hover:pl-2 aria-expanded:opacity-100 aria-expanded:w-fit aria-expanded:pl-2 w-0 pl-0 transition-all duration-150 opacity-[-100] text-ellipsis whitespace-nowrap overflow-hidden">
                     {{ $t(`mappings.mode.${item}`) }}</span>
-            </button>
-        </div>
+        </button>
+      </div>
 
-        <div class="divider mt-0 mb-0 pb-0.5"/>
+      <div class="divider mt-0 mb-0 pb-0.5"/>
 
         <SubHeader class="mt-[-.25rem] mb-1 flex items-center gap-1.5">
             {{ $t("mappings.namespace") }}
