@@ -17,6 +17,7 @@ import enUS from "./locales/en_US.json"
 import enGB from "./locales/en_GB.json"
 // @ts-ignore
 import zhCN from "./locales/zh_CN.json"
+import ruRU from "./locales/ru_RU.json"
 // @ts-ignore
 import zhTW from "./locales/zh_TW.json"
 import {isTauri} from "./app/tauri/tauri"
@@ -63,6 +64,7 @@ const i18n = createI18n({
         "en_GB": enGB,
         "zh_CN": zhCN,
         "zh_TW": zhTW,
+        "ru_RU": ruRU,
     },
 })
 
