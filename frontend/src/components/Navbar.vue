@@ -68,6 +68,13 @@
                       <path fill="#EEE" d="M32 5H4a4 4 0 0 0-4 4v4h36V9a4 4 0 0 0-4-4z"></path>
                     </svg>
                   </template>
+                  <template v-slot:option-de_DE>
+                    <svg viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" preserveAspectRatio="xMidYMid meet">
+                      <path fill="#FC0" d="M36 27a4 4 0 0 1-4 4H4a4 4 0 0 1-4-4v-4h36v4z"></path>
+                      <path fill="red" d="M0 13h36v10H0z"></path>
+                      <path fill="#000001" d="M32 5H4a4 4 0 0 0-4 4v4h36V9a4 4 0 0 0-4-4z"></path>
+                    </svg>
+                  </template>
                     <template v-slot:option-new-group>
                         <a href="https://github.com/linkie/linkie-web/tree/master/frontend/src/locales"
                            class="cursor-pointer px-4 py-2 hover:bg-base-300 dark:hover:bg-base-dark-400 transition-colors flex gap-2 items-center">
@@ -132,7 +139,8 @@ function localeOptions(i18n: VueI18n | ExportedGlobalComposer): DropdownOption[]
         createLocale("en_GB", "English (UK)"),
         createLocale("zh_CN", "中文 (中国)"),
         createLocale("zh_TW", "中文 (台灣)"),
-        createLocale("ru_RU", "Русский")
+        createLocale("ru_RU", "Русский"),
+        createLocale("de_DE", "Deutsch (DE)")
     ]
 }
 
