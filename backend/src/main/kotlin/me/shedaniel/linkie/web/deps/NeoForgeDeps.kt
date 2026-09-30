@@ -4,15 +4,13 @@ import io.ktor.client.call.*
 import io.ktor.client.call.body
 import io.ktor.client.request.*
 import me.shedaniel.linkie.utils.Version
-import me.shedaniel.linkie.utils.toVersion
-import me.shedaniel.linkie.utils.tryToVersion
 import me.shedaniel.linkie.web.httpClient
 import org.dom4j.io.SAXReader
 
 object NeoForgeDeps : Deps("NeoForge") {
     override suspend fun provideData(): Map<VersionIdentifier, Data> {
         val dependencies = mutableMapOf<VersionIdentifier, MutableList<Dependency>>()
-        val pom = httpClient.get("https://maven.neoforged.net/net/neoforged/neoforge/maven-metadata.xml").body<String>()
+        val pom = httpClient.get("https://maven.neoforged.net/releases/net/neoforged/neoforge/maven-metadata.xml").body<String>()
         SAXReader().read(pom.byteInputStream()).rootElement
             .element("versioning")
             .element("versions")
@@ -24,16 +22,14 @@ object NeoForgeDeps : Deps("NeoForge") {
                 if (a == null) return@Comparator -1
                 if (b == null) return@Comparator 1
 
-                var c = a.major.compareTo(b.major)
-                if (c != 0) return@Comparator c
-                c = a.minor.compareTo(b.minor)
-                if (c != 0) return@Comparator c
-                return@Comparator a.patch.compareTo(b.patch)
-            }, String::tryToVersion))
+                a.zip(b).forEach { (x, y) ->
+                    if (x != y) return@Comparator x.compareTo(y)
+                }
+                return@Comparator a.size.compareTo(b.size)
+            }, ::getVersionParts))
             .distinctBy { getMinecraftVersion(it) }
             .forEach {
-                val mcVersion = getMinecraftVersion(it)
-                val mcVersionSemVer = mcVersion.tryToVersion() ?: return@forEach
+                val mcVersion = getMinecraftVersion(it) ?: return@forEach
                 val neoforgeVersion = it
                 val versionIdentifier = VersionIdentifier(
                     loader = "neoforge",
@@ -54,8 +50,17 @@ object NeoForgeDeps : Deps("NeoForge") {
         }
     }
 
-    private fun getMinecraftVersion(it: String): String {
-        val (major, minor, patch, snapshot) = it.toVersion()
-        return Version(1, major, minor, null).toString();
+    private fun getVersionParts(it: String): List<Int>? {
+        if (it.contains('+') || it.contains("alpha")) return null
+        return it.substringBefore('-').split('.').map { part -> part.toIntOrNull() ?: return null }
+    }
+
+    private fun getMinecraftVersion(it: String): String? {
+        val parts = getVersionParts(it) ?: return null
+        return when {
+            parts.size == 3 && parts[0] >= 20 -> Version(1, parts[0], parts[1], null).toString()
+            parts.size == 4 && parts[0] >= 26 -> Version(parts[0], parts[1], parts[2], null).toString()
+            else -> null
+        }
     }
 }
