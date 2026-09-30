@@ -28,7 +28,7 @@ val allDeps = listOf(
     FabricDeps,
     ForgeDeps,
     NeoForgeDeps,
-    LegacyFabricDeps,
+    //LegacyFabricDeps,
     CFDeps(
         "Architectury API", 419699,
         loaders = { _, _ -> listOf("fabric", "forge", "neoforge") },
