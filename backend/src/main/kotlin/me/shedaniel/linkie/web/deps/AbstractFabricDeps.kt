@@ -29,15 +29,15 @@ abstract class AbstractFabricDeps(
         meta["game"]!!.jsonArray.asSequence().map(JsonElement::jsonObject).forEach { obj ->
             val version = obj["version"]!!.jsonPrimitive.content
             val release = version.tryToVersion().let { it != null && it.snapshot == null }
-            val mappingsObj = mappings.firstOrNull { it.jsonObject["gameVersion"]!!.jsonPrimitive.content == version }?.jsonObject ?: return@forEach
-            val yarnVersion = mappingsObj["version"]!!.jsonPrimitive.content
+            val mappingsObj = mappings.firstOrNull { it.jsonObject["gameVersion"]!!.jsonPrimitive.content == version }?.jsonObject
+            val yarnVersion = mappingsObj?.get("version")?.jsonPrimitive?.content
             val versionIdentifier = VersionIdentifier(
                 loader = loader,
                 version = version,
                 stable = release,
             )
             dependencies.getOrPut(versionIdentifier, ::mutableListOf).apply {
-                add(Dependency(mappingsName, DependencyType.Mappings, "$mappingsGroup:$yarnVersion:v2", yarnVersion))
+                if (yarnVersion != null) add(Dependency(mappingsName, DependencyType.Mappings, "$mappingsGroup:$yarnVersion:v2", yarnVersion))
                 add(Dependency("Fabric Loader", DependencyType.Implementation, "net.fabricmc:fabric-loader:$loaderVersion", loaderVersion))
             }
         }
